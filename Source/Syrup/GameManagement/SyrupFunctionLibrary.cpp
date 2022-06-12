@@ -12,11 +12,13 @@
 /**
  * Gets the syrup player character
  * 
+ * @param WorldContextObject - The world context object
+ * 
  * @return The syrup player character
  */
-ASyrupPlayerCharacter* USyrupFunctionLibrary::GetSyrupPlayerCharacter()
+ASyrupPlayerCharacter* USyrupFunctionLibrary::GetSyrupPlayerCharacter(const UObject* WorldContextObject)
 {
-	return Cast<ASyrupPlayerCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+	return Cast<ASyrupPlayerCharacter>(UGameplayStatics::GetPlayerCharacter(WorldContextObject, 0));
 }
 
 

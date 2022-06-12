@@ -20,13 +20,17 @@ class SYRUP_API USyrupFunctionLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
 
+public:
+
 	/**
 	 * Gets the syrup player character
 	 * 
+	 * @param WorldContextObject - The world context object
+	 * 
 	 * @return The syrup player character
 	 */
-	UFUNCTION(BlueprintPure)
-	ASyrupPlayerCharacter* GetSyrupPlayerCharacter();
+	UFUNCTION(BlueprintPure, meta = (WorldContext = "WorldContextObject"))
+	static ASyrupPlayerCharacter* GetSyrupPlayerCharacter(const UObject* WorldContextObject);
 
 };
 
