@@ -83,6 +83,20 @@ float APlant::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 /* /\ Health /\ *\
 \* ------------ */
 
+/* -------------- *\
+\* \/ Maturity \/ */
+
+/**
+ * Changes the plant into its mature state
+ */
+void APlant::Mature()
+{
+	bMature = true;
+}
+
+/* /\ Maturity /\ *\
+\* -------------- */
+
 /* /\ ====== /\ *\
 |  /\ APlant /\  |
 \* /\ ====== /\ */

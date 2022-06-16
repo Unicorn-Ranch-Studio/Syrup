@@ -79,6 +79,31 @@ private:
 
 	/* /\ Energy /\ *\
 	\* ------------ */
+
+	/* -------------- *\
+	\* \/ Maturity \/ */
+
+protected:
+
+	//The turns it takes for this plant to fully mature from when it was planted
+	UPROPERTY(EditDefaultsOnly, meta = (Category = "Maturity"))
+	int NumberOfTurnsToMature;
+
+private:
+
+	/**
+	 * Changes the plant into its mature state
+	 */
+	void Mature();
+
+	//The number of turns left until this plant is fully mature
+	int NumberOfTurnsUntilMaturity;
+
+	//Whether this plant is mature or not
+	bool bMature;
+
+	/* /\ Maturity /\ *\
+	\* -------------- */
 };
 
 /* /\ ====== /\ *\
