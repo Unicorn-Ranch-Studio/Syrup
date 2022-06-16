@@ -35,6 +35,40 @@ public:
 	/* /\ Initialization /\ *\
 	\* -------------------- */
 
+	/* ------------ *\
+	\* \/ Health \/ */
+
+protected:
+
+	//Stores the maximum/starting health of the plant
+	UPROPERTY(EditDefaultsOnly, meta = (Category = "Health"))
+	int MaxHealth;
+
+private:
+
+	/**
+	 * Kills this plant
+	 */
+	UFUNCTION()
+	void Die();
+
+	/**
+	 * Override of take damage to handle the damage taken
+	 *
+	 * @param DamageAmount - The amount of damage taken
+	 * @param DamageEvent - Struct containing more information about the damage taken
+	 * @param EventInstigator - Who caused the damage
+	 * @param DamageCauser - What caused the damage
+	 *
+	 * @return Not relavent
+	 */
+	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+
+	//Stores the current health of the plant
+	int Health;
+
+	/* /\ Health /\ *\
+	\* ------------ */
 };
 
 /* /\ ====== /\ *\
