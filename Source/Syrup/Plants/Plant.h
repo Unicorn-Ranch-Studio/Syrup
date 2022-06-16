@@ -104,6 +104,16 @@ private:
 
 	/* /\ Maturity /\ *\
 	\* -------------- */
+
+	/* ----------------------- *\
+	\* \/ Protection Radius \/ */
+
+	//The radius around the plant that no trash can spawn. Only active when the plant is mature.
+	UPROPERTY(EditDefaultsOnly, meta = (Category = "Protection Radius"))
+	float ProtectionRadius;
+
+	/* /\ Protection Radius /\ *\
+	\* ----------------------- */
 };
 
 /* /\ ====== /\ *\
