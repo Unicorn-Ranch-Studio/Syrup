@@ -69,6 +69,16 @@ private:
 
 	/* /\ Health /\ *\
 	\* ------------ */
+
+	/* ------------ *\
+	\* \/ Energy \/ */
+
+	//The energy cost of planting this plant
+	UPROPERTY(EditDefaultsOnly, meta = (Category = "Energy"))
+	int EnergyCostToPlant;
+
+	/* /\ Energy /\ *\
+	\* ------------ */
 };
 
 /* /\ ====== /\ *\
