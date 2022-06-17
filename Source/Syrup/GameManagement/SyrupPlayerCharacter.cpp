@@ -23,6 +23,7 @@ void ASyrupPlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	CurrentEnergy = MaximumEnergy;
 }
 
 // Called every frame
@@ -92,6 +93,16 @@ void ASyrupPlayerCharacter::MoveDirection(FVector Direction, float Scale)
 int ASyrupPlayerCharacter::GetCurrentEnergy()
 {
 	return CurrentEnergy;
+}
+
+/**
+ * Gets the maximum energy of the player
+ * 
+ * @return The maximum energy
+ */
+int ASyrupPlayerCharacter::GetMaximumEnergy()
+{
+	return MaximumEnergy;
 }
 
 /**

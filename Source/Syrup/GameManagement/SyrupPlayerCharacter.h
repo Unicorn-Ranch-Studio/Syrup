@@ -85,6 +85,14 @@ public:
 	UFUNCTION(BlueprintPure)
 	int GetCurrentEnergy();
 
+	/**
+	 * Gets the maximum energy of the player
+	 * 
+	 * @return The maximum energy
+	 */
+	UFUNCTION(BlueprintPure)
+	int GetMaximumEnergy();
+
 protected:
 
 	//The maximum/starting energy of the player
@@ -96,6 +104,9 @@ private:
 	//The current energy of the player
 	int CurrentEnergy;
 
+//temp public marker
+public:
+
 	/**
 	 * Attempts to use the given amount of energy. 
 	 * 
@@ -103,7 +114,7 @@ private:
 	 * 
 	 * @return Whether there was enough energy to use or not
 	 */
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	bool UseEnergy(int EnergyCost);
 
 	/* /\ Energy /\ *\
