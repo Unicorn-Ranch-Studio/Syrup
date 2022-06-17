@@ -72,6 +72,43 @@ private:
 	/* /\ General Movement /\ *\
 	\* ---------------------- */
 
+	/* ------------ *\
+	\* \/ Energy \/ */
+
+public:
+
+	/**
+	 * Gets the current energy of the player
+	 * 
+	 * @return The current energy
+	 */
+	UFUNCTION(BlueprintPure)
+	int GetCurrentEnergy();
+
+protected:
+
+	//The maximum/starting energy of the player
+	UPROPERTY(EditDefaultsOnly)
+	int MaximumEnergy;
+
+private:
+
+	//The current energy of the player
+	int CurrentEnergy;
+
+	/**
+	 * Attempts to use the given amount of energy. 
+	 * 
+	 * @param EnergyCost - The amount of energy used
+	 * 
+	 * @return Whether there was enough energy to use or not
+	 */
+	UFUNCTION()
+	bool UseEnergy(int EnergyCost);
+
+	/* /\ Energy /\ *\
+	\* ------------ */
+
 };
 
 /* /\ ===================== /\ *\

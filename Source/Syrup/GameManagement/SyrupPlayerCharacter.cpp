@@ -81,6 +81,40 @@ void ASyrupPlayerCharacter::MoveDirection(FVector Direction, float Scale)
 /* /\ General Movement /\ *\
 \* ---------------------- */
 
+/* ------------ *\
+\* \/ Energy \/ */
+
+/**
+ * Gets the current energy of the player
+ *
+ * @return The current energy
+ */
+int ASyrupPlayerCharacter::GetCurrentEnergy()
+{
+	return CurrentEnergy;
+}
+
+/**
+ * Attempts to use the given amount of energy.
+ *
+ * @param EnergyCost - The amount of energy used
+ *
+ * @return Whether there was enough energy to use or not
+ */
+bool ASyrupPlayerCharacter::UseEnergy(int EnergyCost)
+{
+	if (EnergyCost > CurrentEnergy)
+	{
+		return false;
+	}
+
+	CurrentEnergy -= EnergyCost;
+	return true;
+}
+
+/* /\ Energy /\ *\
+\* ------------ */
+
 /* /\ ===================== /\ *\
 |  /\ ASyrupPlayerCharacter /\  |
 \* /\ ===================== /\ */
