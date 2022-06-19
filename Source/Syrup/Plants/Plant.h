@@ -73,6 +73,16 @@ private:
 	/* ------------ *\
 	\* \/ Energy \/ */
 
+public:
+
+	/**
+	 * Gets the energy cost of planting this plant
+	 * 
+	 * @return The energy cost of planting this plant
+	 */
+	UFUNCTION(BlueprintPure)
+	int GetEnergyCostToPlant();
+
 	//The energy cost of planting this plant
 	UPROPERTY(EditDefaultsOnly, meta = (Category = "Energy"))
 	int EnergyCostToPlant;
@@ -107,6 +117,8 @@ private:
 
 	/* ----------------------- *\
 	\* \/ Protection Radius \/ */
+
+private:
 
 	//The radius around the plant that no trash can spawn. Only active when the plant is mature.
 	UPROPERTY(EditDefaultsOnly, meta = (Category = "Protection Radius"))

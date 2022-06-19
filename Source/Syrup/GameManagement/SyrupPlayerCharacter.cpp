@@ -2,6 +2,7 @@
 
 
 #include "SyrupPlayerCharacter.h"
+#include "Syrup/Plants/Plant.h"
 
 /* \/ ====================== \/ *\
 |  \/ ASyrupPlayerCharacter  \/  |
@@ -121,6 +122,19 @@ bool ASyrupPlayerCharacter::UseEnergy(int EnergyCost)
 
 	CurrentEnergy -= EnergyCost;
 	return true;
+}
+
+bool ASyrupPlayerCharacter::Plant(TSubclassOf<APlant> PlantClass, FVector Location)
+{
+	int EnergyCostToPlant = Cast<APlant>(PlantClass->ClassDefaultObject)->GetEnergyCostToPlant();
+
+	if (UseEnergy(EnergyCostToPlant))
+	{
+		GetWorld()->SpawnActor<APlant>(PlantClass, Location, FRotator(), FActorSpawnParameters());
+		return true;
+	}
+
+	return false;
 }
 
 /* /\ Energy /\ *\

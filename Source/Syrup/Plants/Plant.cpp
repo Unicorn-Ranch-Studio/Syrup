@@ -83,6 +83,22 @@ float APlant::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 /* /\ Health /\ *\
 \* ------------ */
 
+/* ------------ *\
+\* \/ Energy \/ */
+
+/**
+ * Gets the energy cost of planting this plant
+ *
+ * @return The energy cost of planting this plant
+ */
+int APlant::GetEnergyCostToPlant()
+{
+	return EnergyCostToPlant;
+}
+
+/* /\ Energy /\ *\
+\* ------------ */
+
 /* -------------- *\
 \* \/ Maturity \/ */
 

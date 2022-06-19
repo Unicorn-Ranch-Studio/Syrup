@@ -6,6 +6,8 @@
 #include "GameFramework/Character.h"
 #include "SyrupPlayerCharacter.generated.h"
 
+class APlant;
+
 /* \/ ====================== \/ *\
 |  \/ ASyrupPlayerCharacter  \/  |
 \* \/ ====================== \/ */
@@ -105,7 +107,7 @@ private:
 	int CurrentEnergy;
 
 //temp public marker
-public:
+//public:
 
 	/**
 	 * Attempts to use the given amount of energy. 
@@ -114,11 +116,30 @@ public:
 	 * 
 	 * @return Whether there was enough energy to use or not
 	 */
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION()
 	bool UseEnergy(int EnergyCost);
 
 	/* /\ Energy /\ *\
 	\* ------------ */
+
+	/* -------------- *\
+	\* \/ Planting \/ */
+
+private:
+
+//temp public marker
+public:
+
+	/**
+	 * Plants a plant, using the energy the plant requires to plant
+	 * 
+	 * @param PlantClass - The class of the plant to be planted
+	 * @param Location - The location to plant the plant
+	 * 
+	 * @return Whether the planting was sucessful or not
+	 */
+	UFUNCTION(BlueprintCallable)
+	bool Plant(TSubclassOf<APlant> PlantClass, FVector Location);
 
 };
 
