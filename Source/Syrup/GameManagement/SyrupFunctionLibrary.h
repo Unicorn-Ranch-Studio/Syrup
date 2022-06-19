@@ -13,7 +13,7 @@ class ASyrupPlayerCharacter;
 \* \/ ====================== \/ */
 
 /**
- * 
+ * A class that holds functions that can be accessed globally
  */
 UCLASS()
 class SYRUP_API USyrupFunctionLibrary : public UBlueprintFunctionLibrary

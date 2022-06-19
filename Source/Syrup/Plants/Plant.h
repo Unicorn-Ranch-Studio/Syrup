@@ -11,6 +11,9 @@
 |  \/ APlant  \/  |
 \* \/ ======= \/ */
 
+/**
+ * The base class for the plants
+ */
 UCLASS()
 class SYRUP_API APlant : public AActor
 {
