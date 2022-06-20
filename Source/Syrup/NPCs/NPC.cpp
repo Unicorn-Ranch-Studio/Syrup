@@ -3,6 +3,9 @@
 
 #include "NPC.h"
 
+/* -------------------- *\
+\* \/ Initialization \/ */
+
 // Sets default values
 ANPC::ANPC()
 {
@@ -25,3 +28,19 @@ void ANPC::Tick(float DeltaTime)
 
 }
 
+/* /\ Initialization /\ *\
+\* -------------------- */
+
+/* ----------------- *\
+\* \/ Interaction \/ */
+
+/**
+ * Interact override to handle interaction with NPCs
+ */
+void ANPC::Interact()
+{
+	UE_LOG(LogTemp, Warning, TEXT("i was interacted with???"))
+}
+
+/* /\ Interaction /\ *\
+\* ----------------- */

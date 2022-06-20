@@ -4,17 +4,18 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Syrup/GameManagement/InteractInterface.h"
 #include "NPC.generated.h"
 
 /* \/ ==== \/ *\
-|  \/ ANPC  \/  |
+|  \/ ANPC \/  |
 \* \/ ==== \/ */
 
 /**
  * The base class for the NPCs
  */
 UCLASS()
-class SYRUP_API ANPC : public AActor
+class SYRUP_API ANPC : public AActor, public IInteractInterface
 {
 	GENERATED_BODY()
 	
@@ -36,17 +37,23 @@ public:
 	/* /\ Initialization /\ *\
 	\* -------------------- */
 
-	/* -------------- *\
-	\* \/ Dialogue \/ */
+	/* ----------------- *\
+	\* \/ Interaction \/ */
 
 public:
+
+	/**
+	 * Interact override to handle interaction with NPCs
+	 */
+	virtual void Interact() override;
 
 	//Temporary variable for interaction testing
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FString Dialogue;
 
-	/* /\ Dialogue /\ *\
-	\* -------------- */
+
+	/* /\ Interaction /\ *\
+	\* ----------------- */
 
 };
 

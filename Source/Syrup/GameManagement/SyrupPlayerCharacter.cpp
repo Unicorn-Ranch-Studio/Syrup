@@ -17,6 +17,8 @@ ASyrupPlayerCharacter::ASyrupPlayerCharacter()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	SetupInteractCollision();
+
 }
 
 // Called when the game starts or when spawned
@@ -41,6 +43,20 @@ void ASyrupPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInp
 
 	PlayerInputComponent->BindAxis("MoveForward", this, &ASyrupPlayerCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &ASyrupPlayerCharacter::MoveRight);
+}
+
+/**
+ * Sets up the interact sphere component
+ */
+void ASyrupPlayerCharacter::SetupInteractCollision()
+{
+	InteractCollision = CreateDefaultSubobject<USphereComponent>("InteractCollision");
+	InteractCollision->SetupAttachment(RootComponent);
+
+	InteractCollision->SetSphereRadius(InteractRadius);
+
+	InteractCollision->OnComponentBeginOverlap.Add();
+
 }
 
 /* /\ Initialization /\ *\
@@ -124,6 +140,14 @@ bool ASyrupPlayerCharacter::UseEnergy(int EnergyCost)
 	return true;
 }
 
+/**
+ * Plants a plant, using the energy the plant requires to plant
+ *
+ * @param PlantClass - The class of the plant to be planted
+ * @param Location - The location to plant the plant
+ *
+ * @return Whether the planting was sucessful or not
+ */
 bool ASyrupPlayerCharacter::Plant(TSubclassOf<APlant> PlantClass, FVector Location)
 {
 	int EnergyCostToPlant = Cast<APlant>(PlantClass->ClassDefaultObject)->GetEnergyCostToPlant();

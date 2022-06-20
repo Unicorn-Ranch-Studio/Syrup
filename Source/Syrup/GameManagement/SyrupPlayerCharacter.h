@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Components/SphereComponent.h"
 #include "SyrupPlayerCharacter.generated.h"
 
 class APlant;
@@ -37,6 +38,13 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+private:
+
+	/**
+	 * Sets up the interact sphere component
+	 */
+	void SetupInteractCollision();
 
 	/* /\ Initialization /\ *\
 	\* -------------------- */
@@ -140,6 +148,28 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable)
 	bool Plant(TSubclassOf<APlant> PlantClass, FVector Location);
+
+	/* ----------------- *\
+	\* \/ Interaction \/ */
+
+protected:
+
+	//Stores the radius of the character interaction collision
+	UPROPERTY(EditDefaultsOnly)
+	float InteractRadius;
+
+private:
+
+	void OnInteractSphereOverlap();
+
+	/**
+	 * The interaction sphere collision component
+	 */
+	UPROPERTY()
+	USphereComponent* InteractCollision;
+
+	/* /\ Interaction /\ *\
+	\* ----------------- */
 
 };
 
