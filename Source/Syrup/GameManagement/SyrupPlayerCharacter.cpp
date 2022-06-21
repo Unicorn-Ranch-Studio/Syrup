@@ -2,6 +2,7 @@
 
 
 #include "SyrupPlayerCharacter.h"
+#include "Kismet/GameplayStatics.h"
 #include "Syrup/Plants/Plant.h"
 
 /* \/ ====================== \/ *\
@@ -43,6 +44,7 @@ void ASyrupPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInp
 
 	PlayerInputComponent->BindAxis("MoveForward", this, &ASyrupPlayerCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &ASyrupPlayerCharacter::MoveRight);
+	PlayerInputComponent->BindAction("Interact", EInputEvent::IE_Pressed, this, &ASyrupPlayerCharacter::InteractPressed);
 }
 
 /**
@@ -55,8 +57,8 @@ void ASyrupPlayerCharacter::SetupInteractCollision()
 
 	InteractCollision->SetSphereRadius(InteractRadius);
 
-	InteractCollision->OnComponentBeginOverlap.Add();
-
+	InteractCollision->OnComponentBeginOverlap.AddDynamic(this, &ASyrupPlayerCharacter::OnInteractSphereOverlap);
+	InteractCollision->OnComponentEndOverlap.AddDynamic(this, &ASyrupPlayerCharacter::OnInteractSphereEndOverlap);
 }
 
 /* /\ Initialization /\ *\
@@ -163,6 +165,73 @@ bool ASyrupPlayerCharacter::Plant(TSubclassOf<APlant> PlantClass, FVector Locati
 
 /* /\ Energy /\ *\
 \* ------------ */
+
+/* ----------------- *\
+\* \/ Interaction \/ */
+
+/**
+ * Function that handles the interact sphere overlaps. Checks if the overlapped actor is interactable.
+ *
+ * @param OverlappedComp - The component of this actor that was overalapped
+ * @param OtherActor - The actor that overlapped this actor
+ * @param OtherComp - The specific component of the other actor that overlapped this actor
+ * @param OtherBodyIndex - The body index of the other actor
+ * @param bFromSweep - Whether this overlap was from a sweep or not
+ * @param SweepResult - The sweep result (if this was from a sweep)
+ */
+void ASyrupPlayerCharacter::OnInteractSphereOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	IInteractInterface* InteractableActor = Cast<IInteractInterface>(OtherActor);
+	if (InteractableActor)
+	{
+		InteractableActor->BecomeInteractable();
+		InteractableActors.Emplace(OtherActor);
+	}
+}
+
+/**
+ * Function that handles the interact sphere overlaps. Checks if the overlapped actor is interactable.
+ *
+ * @param OverlappedComp - The component of this actor that was un-overlapped
+ * @param OtherActor - The actor that un-overlapped this actor
+ * @param OtherComp - The specific component of the other actor that un-overlapped this actor
+ * @param OtherBodyIndex - The body index of the other actor
+ */
+void ASyrupPlayerCharacter::OnInteractSphereEndOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	IInteractInterface* InteractableActor = Cast<IInteractInterface>(OtherActor);
+	if (InteractableActor)
+	{
+		InteractableActor->BecomeNotInteractable();
+		InteractableActors.Remove(OtherActor);
+	}
+}
+
+/**
+ * Handles when the interact button is pressed (as opposed to clicking on something with the mouse)
+ */
+void ASyrupPlayerCharacter::InteractPressed()
+{
+	if (!InteractableActors.IsEmpty())
+	{
+		if (InteractableActors.Num() == 1)
+		{
+			Cast<IInteractInterface>(InteractableActors[0])->Interact();
+		}
+		else 
+		{
+			//Distance to the nearest actor (not useful in this case, but required for the function call)
+			float Distance;
+			AActor* NearestInteractableActor = UGameplayStatics::FindNearestActor(GetActorLocation(), InteractableActors, Distance);
+
+			Cast<IInteractInterface>(NearestInteractableActor)->Interact();
+		}
+	}
+
+}
+
+/* /\ Interaction /\ *\
+\* ----------------- */
 
 /* /\ ===================== /\ *\
 |  /\ ASyrupPlayerCharacter /\  |

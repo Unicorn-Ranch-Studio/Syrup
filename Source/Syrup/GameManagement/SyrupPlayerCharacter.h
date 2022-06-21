@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Components/SphereComponent.h"
+#include "Syrup/GameManagement/InteractInterface.h"
 #include "SyrupPlayerCharacter.generated.h"
 
 class APlant;
@@ -160,13 +161,46 @@ protected:
 
 private:
 
-	void OnInteractSphereOverlap();
+	/**
+	 * Function that handles the interact sphere overlaps. Checks if the overlapped actor is interactable.
+	 * 
+	 * @param OverlappedComp - The component of this actor that was overalapped 
+	 * @param OtherActor - The actor that overlapped this actor
+	 * @param OtherComp - The specific component of the other actor that overlapped this actor
+	 * @param OtherBodyIndex - The body index of the other actor
+	 * @param bFromSweep - Whether this overlap was from a sweep or not
+	 * @param SweepResult - The sweep result (if this was from a sweep)
+	 */
+	UFUNCTION()
+	void OnInteractSphereOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	/**
+	 * Function that handles the interact sphere overlaps. Checks if the overlapped actor is interactable.
+	 *
+	 * @param OverlappedComp - The component of this actor that was un-overlapped
+	 * @param OtherActor - The actor that un-overlapped this actor
+	 * @param OtherComp - The specific component of the other actor that un-overlapped this actor
+	 * @param OtherBodyIndex - The body index of the other actor
+	 */
+	UFUNCTION()
+	void OnInteractSphereEndOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+	/**
+	 * Handles when the interact button is pressed (as opposed to clicking on something with the mouse)
+	 */
+	UFUNCTION()
+	void InteractPressed();
 
 	/**
 	 * The interaction sphere collision component
 	 */
 	UPROPERTY()
 	USphereComponent* InteractCollision;
+
+	/**
+	 * The interactable actors that are currently within the interaction radius
+	 */
+	TArray<AActor*> InteractableActors;
 
 	/* /\ Interaction /\ *\
 	\* ----------------- */

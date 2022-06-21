@@ -39,7 +39,7 @@ void ANPC::Tick(float DeltaTime)
  */
 void ANPC::Interact()
 {
-	UE_LOG(LogTemp, Warning, TEXT("i was interacted with???"))
+	UE_LOG(LogTemp, Warning, TEXT("i was interacted with??? %s"), *GetName());
 }
 
 /* /\ Interaction /\ *\
