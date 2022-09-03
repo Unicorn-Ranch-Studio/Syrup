@@ -11,9 +11,8 @@
  */
 FTransform UGridLibrary::GridLocationToWorldTransform(FIntPoint Location)
 {
-	float XLocation = GetGridHeight() * Location.X - (IsGridLocationFliped(Location) ? GetGridHeight() *.333333333333 : GetGridHeight() * .666666666666);
+	float XLocation = GetGridHeight() * Location.X - (IsGridLocationFlipped(Location) ? GetGridHeight() *.333333333333 : GetGridHeight() * .666666666666);
 	float YLocation = GetGridSideLength() * Location.Y;
-	FRotator Rotation = FRotator(0, IsGridLocationFliped(Location) ? 180 : 0, 0);
 	FRotator Rotation = FRotator(0, IsGridLocationFlipped(Location) ? 180 : 0, 0);
 
 	return FTransform(Rotation, FVector(XLocation, YLocation, 0));
@@ -27,8 +26,39 @@ FTransform UGridLibrary::GridLocationToWorldTransform(FIntPoint Location)
  */
 FIntPoint UGridLibrary::WorldLocationToGridLocation(FVector Location)
 {
-	//FVector2D ScaledLocation = FVector2D(Location) / FVector2D(GetGridHeight(), GetGridSideLength());
-	return FIntPoint(/*FMath::RoundFromZero(ScaledLocation.X), FMath::RoundFromZero(ScaledLocation.Y)*/);
+	FVector2D GridLocation = FVector2D(Location) / FVector2D(GetGridHeight(), GetGridSideLength() * 0.5);
+	GridLocation.Y += 0.5;
+
+	FVector2D RelativeLocation = FVector2D(FMath::Fractional(GridLocation.X), FMath::Fractional(GridLocation.Y));
+	if (RelativeLocation.X < 0)
+	{
+		RelativeLocation.X = 1 + RelativeLocation.X;
+	}
+	if (RelativeLocation.Y < 0)
+	{
+		RelativeLocation.Y = 1 + RelativeLocation.Y;
+	}
+
+	FIntPoint ApproximateLocation = FIntPoint(FMath::Floor(GridLocation.X), FMath::Floor(GridLocation.Y));
+
+	bool bIsFlipped = IsGridLocationFlipped(ApproximateLocation);
+	
+	if (RelativeLocation.X < 0.5 != bIsFlipped)
+	{
+		return ApproximateLocation;
+	}
+
+	if (bIsFlipped)
+	{
+		RelativeLocation.X = 1 - RelativeLocation.X;
+	}
+
+	if (RelativeLocation.Y < RelativeLocation.X - 0.5 || 1 - RelativeLocation.Y < RelativeLocation.X - 0.5)
+	{
+		return ApproximateLocation + (RelativeLocation.Y > 0.5 ? FIntPoint(0, 1) : FIntPoint(0, -1));
+	}
+	
+	return ApproximateLocation;
 }
 
 /*
@@ -38,7 +68,7 @@ FIntPoint UGridLibrary::WorldLocationToGridLocation(FVector Location)
  */
 float UGridLibrary::GetGridHeight()
 {
-	return GridHeight;
+	return Cast<UGridLibrary>(UGridLibrary::StaticClass()->GetDefaultObject())->GridHeight;
 }
 
 /*
@@ -48,7 +78,7 @@ float UGridLibrary::GetGridHeight()
  */
 float UGridLibrary::GetGridSideLength()
 {
-	return 1.15470053837925152901829756100391491129520350254 * GridHeight;
+	return 1.15470053837925152901829756100391491129520350254 * Cast<UGridLibrary>(UGridLibrary::StaticClass()->GetDefaultObject())->GridHeight;
 }
 
 /*
@@ -59,7 +89,7 @@ float UGridLibrary::GetGridSideLength()
  */
 bool UGridLibrary::IsGridLocationFlipped(FIntPoint Location)
 {
-	return (Location.Y % 2) != (Location.X % 2);
+	return FMath::Abs(Location.Y % 2) != FMath::Abs(Location.X % 2);
 }
 
 /*

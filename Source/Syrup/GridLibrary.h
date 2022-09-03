@@ -23,7 +23,7 @@ public:
 	 * @return The world transform of a grid location.
 	 */
 	UFUNCTION(BlueprintPure, Category="Transformation|Grid")
-	FTransform GridLocationToWorldTransform(FIntPoint Location);
+	static FTransform GridLocationToWorldTransform(FIntPoint Location);
 
 	/*
 	 * Gets the grid location of a world location.
@@ -32,7 +32,7 @@ public:
 	 * @return The grid location of a world location.
 	 */
 	UFUNCTION(BlueprintPure, Category="Transformation|Grid")
-	FIntPoint WorldLocationToGridLocation(FVector Location);
+	static FIntPoint WorldLocationToGridLocation(FVector Location);
 
 	/*
 	 * Gets the height of a single grid tile.
@@ -40,7 +40,7 @@ public:
 	 * @return The height of a single grid tile.
 	 */
 	UFUNCTION(BlueprintPure, Category="Transformation|Grid")
-	float GetGridHeight();
+	static float GetGridHeight();
 
 	/*
 	 * Gets the side length of a single grid tile.
@@ -48,7 +48,7 @@ public:
 	 * @return The side length of a single grid tile.
 	 */
 	UFUNCTION(BlueprintPure, Category="Transformation|Grid")
-	float GetGridSideLength();
+	static float GetGridSideLength();
 
 	/*
 	 * Gets whether or not a tile at a given grid location will be fliped.
@@ -57,7 +57,7 @@ public:
 	 * @return Whether or not a tile at a given grid location will be fliped.
 	 */
 	UFUNCTION(BlueprintPure, Category = "Transformation|Grid")
-	bool IsGridLocationFlipped(FIntPoint Location);
+	static bool IsGridLocationFlipped(FIntPoint Location);
 
 	/*
 	 * Gets all the grid locations adjacent to a given grid location.
@@ -67,7 +67,7 @@ public:
 	 * @return All the locations adjacent to a given location.
 	 */
 	UFUNCTION(BlueprintPure, Category = "Transformation|Grid|Adjacency")
-	TSet<FIntPoint> GetAdjacentGridLocations(FIntPoint Location, int Iterations = 1);
+	static TSet<FIntPoint> GetAdjacentGridLocations(FIntPoint Location, int Iterations = 1);
 
 	/*
 	 * Gets all the grid locations within a radius of a given grid location.
@@ -77,10 +77,10 @@ public:
 	 * @return All the grid locations within a radius of a given grid location.
 	 */
 	UFUNCTION(BlueprintPure, Category = "Transformation|Grid|Adjacency")
-	TSet<FIntPoint> GetGridLocationsInRadius(FIntPoint Location, float Radius);
+	static TSet<FIntPoint> GetGridLocationsInRadius(FIntPoint Location, float Radius);
 
 
 private:
 	UPROPERTY()
-	float GridHeight = 3;
+	float GridHeight = 300;
 };
