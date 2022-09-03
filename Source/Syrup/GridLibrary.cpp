@@ -12,7 +12,7 @@
 FTransform UGridLibrary::GridLocationToWorldTransform(FIntPoint Location)
 {
 	float XLocation = GetGridHeight() * Location.X - (IsGridLocationFlipped(Location) ? GetGridHeight() *.333333333333 : GetGridHeight() * .666666666666);
-	float YLocation = GetGridSideLength() * Location.Y;
+	float YLocation = GetGridSideLength() * Location.Y * 0.5;
 	FRotator Rotation = FRotator(0, IsGridLocationFlipped(Location) ? 180 : 0, 0);
 
 	return FTransform(Rotation, FVector(XLocation, YLocation, 0));
