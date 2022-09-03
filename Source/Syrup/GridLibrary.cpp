@@ -14,6 +14,7 @@ FTransform UGridLibrary::GridLocationToWorldTransform(FIntPoint Location)
 	float XLocation = GetGridHeight() * Location.X - (IsGridLocationFliped(Location) ? GetGridHeight() *.333333333333 : GetGridHeight() * .666666666666);
 	float YLocation = GetGridSideLength() * Location.Y;
 	FRotator Rotation = FRotator(0, IsGridLocationFliped(Location) ? 180 : 0, 0);
+	FRotator Rotation = FRotator(0, IsGridLocationFlipped(Location) ? 180 : 0, 0);
 
 	return FTransform(Rotation, FVector(XLocation, YLocation, 0));
 }
@@ -26,8 +27,8 @@ FTransform UGridLibrary::GridLocationToWorldTransform(FIntPoint Location)
  */
 FIntPoint UGridLibrary::WorldLocationToGridLocation(FVector Location)
 {
-	FVector2D ScaledLocation = FVector2D(Location) / FVector2D(GetGridHeight(), GetGridSideLength());
-	return FIntPoint(FMath::RoundFromZero(ScaledLocation.X), FMath::RoundFromZero(ScaledLocation.Y));
+	//FVector2D ScaledLocation = FVector2D(Location) / FVector2D(GetGridHeight(), GetGridSideLength());
+	return FIntPoint(/*FMath::RoundFromZero(ScaledLocation.X), FMath::RoundFromZero(ScaledLocation.Y)*/);
 }
 
 /*
@@ -56,9 +57,9 @@ float UGridLibrary::GetGridSideLength()
  * @param Location - The location of the tile.
  * @return Whether or not a tile at a given grid location will be fliped.
  */
-bool UGridLibrary::IsGridLocationFliped(FIntPoint Location)
+bool UGridLibrary::IsGridLocationFlipped(FIntPoint Location)
 {
-	return false;
+	return (Location.Y % 2) != (Location.X % 2);
 }
 
 /*

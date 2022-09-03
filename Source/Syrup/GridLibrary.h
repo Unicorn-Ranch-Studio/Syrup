@@ -57,7 +57,7 @@ public:
 	 * @return Whether or not a tile at a given grid location will be fliped.
 	 */
 	UFUNCTION(BlueprintPure, Category = "Transformation|Grid")
-	bool IsGridLocationFliped(FIntPoint Location);
+	bool IsGridLocationFlipped(FIntPoint Location);
 
 	/*
 	 * Gets all the grid locations adjacent to a given grid location.
