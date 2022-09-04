@@ -93,18 +93,54 @@ bool UGridLibrary::IsGridLocationFlipped(FIntPoint Location)
 }
 
 /*
+ * Gets the grid direction after a given grid direction.
+ *
+ * @param Direction - The given direction.
+ * @param bCounterClockwise - Whether after is defined as being counterclockwise of instead of clockwise of.
+ * @return The grid direction after a given grid direction.
+ */
+EGridDirection UGridLibrary::GetNextDirection(EGridDirection Direction, bool bCounterClockwise = false)
+{
+	switch (Direction)
+	{
+	case EGridDirection::Down:
+		return bCounterClockwise ? EGridDirection::UpLeft : EGridDirection::UpRight;
+
+	case EGridDirection::Up:
+		return bCounterClockwise ? EGridDirection::DownLeft : EGridDirection::DownRight;
+
+	case EGridDirection::UpLeft:
+		return bCounterClockwise ? EGridDirection::UpRight : EGridDirection::Down;
+
+	case EGridDirection::DownLeft:
+		return bCounterClockwise ? EGridDirection::Up : EGridDirection::DownRight;
+
+	case EGridDirection::UpRight:
+		return bCounterClockwise ? EGridDirection::Down : EGridDirection::UpLeft;
+
+	case EGridDirection::DownRight:
+		return bCounterClockwise ? EGridDirection::DownLeft : EGridDirection::Up;
+
+	default:
+		ensureAlwaysMsgf(false, TEXT("Error: Invalid Direction"));
+		return EGridDirection::Down;
+	}
+}
+
+/*
  * Gets all the grid locations adjacent to a given grid location.
  *
  * @param Location - The given location.
  * @return All the locations adjacent to a given location.
  */
-TSet<FIntPoint> UGridLibrary::GetAdjacentGridLocations(FIntPoint Location)
+TMap<EGridDirection, FIntPoint> UGridLibrary::GetAdjacentGridLocations(FIntPoint Location)
 {
-	TSet<FIntPoint> AdjecentTiles = TSet<FIntPoint>();
+	TMap<EGridDirection, FIntPoint> AdjecentTiles = TMap<EGridDirection, FIntPoint>();
+	bool bFlip = IsGridLocationFlipped(Location);
 
-	AdjecentTiles.Add(Location + FIntPoint(0, 1));
-	AdjecentTiles.Add(Location + FIntPoint(0, -1));
-	AdjecentTiles.Add(Location + FIntPoint(IsGridLocationFlipped(Location) ? 1 : -1, 0));
+	AdjecentTiles.Add(bFlip ? EGridDirection::Up        : EGridDirection::Down   , Location + FIntPoint(bFlip ? 1 : -1, 0));
+	AdjecentTiles.Add(bFlip ? EGridDirection::DownLeft  : EGridDirection::UpLeft , Location + FIntPoint(0, -1));
+	AdjecentTiles.Add(bFlip ? EGridDirection::DownRight : EGridDirection::UpRight, Location + FIntPoint(0, 1));
 
 	return AdjecentTiles;
 }

@@ -6,6 +6,17 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "GridLibrary.generated.h"
 
+UENUM(BlueprintType)
+enum class EGridDirection : uint8
+{
+	Down		= 0		UMETA(DisplayName = "Down"),
+	Up			= 1		UMETA(DisplayName = "Up"),
+	UpLeft		= 2		UMETA(DisplayName = "Up and to the Left"),
+	DownLeft	= 3		UMETA(DisplayName = "Down and to the Left"),
+	UpRight		= 4		UMETA(DisplayName = "Up and to the Right"),
+	DownRight	= 5		UMETA(DisplayName = "Down and to the Right")
+};
+
 /**
  * A library for functions related to the in game grid.
  */
@@ -59,6 +70,17 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Transformation|Grid")
 	static bool IsGridLocationFlipped(FIntPoint Location);
 
+	
+	/*
+	 * Gets the grid direction after a given grid direction.
+	 * 
+	 * @param Direction - The given direction.
+	 * @param bCounterClockwise - Whether after is defined as being counterclockwise of instead of clockwise of.
+	 * @return The grid direction after a given grid direction.
+	 */
+	UFUNCTION(BlueprintPure, Category = "Transformation|Grid|Direction")
+	static EGridDirection GetNextDirection(EGridDirection Direction, bool bCounterClockwise = false);
+
 	/*
 	 * Gets all the grid locations adjacent to a given grid location.
 	 *
@@ -67,7 +89,7 @@ public:
 	 * @return All the locations adjacent to a given location.
 	 */
 	UFUNCTION(BlueprintPure, Category = "Transformation|Grid|Adjacency")
-	static TSet<FIntPoint> GetAdjacentGridLocations(FIntPoint Location);
+	static TMap<EGridDirection, FIntPoint> GetAdjacentGridLocations(FIntPoint Location);
 
 	/*
 	 * Gets all the grid locations within a radius of a given grid location.
