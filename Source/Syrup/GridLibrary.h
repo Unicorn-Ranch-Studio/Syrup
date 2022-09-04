@@ -12,9 +12,9 @@ enum class EGridDirection : uint8
 	Down		= 0		UMETA(DisplayName = "Down"),
 	Up			= 1		UMETA(DisplayName = "Up"),
 	UpLeft		= 2		UMETA(DisplayName = "Up and to the Left"),
-	DownLeft	= 3		UMETA(DisplayName = "Down and to the Left"),
+	DownRight	= 3		UMETA(DisplayName = "Down and to the Right"),
 	UpRight		= 4		UMETA(DisplayName = "Up and to the Right"),
-	DownRight	= 5		UMETA(DisplayName = "Down and to the Right")
+	DownLeft	= 5		UMETA(DisplayName = "Down and to the Left")
 };
 
 /**

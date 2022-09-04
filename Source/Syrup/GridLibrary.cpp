@@ -101,30 +101,7 @@ bool UGridLibrary::IsGridLocationFlipped(FIntPoint Location)
  */
 EGridDirection UGridLibrary::GetNextDirection(EGridDirection Direction, bool bCounterClockwise = false)
 {
-	switch (Direction)
-	{
-	case EGridDirection::Down:
-		return bCounterClockwise ? EGridDirection::UpLeft : EGridDirection::UpRight;
-
-	case EGridDirection::Up:
-		return bCounterClockwise ? EGridDirection::DownLeft : EGridDirection::DownRight;
-
-	case EGridDirection::UpLeft:
-		return bCounterClockwise ? EGridDirection::UpRight : EGridDirection::Down;
-
-	case EGridDirection::DownLeft:
-		return bCounterClockwise ? EGridDirection::Up : EGridDirection::DownRight;
-
-	case EGridDirection::UpRight:
-		return bCounterClockwise ? EGridDirection::Down : EGridDirection::UpLeft;
-
-	case EGridDirection::DownRight:
-		return bCounterClockwise ? EGridDirection::DownLeft : EGridDirection::Up;
-
-	default:
-		ensureAlwaysMsgf(false, TEXT("Error: Invalid Direction"));
-		return EGridDirection::Down;
-	}
+	return (EGridDirection)(((uint8)Direction + (bCounterClockwise ? 4 : 2)) % 6);
 }
 
 /*
