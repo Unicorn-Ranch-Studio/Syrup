@@ -11,8 +11,8 @@
  */
 FTransform UGridLibrary::GridLocationToWorldTransform(FIntPoint Location)
 {
-	float XLocation = GetGridHeight() * Location.X - (IsGridLocationFlipped(Location) ? GetGridHeight() *.333333333333 : GetGridHeight() * .666666666666);
-	float YLocation = GetGridSideLength() * Location.Y * 0.5;
+	double XLocation = GetGridHeight() * Location.X - (IsGridLocationFlipped(Location) ? GetGridHeight() *.333333333333 : GetGridHeight() * .666666666666);
+	double YLocation = GetGridSideLength() * Location.Y * 0.5;
 	FRotator Rotation = FRotator(0, IsGridLocationFlipped(Location) ? 180 : 0, 0);
 
 	return FTransform(Rotation, FVector(XLocation, YLocation, 0));
@@ -66,7 +66,7 @@ FIntPoint UGridLibrary::WorldLocationToGridLocation(FVector Location)
  *
  * @return The height of a single grid tile.
  */
-float UGridLibrary::GetGridHeight()
+double UGridLibrary::GetGridHeight()
 {
 	return Cast<UGridLibrary>(UGridLibrary::StaticClass()->GetDefaultObject())->GridHeight;
 }
@@ -76,7 +76,7 @@ float UGridLibrary::GetGridHeight()
  *
  * @return The side length of a single grid tile.
  */
-float UGridLibrary::GetGridSideLength()
+double UGridLibrary::GetGridSideLength()
 {
 	return 1.15470053837925152901829756100391491129520350254 * Cast<UGridLibrary>(UGridLibrary::StaticClass()->GetDefaultObject())->GridHeight;
 }
@@ -96,12 +96,17 @@ bool UGridLibrary::IsGridLocationFlipped(FIntPoint Location)
  * Gets all the grid locations adjacent to a given grid location.
  *
  * @param Location - The given location.
- * @param Iterations - The number of adjacency iterations to compute.
  * @return All the locations adjacent to a given location.
  */
-TSet<FIntPoint> UGridLibrary::GetAdjacentGridLocations(FIntPoint Location, int Iterations)
+TSet<FIntPoint> UGridLibrary::GetAdjacentGridLocations(FIntPoint Location)
 {
-	return TSet<FIntPoint>();
+	TSet<FIntPoint> AdjecentTiles = TSet<FIntPoint>();
+
+	AdjecentTiles.Add(Location + FIntPoint(0, 1));
+	AdjecentTiles.Add(Location + FIntPoint(0, -1));
+	AdjecentTiles.Add(Location + FIntPoint(IsGridLocationFlipped(Location) ? 1 : -1, 0));
+
+	return AdjecentTiles;
 }
 
 /*
@@ -111,7 +116,7 @@ TSet<FIntPoint> UGridLibrary::GetAdjacentGridLocations(FIntPoint Location, int I
  * @param Radius -  The Radius to get locations within
  * @return All the grid locations within a radius of a given grid location.
  */
-TSet<FIntPoint> UGridLibrary::GetGridLocationsInRadius(FIntPoint Location, float Radius)
+TSet<FIntPoint> UGridLibrary::GetGridLocationsInRadius(FIntPoint Location, double Radius)
 {
 	return TSet<FIntPoint>();
 }

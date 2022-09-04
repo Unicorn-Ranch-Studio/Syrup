@@ -40,7 +40,7 @@ public:
 	 * @return The height of a single grid tile.
 	 */
 	UFUNCTION(BlueprintPure, Category="Transformation|Grid")
-	static float GetGridHeight();
+	static double GetGridHeight();
 
 	/*
 	 * Gets the side length of a single grid tile.
@@ -48,7 +48,7 @@ public:
 	 * @return The side length of a single grid tile.
 	 */
 	UFUNCTION(BlueprintPure, Category="Transformation|Grid")
-	static float GetGridSideLength();
+	static double GetGridSideLength();
 
 	/*
 	 * Gets whether or not a tile at a given grid location will be fliped.
@@ -67,7 +67,7 @@ public:
 	 * @return All the locations adjacent to a given location.
 	 */
 	UFUNCTION(BlueprintPure, Category = "Transformation|Grid|Adjacency")
-	static TSet<FIntPoint> GetAdjacentGridLocations(FIntPoint Location, int Iterations = 1);
+	static TSet<FIntPoint> GetAdjacentGridLocations(FIntPoint Location);
 
 	/*
 	 * Gets all the grid locations within a radius of a given grid location.
@@ -77,10 +77,10 @@ public:
 	 * @return All the grid locations within a radius of a given grid location.
 	 */
 	UFUNCTION(BlueprintPure, Category = "Transformation|Grid|Adjacency")
-	static TSet<FIntPoint> GetGridLocationsInRadius(FIntPoint Location, float Radius);
+	static TSet<FIntPoint> GetGridLocationsInRadius(FIntPoint Location, double Radius);
 
 
 private:
 	UPROPERTY()
-	float GridHeight = 300;
+	double GridHeight = 300;
 };
