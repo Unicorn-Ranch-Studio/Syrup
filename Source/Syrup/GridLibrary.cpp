@@ -113,10 +113,30 @@ TSet<FIntPoint> UGridLibrary::GetAdjacentGridLocations(FIntPoint Location)
  * Gets all the grid locations within a radius of a given grid location.
  *
  * @param Location - The given location.
- * @param Radius -  The Radius to get locations within
+ * @param Radius -  The Radius to get locations within.
  * @return All the grid locations within a radius of a given grid location.
  */
 TSet<FIntPoint> UGridLibrary::GetGridLocationsInRadius(FIntPoint Location, double Radius)
 {
-	return TSet<FIntPoint>();
+	Radius = FMath::Abs(Radius);
+	FIntPoint SearchArea = FIntPoint(FMath::CeilToDouble(Radius), FMath::CeilToDouble(Radius * 2 * 0.86602540378));
+	double YSize = 1 / (2 * 0.86602540378);
+	TSet<FIntPoint> ReturnValue = TSet<FIntPoint>();
+
+	for (int IndexX = -SearchArea.X; IndexX <= 0; IndexX++)
+	{
+		for (int IndexY = -SearchArea.Y; IndexY <= 0; IndexY++)
+		{
+			if (IndexX * IndexX + IndexY * IndexY * YSize * YSize < Radius * Radius)
+			{
+				ReturnValue.Add(FIntPoint( IndexX,  IndexY));
+				ReturnValue.Add(FIntPoint(-IndexX,  IndexY));
+				ReturnValue.Add(FIntPoint(-IndexX, -IndexY));
+				ReturnValue.Add(FIntPoint( IndexX, -IndexY));
+			}
+		}
+	}
+
+	return ReturnValue;
+}
 }
