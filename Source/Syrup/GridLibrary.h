@@ -81,6 +81,26 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Transformation|Grid|Direction")
 	static EGridDirection GetNextDirection(EGridDirection Direction, bool bCounterClockwise = false);
 
+	
+	/*
+	 * Gets the opposite grid direction of a given grid direction.
+	 * 
+	 * @param Direction - The given direction.
+	 * @return The opposite grid direction of a given grid direction.
+	 */
+	UFUNCTION(BlueprintPure, Category = "Transformation|Grid|Direction")
+	static EGridDirection FlipDirection(EGridDirection Direction);
+
+	/*
+	 * Gets whether or not a given direction is valid at a given location.
+	 * 
+	 * @param Direction - The given direction.
+	 * @param Location - The given location.
+	 * @return Whether or not a given direction is valid at a given location.
+	 */
+	UFUNCTION(BlueprintPure, Category = "Transformation|Grid|Direction")
+	static bool IsDirectionValidAtLocation(EGridDirection Direction, FIntPoint Location);
+
 	/*
 	 * Gets all the grid locations adjacent to a given grid location.
 	 *

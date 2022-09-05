@@ -99,9 +99,33 @@ bool UGridLibrary::IsGridLocationFlipped(FIntPoint Location)
  * @param bCounterClockwise - Whether after is defined as being counterclockwise of instead of clockwise of.
  * @return The grid direction after a given grid direction.
  */
-EGridDirection UGridLibrary::GetNextDirection(EGridDirection Direction, bool bCounterClockwise = false)
+EGridDirection UGridLibrary::GetNextDirection(EGridDirection Direction, bool bCounterClockwise)
 {
 	return (EGridDirection)(((uint8)Direction + (bCounterClockwise ? 4 : 2)) % 6);
+}
+
+/*
+ * Gets the opposite grid direction of a given grid direction.
+ *
+ * @param Direction - The given direction.
+ * @return The opposite grid direction of a given grid direction.
+ */
+EGridDirection UGridLibrary::FlipDirection(EGridDirection Direction)
+{
+	uint8 IntDirection = (uint8)Direction;
+	return (EGridDirection)((IntDirection + (IntDirection % 2 ? -1 : 1)));
+}
+
+/*
+ * Gets whether or not a given direction is valid at a given location.
+ *
+ * @param Direction - The given direction.
+ * @param Location - The given location.
+ * @return Whether or not a given direction is valid at a given location.
+ */
+bool UGridLibrary::IsDirectionValidAtLocation(EGridDirection Direction, FIntPoint Location)
+{
+	return (uint8)Direction % 2 == IsGridLocationFlipped(Location);
 }
 
 /*
