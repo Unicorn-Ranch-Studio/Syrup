@@ -187,8 +187,13 @@ TSet<FIntPoint> UGridLibrary::GetGridLocationsInRadius(FIntPoint Location, doubl
  * @param LineStartOffset - The location along the line to start drawing it at.
  * @return All the grid locations of a line.
  */
-TSet<FIntPoint> UGridLibrary::GetLocationsInLine(FIntPoint LineOrigin, EGridDirection PerpendicularDirection, int Length, int LineStartOffset = 0)
+TSet<FIntPoint> UGridLibrary::GetLocationsInLine(FIntPoint LineOrigin, EGridDirection PerpendicularDirection, int Length, int LineStartOffset)
 {
+	if (IsDirectionValidAtLocation(PerpendicularDirection, LineOrigin))
+	{
+		PerpendicularDirection = FlipDirection(PerpendicularDirection);
+	}
+
 	FIntPoint LineDirection = FIntPoint::ZeroValue;
 	FIntPoint LineDirectionFliped = FIntPoint::ZeroValue;
 	switch (PerpendicularDirection)
@@ -204,13 +209,13 @@ TSet<FIntPoint> UGridLibrary::GetLocationsInLine(FIntPoint LineOrigin, EGridDire
 		break;
 
 	case EGridDirection::UpLeft:
-		LineDirection = FIntPoint(1, 0);
-		LineDirectionFliped = FIntPoint(0, 1);
+		LineDirection = FIntPoint(0, 1);
+		LineDirectionFliped = FIntPoint(1, 0);
 		break;
 
 	case EGridDirection::DownRight:
-		LineDirection = FIntPoint(0, -1);
-		LineDirectionFliped = FIntPoint(-1, 0);
+		LineDirection = FIntPoint(-1, 0);
+		LineDirectionFliped = FIntPoint(0, -1);
 		break;
 
 	case EGridDirection::UpRight:
@@ -223,4 +228,21 @@ TSet<FIntPoint> UGridLibrary::GetLocationsInLine(FIntPoint LineOrigin, EGridDire
 		LineDirectionFliped = FIntPoint(1, 0);
 		break;
 	}
+
+	while (LineStartOffset != 0)
+	{
+		LineOrigin += FIntPoint(FMath::Sign(LineStartOffset)) * ((IsGridLocationFlipped(LineOrigin) != LineStartOffset < 0) ? LineDirectionFliped : LineDirection);
+		LineStartOffset -= FMath::Sign(LineStartOffset);
+	}
+
+	TSet<FIntPoint> ReturnValue = TSet<FIntPoint>();
+	ReturnValue.Add(LineOrigin);
+	while (Length != 0)
+	{
+		LineOrigin += FIntPoint(FMath::Sign(Length)) * (IsGridLocationFlipped(LineOrigin) ? LineDirectionFliped : LineDirection);
+		ReturnValue.Add(LineOrigin);
+		Length -= FMath::Sign(Length);
+	}
+
+	return ReturnValue;
 }
