@@ -122,6 +122,17 @@ public:
 	static TSet<FIntPoint> GetGridLocationsInRadius(FIntPoint Location, double Radius);
 
 	/*
+	 * Gets all the grid locations of a given shape when scaled up.
+	 *
+	 * @param ShapeLocations - The locations contained shape to scale.
+	 * @param Size -  The number of layers to add to the shape.
+	 * @return All the grid locations of a given shape when scaled up.
+	 */
+	UFUNCTION(BlueprintPure, Category = "Transformation|Grid|Adjacency")
+	static TSet<FIntPoint> ScaleShapeUp(TSet<FIntPoint> Shape, int Size, bool bChopPoints = false);
+
+	
+	/*
 	 * Gets all the grid locations of a line.
 	 *
 	 * @param LineOrigin - The start of the line.

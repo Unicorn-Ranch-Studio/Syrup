@@ -176,6 +176,68 @@ TSet<FIntPoint> UGridLibrary::GetGridLocationsInRadius(FIntPoint Location, doubl
 
 	return ReturnValue;
 }
+
+/*
+ * Gets all the grid locations of a given shape when scaled up.
+ *
+ * @param ShapeLocations - The locations contained shape to scale.
+ * @param Size -  The number of layers to add to the shape.
+ * @return All the grid locations of a given shape when scaled up.
+ */
+TSet<FIntPoint> UGridLibrary::ScaleShapeUp(TSet<FIntPoint> ShapeLocations, int Size, bool bChopPoints)
+{
+	// End if invalid size
+	if (Size < 1)
+	{
+		return ShapeLocations;
+	}
+
+	// Get the details of the layers that need to be added
+	TSet<TTuple<FIntPoint, EGridDirection, bool>> LayerDetails = TSet<TTuple<FIntPoint, EGridDirection, bool>>();
+	for (FIntPoint EachShapeLocation : ShapeLocations)
+	{
+		// Get the adjacent locations of the shape and check to see if they are not contained in the shape
+		TMap<EGridDirection, FIntPoint> AdjacentLocations = GetAdjacentGridLocations(EachShapeLocation);
+		for (EGridDirection DirectionIndex = (EGridDirection)IsGridLocationFlipped(EachShapeLocation); (uint8)DirectionIndex < 6; DirectionIndex = (EGridDirection)((uint8)DirectionIndex + 2))
+		{
+			bool bShouldLayerBeAdded = !ShapeLocations.Contains(AdjacentLocations.FindRef(DirectionIndex));
+			if (bShouldLayerBeAdded)
+			{
+				// If next adjacent location is also outside the shape then add cap
+				bool bShouldCapBeAdded = bShouldLayerBeAdded && !ShapeLocations.Contains(AdjacentLocations.FindRef(GetNextDirection(DirectionIndex)));
+
+				LayerDetails.Add(TTuple<FIntPoint, EGridDirection, bool>(AdjacentLocations.FindRef(DirectionIndex), DirectionIndex, bShouldCapBeAdded));
+			}
+		}
+	}
+
+
+	// Create Layers
+	TSet<FIntPoint> ReturnValue = TSet<FIntPoint>(ShapeLocations);
+	
+	// For each layer details get the locations of a trapziod with one corner on the layer location.
+	for (TTuple<FIntPoint, EGridDirection, bool> EachLayerDetail : LayerDetails)
+	{
+		TArray<FIntPoint> StartLocations = (GetLocationsInLine(EachLayerDetail.Get<FIntPoint>(), GetNextDirection(EachLayerDetail.Get<EGridDirection>(), true), 2 * Size)).Array();
+		
+		for (int LayerIndex = 0; LayerIndex < Size; LayerIndex++)
+		{
+			// Adjust trapizode size if a cap is needed.
+			int Length = 2 + 2 * LayerIndex;
+			if (EachLayerDetail.Get<bool>())
+			{
+				Length += 2 * (Size);
+				if (bChopPoints)
+				{
+					Length -= LayerIndex * 2 + 1;
+				}
+			}
+
+			ReturnValue = ReturnValue.Union(GetLocationsInLine(StartLocations[1 + 2 * LayerIndex], EachLayerDetail.Get<EGridDirection>(), -Length));
+		}
+	}
+
+	return ReturnValue;
 }
 
 /*
@@ -239,7 +301,7 @@ TSet<FIntPoint> UGridLibrary::GetLocationsInLine(FIntPoint LineOrigin, EGridDire
 	ReturnValue.Add(LineOrigin);
 	while (Length != 0)
 	{
-		LineOrigin += FIntPoint(FMath::Sign(Length)) * (IsGridLocationFlipped(LineOrigin) ? LineDirectionFliped : LineDirection);
+		LineOrigin += FIntPoint(FMath::Sign(Length)) * ((IsGridLocationFlipped(LineOrigin) != Length < 0) ? LineDirectionFliped : LineDirection);
 		ReturnValue.Add(LineOrigin);
 		Length -= FMath::Sign(Length);
 	}
