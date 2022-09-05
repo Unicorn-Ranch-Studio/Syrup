@@ -251,11 +251,13 @@ TSet<FIntPoint> UGridLibrary::ScaleShapeUp(TSet<FIntPoint> ShapeLocations, int S
  */
 TSet<FIntPoint> UGridLibrary::GetLocationsInLine(FIntPoint LineOrigin, EGridDirection PerpendicularDirection, int Length, int LineStartOffset)
 {
+	// Snap direction to location.
 	if (IsDirectionValidAtLocation(PerpendicularDirection, LineOrigin))
 	{
 		PerpendicularDirection = FlipDirection(PerpendicularDirection);
 	}
 
+	// Get the direction the line will move in based on direction.
 	FIntPoint LineDirection = FIntPoint::ZeroValue;
 	FIntPoint LineDirectionFliped = FIntPoint::ZeroValue;
 	switch (PerpendicularDirection)
@@ -291,12 +293,14 @@ TSet<FIntPoint> UGridLibrary::GetLocationsInLine(FIntPoint LineOrigin, EGridDire
 		break;
 	}
 
+	// Adjust line origin based off of offset.
 	while (LineStartOffset != 0)
 	{
 		LineOrigin += FIntPoint(FMath::Sign(LineStartOffset)) * ((IsGridLocationFlipped(LineOrigin) != LineStartOffset < 0) ? LineDirectionFliped : LineDirection);
 		LineStartOffset -= FMath::Sign(LineStartOffset);
 	}
 
+	//Get line locations.
 	TSet<FIntPoint> ReturnValue = TSet<FIntPoint>();
 	ReturnValue.Add(LineOrigin);
 	while (Length != 0)
