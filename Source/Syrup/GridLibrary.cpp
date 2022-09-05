@@ -153,3 +153,50 @@ TSet<FIntPoint> UGridLibrary::GetGridLocationsInRadius(FIntPoint Location, doubl
 	return ReturnValue;
 }
 }
+
+/*
+ * Gets all the grid locations of a line.
+ *
+ * @param LineOrigin - The start of the line.
+ * @param Size -  The direction perpendicular to the line.
+ * @param Length - The length of he line.
+ * @param LineStartOffset - The location along the line to start drawing it at.
+ * @return All the grid locations of a line.
+ */
+TSet<FIntPoint> UGridLibrary::GetLocationsInLine(FIntPoint LineOrigin, EGridDirection PerpendicularDirection, int Length, int LineStartOffset = 0)
+{
+	FIntPoint LineDirection = FIntPoint::ZeroValue;
+	FIntPoint LineDirectionFliped = FIntPoint::ZeroValue;
+	switch (PerpendicularDirection)
+	{
+	case EGridDirection::Down:
+		LineDirection = FIntPoint(0,-1);
+		LineDirectionFliped = LineDirection;
+		break;
+
+	case EGridDirection::Up:
+		LineDirection = FIntPoint(0, 1);
+		LineDirectionFliped = LineDirection;
+		break;
+
+	case EGridDirection::UpLeft:
+		LineDirection = FIntPoint(1, 0);
+		LineDirectionFliped = FIntPoint(0, 1);
+		break;
+
+	case EGridDirection::DownRight:
+		LineDirection = FIntPoint(0, -1);
+		LineDirectionFliped = FIntPoint(-1, 0);
+		break;
+
+	case EGridDirection::UpRight:
+		LineDirection = FIntPoint(-1, 0);
+		LineDirectionFliped = FIntPoint(0, 1);
+		break;
+
+	case EGridDirection::DownLeft:
+		LineDirection = FIntPoint(0, -1);
+		LineDirectionFliped = FIntPoint(1, 0);
+		break;
+	}
+}

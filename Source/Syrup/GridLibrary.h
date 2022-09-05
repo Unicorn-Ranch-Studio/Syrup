@@ -101,6 +101,17 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Transformation|Grid|Adjacency")
 	static TSet<FIntPoint> GetGridLocationsInRadius(FIntPoint Location, double Radius);
 
+	/*
+	 * Gets all the grid locations of a line.
+	 *
+	 * @param LineOrigin - The start of the line.
+	 * @param Size -  The direction perpendicular to the line.
+	 * @param Length - The length of he line.
+	 * @param LineStartOffset - The location along the line to start drawing it at.
+	 * @return All the grid locations of a line.
+	 */
+	UFUNCTION(BlueprintPure, Category = "Transformation|Grid|Adjacency", Meta=(HidePin = "LineStartOffset"))
+	static TSet<FIntPoint> GetLocationsInLine(FIntPoint LineOrigin, EGridDirection PerpendicularDirection, int Length, int LineStartOffset = 0);
 
 private:
 	UPROPERTY()
