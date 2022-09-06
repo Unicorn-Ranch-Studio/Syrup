@@ -11,7 +11,7 @@
  */
 FTransform UGridLibrary::GridLocationToWorldTransform(FIntPoint Location)
 {
-	double XLocation = GetGridHeight() * Location.X - (IsGridLocationFlipped(Location) ? GetGridHeight() *.333333333333 : GetGridHeight() * .666666666666);
+	double XLocation = GetGridHeight() * Location.X + (!IsGridLocationFlipped(Location) ? GetGridHeight() *.333333333333 : GetGridHeight() * .666666666666);
 	double YLocation = GetGridSideLength() * Location.Y * 0.5;
 	FRotator Rotation = FRotator(0, IsGridLocationFlipped(Location) ? 180 : 0, 0);
 
@@ -59,6 +59,17 @@ FIntPoint UGridLibrary::WorldLocationToGridLocation(FVector Location)
 	}
 	
 	return ApproximateLocation;
+}
+
+/*
+ * Gets snaps a given location to the grid.
+ *
+ * @param Location - The location in the world to snap.
+ * @return The snaped transform.
+ */
+FTransform UGridLibrary::SnapWorldLocationToGrid(FVector Location)
+{
+	return GridLocationToWorldTransform(WorldLocationToGridLocation(Location));
 }
 
 /*
@@ -126,6 +137,45 @@ EGridDirection UGridLibrary::FlipDirection(EGridDirection Direction)
 bool UGridLibrary::IsDirectionValidAtLocation(EGridDirection Direction, FIntPoint Location)
 {
 	return (uint8)Direction % 2 == IsGridLocationFlipped(Location);
+}
+
+/*
+ * Gets where the a given relative location of a tile would be if its root was pointed in a given direction. Intial direction assumed to be up.
+ *
+ * @param Direction - The given direction.
+ * @param Location - The given location.
+ * @return Where the a given relative location of a tile would be if its root was pointed in a given direction.
+ */
+FIntPoint UGridLibrary::PointLocationInDirection(EGridDirection Direction, FIntPoint Location)
+{
+	// Flip if Nessesary
+	if (IsDirectionValidAtLocation(Direction, FIntPoint::ZeroValue))
+	{
+		Location.X = -Location.X;
+	}
+
+	// Gets the world location of the location to rotate.
+	FVector WorldLocation = GridLocationToWorldTransform(Location).GetTranslation() - FVector(GetGridHeight() * 0.33333333333333, 0, 0);
+	// Rotates that location in world space
+	WorldLocation = WorldLocation.RotateAngleAxis(((uint8)Direction / 2) * 120, FVector(0, 0, 1));
+	// Translates that back to grid space
+	return WorldLocationToGridLocation(WorldLocation + FVector(GetGridHeight() * 0.33333333333333, 0, 0));
+}
+
+/*
+ * Gets where the a given set of relative locations of a shape would be if its root was pointed in a given direction. Intial direction assumed to be up.
+ *
+ * @param Direction - The given direction.
+ * @param Location - The given set of  locations.
+ * @return Where the a given relative location of a shape would be if its root was pointed in a given direction.
+ */
+TSet<FIntPoint> UGridLibrary::PointShapeInDirection(EGridDirection Direction, TSet<FIntPoint> TileLocations)
+{
+	for (FIntPoint& EachTileLocation : TileLocations)
+	{
+		EachTileLocation = PointLocationInDirection(Direction, EachTileLocation);
+	}
+	return TileLocations;
 }
 
 /*

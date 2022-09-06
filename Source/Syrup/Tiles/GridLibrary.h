@@ -46,6 +46,15 @@ public:
 	static FIntPoint WorldLocationToGridLocation(FVector Location);
 
 	/*
+	 * Gets snaps a given location to the grid.
+	 * 
+	 * @param Location - The location in the world to snap.
+	 * @return The snaped transform.
+	 */
+	UFUNCTION(BlueprintPure, Category="Transformation|Grid")
+	static FTransform SnapWorldLocationToGrid(FVector Location);
+
+	/*
 	 * Gets the height of a single grid tile.
 	 * 
 	 * @return The height of a single grid tile.
@@ -102,6 +111,26 @@ public:
 	static bool IsDirectionValidAtLocation(EGridDirection Direction, FIntPoint Location);
 
 	/*
+	 * Gets where the a given relative location of a tile would be if its root was pointed in a given direction. Intial direction assumed to be up.
+	 * 
+	 * @param Direction - The given direction.
+	 * @param Location - The given location.
+	 * @return Where the a given relative location of a tile would be if its root was pointed in a given direction.
+	 */
+	UFUNCTION(BlueprintPure, Category = "Transformation|Grid|Direction")
+	static FIntPoint PointLocationInDirection(EGridDirection Direction, FIntPoint Location);
+
+	/*
+	 * Gets where the a given set of relative locations of a shape would be if its root was pointed in a given direction. Intial direction assumed to be up.
+	 *
+	 * @param Direction - The given direction.
+	 * @param Location - The given set of  locations.
+	 * @return Where the a given relative location of a shape would be if its root was pointed in a given direction.
+	 */
+	UFUNCTION(BlueprintPure, Category = "Transformation|Grid|Direction")
+	static TSet<FIntPoint> PointShapeInDirection(EGridDirection Direction, TSet<FIntPoint> TileLocations);
+
+	/*
 	 * Gets all the grid locations adjacent to a given grid location.
 	 *
 	 * @param Location - The given location.
@@ -146,5 +175,5 @@ public:
 
 private:
 	UPROPERTY()
-	double GridHeight = 300;
+	double GridHeight = 51.9615242270663188058233902451761710082841576;
 };
