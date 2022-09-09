@@ -34,7 +34,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly)
 	UMaterialInterface* TileMaterial;
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
 	UInstancedStaticMeshComponent* SubtileMesh;
 
 private:
