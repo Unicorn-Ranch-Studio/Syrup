@@ -150,18 +150,20 @@ bool UGridLibrary::IsDirectionValidAtLocation(EGridDirection Direction, FIntPoin
  */
 FIntPoint UGridLibrary::PointLocationInDirection(EGridDirection Direction, FIntPoint Location)
 {
+	// Gets the world location of the location to rotate.
+	FVector WorldLocation = GridLocationToWorldTransform(Location).GetTranslation() - FVector(GetGridHeight() * 0.33333333333333, 0, 0);
+	// Rotates that location in world space
+	WorldLocation = WorldLocation.RotateAngleAxis(((uint8)Direction / 2) * 120, FVector(0, 0, 1));
+	// Translates that back to grid space
+	Location =  WorldLocationToGridLocation(WorldLocation + FVector(GetGridHeight() * 0.33333333333333, 0, 0));
+
 	// Flip if Nessesary
 	if (IsDirectionValidAtLocation(Direction, FIntPoint::ZeroValue))
 	{
 		Location.X = -Location.X;
 	}
 
-	// Gets the world location of the location to rotate.
-	FVector WorldLocation = GridLocationToWorldTransform(Location).GetTranslation() - FVector(GetGridHeight() * 0.33333333333333, 0, 0);
-	// Rotates that location in world space
-	WorldLocation = WorldLocation.RotateAngleAxis(((uint8)Direction / 2) * 120, FVector(0, 0, 1));
-	// Translates that back to grid space
-	return WorldLocationToGridLocation(WorldLocation + FVector(GetGridHeight() * 0.33333333333333, 0, 0));
+	return Location;
 }
 
 /*

@@ -45,7 +45,4 @@ private:
 	//The mesh used for each tile as the ground.
 	UPROPERTY()
 	UStaticMesh* TileMesh;
-
-	//The prevous grid location of this mesh.
-	FIntPoint PrevousGridLocation;
 };

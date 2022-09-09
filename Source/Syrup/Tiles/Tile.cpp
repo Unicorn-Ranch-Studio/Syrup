@@ -10,6 +10,9 @@ ATile::ATile()
 {
 	TileLocations.Add(FIntPoint::ZeroValue);
 
+	//Create Root
+	RootComponent = CreateDefaultSubobject<USceneComponent>(FName("Root"));
+	
 	//Get Tile Mesh
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> MeshRef(TEXT("/Game/Tiles/SM_Tile.SM_Tile"));
 	TileMesh = MeshRef.Object;
@@ -17,9 +20,11 @@ ATile::ATile()
 
 	//Create subtile mesh
 	SubtileMesh = CreateDefaultSubobject<UInstancedStaticMeshComponent>(FName("Subtile Mesh Instances"));
+	SubtileMesh->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
+	SubtileMesh->SetAbsolute(true);
 	SubtileMesh->SetStaticMesh(TileMesh);
 	SubtileMesh->SetMaterial(0, TileMaterial);
-	RootComponent = SubtileMesh;
+	SubtileMesh->CastShadow = false;
 }
 
 void ATile::OnConstruction(const FTransform& Transform)
@@ -28,14 +33,15 @@ void ATile::OnConstruction(const FTransform& Transform)
 
 	FIntPoint GridLocation = GetGridLocation();
 
-	SubtileMesh->ClearInstances();
-	SubtileMesh->InstancingRandomSeed = FMath::Rand();
-
 	//Snap direction
 	if (UGridLibrary::IsDirectionValidAtLocation(Orientation, GridLocation))
 	{
 		Orientation = UGridLibrary::FlipDirection(Orientation);
 	}
+
+	//Reset Mesh
+	SubtileMesh->ClearInstances();
+	SubtileMesh->InstancingRandomSeed = FMath::Rand();
 
 	//Ensure tile has valid orign
 	TileLocations.Add(FIntPoint::ZeroValue);
@@ -44,17 +50,19 @@ void ATile::OnConstruction(const FTransform& Transform)
 	TArray<FTransform> TileWorldTransforms = TArray<FTransform>();
 	for (FIntPoint EachTileLocation : TileLocations)
 	{
-		FTransform TileWorldTransform = UGridLibrary::GridLocationToWorldTransform(UGridLibrary::PointLocationInDirection(Orientation, EachTileLocation) + GridLocation);
+		FIntPoint RotatedGridLocation = UGridLibrary::PointLocationInDirection(Orientation, EachTileLocation);
+		FTransform TileWorldTransform = UGridLibrary::GridLocationToWorldTransform(RotatedGridLocation + GridLocation);
 		TileWorldTransforms.Add(TileWorldTransform);
-		
+
 		FVector TileWorldLocation = TileWorldTransform.GetTranslation();
 		FHitResult HitResult = FHitResult();
 
 		checkCode
 		(
-			if (GetWorld()->LineTraceSingleByObjectType(HitResult, TileWorldLocation, TileWorldLocation + FVector(0, 0, -KINDA_SMALL_NUMBER), FCollisionObjectQueryParams::AllDynamicObjects))
+			ATile* OverlapedTile = nullptr;
+			if (UGridLibrary::OverlapGridLocation(this, RotatedGridLocation + GridLocation, OverlapedTile, TArray<AActor*>()))
 			{
-				UE_LOG(LogTemp, Warning, TEXT("Tiles overlaping at: %s"), *TileWorldLocation.ToString());
+				UE_LOG(LogLevel, Warning, TEXT("%s is overlaping %s at: %s"), *GetName(), *OverlapedTile->GetName(), *TileWorldLocation.ToString());
 				DrawDebugPoint(GetWorld(), TileWorldTransforms.Last().GetTranslation() + FVector(0, 0, 1), 50, FColor::Red, false, 5);
 			}
 		);
