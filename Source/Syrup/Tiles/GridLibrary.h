@@ -6,6 +6,8 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "GridLibrary.generated.h"
 
+class ATile;
+
 UENUM(BlueprintType)
 enum class EGridDirection : uint8
 {
@@ -160,7 +162,6 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Transformation|Grid|Adjacency")
 	static TSet<FIntPoint> ScaleShapeUp(TSet<FIntPoint> Shape, int Size, bool bChopPoints = false);
 
-	
 	/*
 	 * Gets all the grid locations of a line.
 	 *
@@ -172,6 +173,32 @@ public:
 	 */
 	UFUNCTION(BlueprintPure, Category = "Transformation|Grid|Adjacency", Meta=(HidePin = "LineStartOffset"))
 	static TSet<FIntPoint> GetLocationsInLine(FIntPoint LineOrigin, EGridDirection PerpendicularDirection, int Length = 3, int LineStartOffset = 0);
+
+	/**
+	 * Checks a given grid location for a tile.
+	 * 
+	 * @param WorldContext - The an object in world to check.
+	 * @param GridLocation - The given grid location to check.
+	 * @param OverlapingTile - Will be set to the tile at the given location if there is one, otherwise is nullptr.
+	 * @param IgnoredTiles - The tiles to ignore when querying.
+	 * @return Whether or not a tile was at the given location.
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Transformation|Grid|Collision", Meta = (WorldContext = "WorldContext", AutoCreateRefTerm = "IgnoredTiles"))
+	static bool OverlapGridLocation(const UObject* WorldContext, const FIntPoint GridLocation, ATile*& OverlapingTile, const TArray<AActor*>& IgnoredTiles);
+	
+	
+	/**
+	 * Checks a given shape's grid locations for tiles.
+	 * 
+	 * @param WorldContext - The an object in world to check.
+	 * @param ShapeGridLocations - The given shape's grid locations to check.
+	 * @param OverlapingTiles - Will be set to the tile at the given location if there is one, otherwise is nullptr.
+	 * @param IgnoredTiles - The tiles to ignore when querying.
+	 * @return Whether or not a tile was at overlaping the given shape.
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Transformation|Grid|Collision", Meta=(WorldContext = "WorldContext", AutoCreateRefTerm = "IgnoredTiles"))
+	static bool OverlapShape(const UObject* WorldContext, const TSet<FIntPoint>& ShapeGridLocations, TSet<ATile*>& OverlapingTiles, const TArray<AActor*>& IgnoredTiles);
+
 private:
 	UPROPERTY()
 	double GridHeight = 51.9615242270663188058233902451761710082841576;

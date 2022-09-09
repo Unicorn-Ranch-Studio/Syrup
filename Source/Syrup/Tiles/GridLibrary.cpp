@@ -3,6 +3,8 @@
 
 #include "GridLibrary.h"
 
+#include "Tile.h"
+
 /*
  * Gets the world transform of a grid location.
  *
@@ -361,4 +363,50 @@ TSet<FIntPoint> UGridLibrary::GetLocationsInLine(FIntPoint LineOrigin, EGridDire
 	}
 
 	return ReturnValue;
+}
+
+/**
+ * Checks a given grid location for a tile.
+ *
+ * @param WorldContext - The an object in world to check.
+ * @param GridLocation - The given grid location to check.
+ * @param OverlapingTile - Will be set to the tile at the given location if there is one, otherwise is nullptr.
+ * @param IgnoredTiles - The tiles to ignore when querying.
+ * @return Whether or not a tile was at the given location.
+ */
+bool UGridLibrary::OverlapGridLocation(const UObject* WorldContext, const FIntPoint GridLocation, ATile*& OverlapingTile, const TArray<AActor*>& IgnoredTiles)
+{
+	FCollisionQueryParams Params = FCollisionQueryParams();
+	Params.AddIgnoredActors(IgnoredTiles);
+
+	FHitResult Hit = FHitResult();
+
+	FVector WorldLocation = GridLocationToWorldTransform(GridLocation).GetTranslation();
+
+	bool ReturnValue = WorldContext->GetWorld()->LineTraceSingleByObjectType(Hit, WorldLocation, WorldLocation - FVector(0, 0, KINDA_SMALL_NUMBER), FCollisionObjectQueryParams::AllDynamicObjects, Params);
+	OverlapingTile = Cast<ATile>(Hit.GetActor());
+	return IsValid(OverlapingTile);
+}
+
+/**
+ * Checks a given shape's grid locations for tiles.
+ *
+ * @param WorldContext - The an object in world to check.
+ * @param ShapeGridLocations - The given shape's grid locations to check.
+ * @param OverlapingTiles - Will be set to the tile at the given location if there is one, otherwise is nullptr.
+ * @param IgnoredTiles - The tiles to ignore when querying.
+ * @return Whether or not a tile was at overlaping the given shape.
+ */
+bool UGridLibrary::OverlapShape(const UObject* WorldContext, const TSet<FIntPoint>& ShapeGridLocations, TSet<ATile*>& OverlapingTiles, const TArray<AActor*>& IgnoredTiles)
+{
+	for (FIntPoint EachShapeGridLocation : ShapeGridLocations)
+	{
+		ATile* OverlapedTile;
+		OverlapGridLocation(WorldContext, EachShapeGridLocation, OverlapedTile, IgnoredTiles);
+		if (IsValid(OverlapedTile))
+		{
+			OverlapingTiles.Add(OverlapedTile);
+		}
+	}
+	return (bool)(OverlapingTiles.Num());
 }
