@@ -172,7 +172,6 @@ public:
 	 */
 	UFUNCTION(BlueprintPure, Category = "Transformation|Grid|Adjacency", Meta=(HidePin = "LineStartOffset"))
 	static TSet<FIntPoint> GetLocationsInLine(FIntPoint LineOrigin, EGridDirection PerpendicularDirection, int Length = 3, int LineStartOffset = 0);
-
 private:
 	UPROPERTY()
 	double GridHeight = 51.9615242270663188058233902451761710082841576;

@@ -4,6 +4,7 @@
 #include "Tile.h"
 
 #include "Components/InstancedStaticMeshComponent.h"
+#include "DrawDebugHelpers.h"
 
 ATile::ATile()
 {
@@ -43,7 +44,20 @@ void ATile::OnConstruction(const FTransform& Transform)
 	TArray<FTransform> TileWorldTransforms = TArray<FTransform>();
 	for (FIntPoint EachTileLocation : TileLocations)
 	{
-		TileWorldTransforms.Add(UGridLibrary::GridLocationToWorldTransform(UGridLibrary::PointLocationInDirection(Orientation, EachTileLocation) + GridLocation));
+		FTransform TileWorldTransform = UGridLibrary::GridLocationToWorldTransform(UGridLibrary::PointLocationInDirection(Orientation, EachTileLocation) + GridLocation);
+		TileWorldTransforms.Add(TileWorldTransform);
+		
+		FVector TileWorldLocation = TileWorldTransform.GetTranslation();
+		FHitResult HitResult = FHitResult();
+
+		checkCode
+		(
+			if (GetWorld()->LineTraceSingleByObjectType(HitResult, TileWorldLocation, TileWorldLocation + FVector(0, 0, -KINDA_SMALL_NUMBER), FCollisionObjectQueryParams::AllDynamicObjects))
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Tiles overlaping at: %s"), *TileWorldLocation.ToString());
+				DrawDebugPoint(GetWorld(), TileWorldTransforms.Last().GetTranslation() + FVector(0, 0, 1), 50, FColor::Red, false, 5);
+			}
+		);
 	}
 
 	SubtileMesh->AddInstances(TileWorldTransforms, false, true);
