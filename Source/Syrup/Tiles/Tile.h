@@ -8,14 +8,32 @@
 #include "GameFramework/Actor.h"
 #include "Tile.generated.h"
 
+
+/* \/ ===== \/ *\
+|  \/ ATile \/  |
+\* \/ ===== \/ */
+/**
+ * An object that snaps to the grid. 
+ * 
+ * May take up multiple grid locations by adding to the grid locations array.
+ */
 UCLASS()
 class SYRUP_API ATile : public AActor
 {
 	GENERATED_BODY()
 	
 public:	
+	/**
+	 * Sets up the root and subtile mesh compoenents.
+	 */
 	ATile();
 
+	/**
+	 * Adjusts the subtile mesh location so that it is always snaped to the
+	 * grid location and oreintation closest to its world transform.
+	 * 
+	 * @param Transform - The new transform of the tile.
+	 */
 	virtual void OnConstruction(const FTransform& Transform) override;
 
 	/**
@@ -42,3 +60,6 @@ private:
 	UPROPERTY()
 	UStaticMesh* TileMesh;
 };
+/* /\ ===== /\ *\
+|  /\ ATile /\  |
+\* /\ ===== /\ */
