@@ -21,7 +21,7 @@ ATile::ATile()
 	//Create subtile mesh
 	SubtileMesh = CreateDefaultSubobject<UInstancedStaticMeshComponent>(FName("Subtile Mesh Instances"));
 	SubtileMesh->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
-	SubtileMesh->SetAbsolute(true);
+	SubtileMesh->SetAbsolute(true, true);
 	SubtileMesh->SetStaticMesh(TileMesh);
 	SubtileMesh->SetMaterial(0, TileMaterial);
 	SubtileMesh->CastShadow = false;
@@ -29,6 +29,7 @@ ATile::ATile()
 
 void ATile::OnConstruction(const FTransform& Transform)
 {
+	SetActorTransform(Transform * (FTransform(-FVector(0, 0, Transform.GetTranslation().Z))));
 	SubtileMesh->SetMaterial(0, TileMaterial);
 
 	FGridTransform GridTransform = GetGridTransform();
@@ -37,6 +38,7 @@ void ATile::OnConstruction(const FTransform& Transform)
 	//Reset Mesh
 	SubtileMesh->ClearInstances();
 	SubtileMesh->InstancingRandomSeed = FMath::Rand();
+	SubtileMesh->SetWorldTransform(UGridLibrary::GridTransformToWorldTransform(GridTransform));
 
 	//Ensure tile has valid orign
 	TileLocations.Add(FIntPoint::ZeroValue);

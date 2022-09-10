@@ -14,9 +14,10 @@
 FTransform UGridLibrary::GridTransformToWorldTransform(const FGridTransform GridTransform)
 {
 	FIntPoint Location = GridTransform.Location;
-	double XLocation = GetGridHeight() * Location.X + (!IsGridLocationFlipped(Location) ? GetGridHeight() *.333333333333 : GetGridHeight() * .666666666666);
+	bool bIsFlipped = IsGridLocationFlipped(Location);
+	double XLocation = GetGridHeight() * Location.X + (!bIsFlipped ? GetGridHeight() *.333333333333 : GetGridHeight() * .666666666666);
 	double YLocation = GetGridSideLength() * Location.Y * 0.5;
-	FRotator Rotation = FRotator(0, (IsGridLocationFlipped(Location) ? 180 : 0) + 120 * (uint8)GridTransform.Direction, 0);
+	FRotator Rotation = FRotator(0, (bIsFlipped ? -60 : -120) + (bIsFlipped ? 120 : -120) * (uint8)GridTransform.Direction, 0);
 
 	return FTransform(Rotation, FVector(XLocation, YLocation, 0));
 }
