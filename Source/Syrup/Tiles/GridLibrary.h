@@ -19,6 +19,26 @@ enum class EGridDirection : uint8
 	DownLeft	= 5		UMETA(DisplayName = "Down and to the Left")
 };
 
+USTRUCT(BlueprintType)
+struct SYRUP_API FGridTransform
+{
+	GENERATED_BODY()
+
+	//The grid location.
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FIntPoint Location = FIntPoint::ZeroValue;
+
+	//The direction on the grid.
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	EGridDirection Direction = EGridDirection::Up;
+
+	FGridTransform(FIntPoint GridLocation = FIntPoint::ZeroValue, EGridDirection GridDirection = EGridDirection::Up)
+	{
+		Location = GridLocation;
+		Direction = GridDirection;
+	}
+};
+
 /**
  * A library for functions related to the in game grid.
  */
@@ -30,31 +50,31 @@ class SYRUP_API UGridLibrary : public UBlueprintFunctionLibrary
 
 public:
 	/*
-	 * Gets the world transform of a grid location.
+	 * Gets the world transform of a grid transform.
 	 * 
-	 * @param Location - The location on the grid to get the tranform of.
-	 * @return The world transform of a grid location.
+	 * @param Location - The transform on the grid to get the tranform of.
+	 * @return The world transform of the grid transform.
 	 */
 	UFUNCTION(BlueprintPure, Category="Transformation|Grid")
-	static FTransform GridLocationToWorldTransform(FIntPoint Location);
+	static FTransform GridTransformToWorldTransform(const FGridTransform GridTransform);
 
 	/*
-	 * Gets the grid location of a world location.
+	 * Gets the grid transform of a world transform.
 	 * 
-	 * @param Location - The location in the world to get the grid location of.
-	 * @return The grid location of a world location.
+	 * @param WorldTransform - The transform in the world to get the grid location of.
+	 * @return The grid transform of the world transform.
 	 */
 	UFUNCTION(BlueprintPure, Category="Transformation|Grid")
-	static FIntPoint WorldLocationToGridLocation(FVector Location);
+	static FGridTransform WorldTransformToGridTransform(const FTransform WorldTransform);
 
 	/*
-	 * Gets snaps a given location to the grid.
+	 * Gets snaps a given transform to the grid.
 	 * 
-	 * @param Location - The location in the world to snap.
+	 * @param Location - The transform in the world to snap.
 	 * @return The snaped transform.
 	 */
 	UFUNCTION(BlueprintPure, Category="Transformation|Grid")
-	static FTransform SnapWorldLocationToGrid(FVector Location);
+	static FTransform SnapWorldTransformToGrid(const FTransform Transform);
 
 	/*
 	 * Gets the height of a single grid tile.
@@ -79,7 +99,7 @@ public:
 	 * @return Whether or not a tile at a given grid location will be fliped.
 	 */
 	UFUNCTION(BlueprintPure, Category = "Transformation|Grid")
-	static bool IsGridLocationFlipped(FIntPoint Location);
+	static bool IsGridLocationFlipped(const FIntPoint Location);
 
 	
 	/*
@@ -90,7 +110,7 @@ public:
 	 * @return The grid direction after a given grid direction.
 	 */
 	UFUNCTION(BlueprintPure, Category = "Transformation|Grid|Direction")
-	static EGridDirection GetNextDirection(EGridDirection Direction, bool bCounterClockwise = false);
+	static EGridDirection GetNextDirection(const EGridDirection Direction, const bool bCounterClockwise = false);
 
 	
 	/*
@@ -100,7 +120,7 @@ public:
 	 * @return The opposite grid direction of a given grid direction.
 	 */
 	UFUNCTION(BlueprintPure, Category = "Transformation|Grid|Direction")
-	static EGridDirection FlipDirection(EGridDirection Direction);
+	static EGridDirection FlipDirection(const EGridDirection Direction);
 
 	/*
 	 * Gets whether or not a given direction is valid at a given location.
@@ -110,7 +130,7 @@ public:
 	 * @return Whether or not a given direction is valid at a given location.
 	 */
 	UFUNCTION(BlueprintPure, Category = "Transformation|Grid|Direction")
-	static bool IsDirectionValidAtLocation(EGridDirection Direction, FIntPoint Location);
+	static bool IsDirectionValidAtLocation(const EGridDirection Direction, const FIntPoint Location);
 
 	/*
 	 * Gets where the a given relative location of a tile would be if its root was pointed in a given direction. Intial direction assumed to be up.
@@ -120,7 +140,7 @@ public:
 	 * @return Where the a given relative location of a tile would be if its root was pointed in a given direction.
 	 */
 	UFUNCTION(BlueprintPure, Category = "Transformation|Grid|Direction")
-	static FIntPoint PointLocationInDirection(EGridDirection Direction, FIntPoint Location);
+	static FIntPoint PointLocationInDirection(const EGridDirection Direction, const FIntPoint Location);
 
 	/*
 	 * Gets where the a given set of relative locations of a shape would be if its root was pointed in a given direction. Intial direction assumed to be up.
@@ -130,7 +150,7 @@ public:
 	 * @return Where the a given relative location of a shape would be if its root was pointed in a given direction.
 	 */
 	UFUNCTION(BlueprintPure, Category = "Transformation|Grid|Direction")
-	static TSet<FIntPoint> PointShapeInDirection(EGridDirection Direction, TSet<FIntPoint> TileLocations);
+	static TSet<FIntPoint> PointShapeInDirection(const EGridDirection Direction, const TSet<FIntPoint> TileLocations);
 
 	/*
 	 * Gets all the grid locations adjacent to a given grid location.
@@ -140,7 +160,7 @@ public:
 	 * @return All the locations adjacent to a given location.
 	 */
 	UFUNCTION(BlueprintPure, Category = "Transformation|Grid|Adjacency")
-	static TMap<EGridDirection, FIntPoint> GetAdjacentGridLocations(FIntPoint Location);
+	static TMap<EGridDirection, FIntPoint> GetAdjacentGridLocations(const FIntPoint Location);
 
 	/*
 	 * Gets all the grid locations within a radius of a given grid location.
@@ -150,7 +170,7 @@ public:
 	 * @return All the grid locations within a radius of a given grid location.
 	 */
 	UFUNCTION(BlueprintPure, Category = "Transformation|Grid|Adjacency")
-	static TSet<FIntPoint> GetGridLocationsInRadius(FIntPoint Location, double Radius);
+	static TSet<FIntPoint> GetGridLocationsInRadius(const FIntPoint Location, const double Radius);
 
 	/*
 	 * Gets all the grid locations of a given shape when scaled up.
@@ -160,7 +180,7 @@ public:
 	 * @return All the grid locations of a given shape when scaled up.
 	 */
 	UFUNCTION(BlueprintPure, Category = "Transformation|Grid|Adjacency")
-	static TSet<FIntPoint> ScaleShapeUp(TSet<FIntPoint> Shape, int Size, bool bChopPoints = false);
+	static TSet<FIntPoint> ScaleShapeUp(const TSet<FIntPoint> Shape, const int Size, const bool bChopPoints = false);
 
 	/*
 	 * Gets all the grid locations of a line.
@@ -172,7 +192,7 @@ public:
 	 * @return All the grid locations of a line.
 	 */
 	UFUNCTION(BlueprintPure, Category = "Transformation|Grid|Adjacency", Meta=(HidePin = "LineStartOffset"))
-	static TSet<FIntPoint> GetLocationsInLine(FIntPoint LineOrigin, EGridDirection PerpendicularDirection, int Length = 3, int LineStartOffset = 0);
+	static TSet<FIntPoint> GetLocationsInLine(const FIntPoint LineOrigin, const EGridDirection PerpendicularDirection, const int Length = 3, const int LineStartOffset = 0);
 
 	/**
 	 * Checks a given grid location for a tile.

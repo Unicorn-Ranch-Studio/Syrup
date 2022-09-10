@@ -31,13 +31,8 @@ void ATile::OnConstruction(const FTransform& Transform)
 {
 	SubtileMesh->SetMaterial(0, TileMaterial);
 
-	FIntPoint GridLocation = GetGridLocation();
+	FGridTransform GridTransform = GetGridTransform();
 
-	//Snap direction
-	if (UGridLibrary::IsDirectionValidAtLocation(Orientation, GridLocation))
-	{
-		Orientation = UGridLibrary::FlipDirection(Orientation);
-	}
 
 	//Reset Mesh
 	SubtileMesh->ClearInstances();
@@ -50,8 +45,8 @@ void ATile::OnConstruction(const FTransform& Transform)
 	TArray<FTransform> TileWorldTransforms = TArray<FTransform>();
 	for (FIntPoint EachTileLocation : TileLocations)
 	{
-		FIntPoint RotatedGridLocation = UGridLibrary::PointLocationInDirection(Orientation, EachTileLocation);
-		FTransform TileWorldTransform = UGridLibrary::GridLocationToWorldTransform(RotatedGridLocation + GridLocation);
+		FIntPoint RotatedGridLocation = UGridLibrary::PointLocationInDirection(GridTransform.Direction, EachTileLocation);
+		FTransform TileWorldTransform = UGridLibrary::GridTransformToWorldTransform(FGridTransform(RotatedGridLocation + GridTransform.Location));
 		TileWorldTransforms.Add(TileWorldTransform);
 
 		FVector TileWorldLocation = TileWorldTransform.GetTranslation();
@@ -60,7 +55,7 @@ void ATile::OnConstruction(const FTransform& Transform)
 		checkCode
 		(
 			ATile* OverlapedTile = nullptr;
-			if (UGridLibrary::OverlapGridLocation(this, RotatedGridLocation + GridLocation, OverlapedTile, TArray<AActor*>()))
+			if (UGridLibrary::OverlapGridLocation(this, RotatedGridLocation + GridTransform.Location, OverlapedTile, TArray<AActor*>()))
 			{
 				UE_LOG(LogLevel, Warning, TEXT("%s is overlaping %s at: %s"), *GetName(), *OverlapedTile->GetName(), *TileWorldLocation.ToString());
 				DrawDebugPoint(GetWorld(), TileWorldTransforms.Last().GetTranslation() + FVector(0, 0, 1), 50, FColor::Red, false, 5);
@@ -72,11 +67,11 @@ void ATile::OnConstruction(const FTransform& Transform)
 }
 
 /**
- * Gets the grid location this tile.
+ * Gets the grid transform this tile.
  *
- * @return The grid location this tile.
+ * @return The grid transform this tile.
  */
-FIntPoint ATile::GetGridLocation()
+FGridTransform ATile::GetGridTransform() const
 {
-	return UGridLibrary::WorldLocationToGridLocation(GetActorLocation());
+	return UGridLibrary::WorldTransformToGridTransform(GetActorTransform());
 }

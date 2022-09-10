@@ -19,16 +19,12 @@ public:
 	virtual void OnConstruction(const FTransform& Transform) override;
 
 	/**
-	 * Gets the grid location this tile.
-	 * 
-	 * @return The grid location this tile.
+	 * Gets the grid transform this tile.
+	 *
+	 * @return The grid transform this tile.
 	 */
 	UFUNCTION(BlueprintPure)
-	FIntPoint GetGridLocation();
-
-	//The current orientation of this tile.
-	UPROPERTY(EditInstanceOnly)
-	EGridDirection Orientation = EGridDirection::Up;
+	FGridTransform GetGridTransform() const;
 
 protected:
 	UPROPERTY(EditDefaultsOnly)

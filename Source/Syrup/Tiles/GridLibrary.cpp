@@ -6,31 +6,34 @@
 #include "Tile.h"
 
 /*
- * Gets the world transform of a grid location.
+ * Gets the world transform of a grid transform.
  *
- * @param Location - The location on the grid to get the tranform of.
- * @return The world transform of a grid location.
+ * @param Location - The transform on the grid to get the tranform of.
+ * @return The world transform of the grid transform.
  */
-FTransform UGridLibrary::GridLocationToWorldTransform(FIntPoint Location)
+FTransform UGridLibrary::GridTransformToWorldTransform(const FGridTransform GridTransform)
 {
+	FIntPoint Location = GridTransform.Location;
 	double XLocation = GetGridHeight() * Location.X + (!IsGridLocationFlipped(Location) ? GetGridHeight() *.333333333333 : GetGridHeight() * .666666666666);
 	double YLocation = GetGridSideLength() * Location.Y * 0.5;
-	FRotator Rotation = FRotator(0, IsGridLocationFlipped(Location) ? 180 : 0, 0);
+	FRotator Rotation = FRotator(0, (IsGridLocationFlipped(Location) ? 180 : 0) + 120 * (uint8)GridTransform.Direction, 0);
 
 	return FTransform(Rotation, FVector(XLocation, YLocation, 0));
 }
 
 /*
- * Gets the grid location of a world location.
+ * Gets the grid transform of a world transform.
  *
- * @param Location - The location in the world to get the grid location of.
- * @return The grid location of a world location.
+ * @param WorldTransform - The transform in the world to get the grid location of.
+ * @return The grid transform of the world transform.
  */
-FIntPoint UGridLibrary::WorldLocationToGridLocation(FVector Location)
+FGridTransform UGridLibrary::WorldTransformToGridTransform(const FTransform WorldTransform)
 {
-	FVector2D GridLocation = FVector2D(Location) / FVector2D(GetGridHeight(), GetGridSideLength() * 0.5);
+	//Scale to grid
+	FVector2D GridLocation = FVector2D(WorldTransform.GetLocation()) / FVector2D(GetGridHeight(), GetGridSideLength() * 0.5);
 	GridLocation.Y += 0.5;
 
+	//Get the distance from the aproapreate edge.
 	FVector2D RelativeLocation = FVector2D(FMath::Fractional(GridLocation.X), FMath::Fractional(GridLocation.Y));
 	if (RelativeLocation.X < 0)
 	{
@@ -41,37 +44,43 @@ FIntPoint UGridLibrary::WorldLocationToGridLocation(FVector Location)
 		RelativeLocation.Y = 1 + RelativeLocation.Y;
 	}
 
+	//Floor to grid location
 	FIntPoint ApproximateLocation = FIntPoint(FMath::Floor(GridLocation.X), FMath::Floor(GridLocation.Y));
-
 	bool bIsFlipped = IsGridLocationFlipped(ApproximateLocation);
-	
-	if (RelativeLocation.X < 0.5 != bIsFlipped)
+
+	//Adjust for points
+	if (RelativeLocation.X < 0.5 == bIsFlipped)
 	{
-		return ApproximateLocation;
+		if (bIsFlipped)
+		{
+			RelativeLocation.X = 1 - RelativeLocation.X;
+		}
+
+		if (RelativeLocation.Y < RelativeLocation.X - 0.5 || 1 - RelativeLocation.Y < RelativeLocation.X - 0.5)
+		{
+			ApproximateLocation = ApproximateLocation + (RelativeLocation.Y > 0.5 ? FIntPoint(0, 1) : FIntPoint(0, -1));
+		}
 	}
 
-	if (bIsFlipped)
-	{
-		RelativeLocation.X = 1 - RelativeLocation.X;
-	}
+	//Get grid direction
+	bIsFlipped = IsGridLocationFlipped(ApproximateLocation);
+	float Yaw = WorldTransform.GetRotation().Rotator().Yaw * (bIsFlipped ? -1 : 1) + (bIsFlipped ? 240 : 60);
+	Yaw = Yaw < 0 ? 360 + Yaw : Yaw;
+	Yaw = FMath::Fmod(Yaw, 360);
+	EGridDirection Direction = (EGridDirection)(((int)(Yaw / 120) * 2) + (bIsFlipped ? 0 : 1));
 
-	if (RelativeLocation.Y < RelativeLocation.X - 0.5 || 1 - RelativeLocation.Y < RelativeLocation.X - 0.5)
-	{
-		return ApproximateLocation + (RelativeLocation.Y > 0.5 ? FIntPoint(0, 1) : FIntPoint(0, -1));
-	}
-	
-	return ApproximateLocation;
+	return FGridTransform(ApproximateLocation, Direction);
 }
 
 /*
- * Gets snaps a given location to the grid.
+ * Gets snaps a given transform to the grid.
  *
- * @param Location - The location in the world to snap.
+ * @param Location - The transform in the world to snap.
  * @return The snaped transform.
  */
-FTransform UGridLibrary::SnapWorldLocationToGrid(FVector Location)
+FTransform UGridLibrary::SnapWorldTransformToGrid(const FTransform Transform)
 {
-	return GridLocationToWorldTransform(WorldLocationToGridLocation(Location));
+	return GridTransformToWorldTransform(WorldTransformToGridTransform(Transform));
 }
 
 /*
@@ -100,7 +109,7 @@ double UGridLibrary::GetGridSideLength()
  * @param Location - The location of the tile.
  * @return Whether or not a tile at a given grid location will be fliped.
  */
-bool UGridLibrary::IsGridLocationFlipped(FIntPoint Location)
+bool UGridLibrary::IsGridLocationFlipped(const FIntPoint Location)
 {
 	return FMath::Abs(Location.Y % 2) != FMath::Abs(Location.X % 2);
 }
@@ -112,7 +121,7 @@ bool UGridLibrary::IsGridLocationFlipped(FIntPoint Location)
  * @param bCounterClockwise - Whether after is defined as being counterclockwise of instead of clockwise of.
  * @return The grid direction after a given grid direction.
  */
-EGridDirection UGridLibrary::GetNextDirection(EGridDirection Direction, bool bCounterClockwise)
+EGridDirection UGridLibrary::GetNextDirection(const EGridDirection Direction, const bool bCounterClockwise)
 {
 	return (EGridDirection)(((uint8)Direction + (bCounterClockwise ? 4 : 2)) % 6);
 }
@@ -123,7 +132,7 @@ EGridDirection UGridLibrary::GetNextDirection(EGridDirection Direction, bool bCo
  * @param Direction - The given direction.
  * @return The opposite grid direction of a given grid direction.
  */
-EGridDirection UGridLibrary::FlipDirection(EGridDirection Direction)
+EGridDirection UGridLibrary::FlipDirection(const EGridDirection Direction)
 {
 	uint8 IntDirection = (uint8)Direction;
 	return (EGridDirection)((IntDirection + (IntDirection % 2 ? -1 : 1)));
@@ -136,7 +145,7 @@ EGridDirection UGridLibrary::FlipDirection(EGridDirection Direction)
  * @param Location - The given location.
  * @return Whether or not a given direction is valid at a given location.
  */
-bool UGridLibrary::IsDirectionValidAtLocation(EGridDirection Direction, FIntPoint Location)
+bool UGridLibrary::IsDirectionValidAtLocation(const EGridDirection Direction, const FIntPoint Location)
 {
 	return (uint8)Direction % 2 == IsGridLocationFlipped(Location);
 }
@@ -148,22 +157,24 @@ bool UGridLibrary::IsDirectionValidAtLocation(EGridDirection Direction, FIntPoin
  * @param Location - The given location.
  * @return Where the a given relative location of a tile would be if its root was pointed in a given direction.
  */
-FIntPoint UGridLibrary::PointLocationInDirection(EGridDirection Direction, FIntPoint Location)
+FIntPoint UGridLibrary::PointLocationInDirection(const EGridDirection Direction, const FIntPoint Location)
 {
+	FIntPoint ReturnValue = Location;
+
 	// Gets the world location of the location to rotate.
-	FVector WorldLocation = GridLocationToWorldTransform(Location).GetTranslation() - FVector(GetGridHeight() * 0.33333333333333, 0, 0);
+	FVector WorldLocation = GridTransformToWorldTransform(Location).GetTranslation() - FVector(GetGridHeight() * 0.33333333333333, 0, 0);
 	// Rotates that location in world space
 	WorldLocation = WorldLocation.RotateAngleAxis(((uint8)Direction / 2) * 120, FVector(0, 0, 1));
 	// Translates that back to grid space
-	Location =  WorldLocationToGridLocation(WorldLocation + FVector(GetGridHeight() * 0.33333333333333, 0, 0));
+	ReturnValue = WorldTransformToGridTransform(FTransform(WorldLocation + FVector(GetGridHeight() * 0.33333333333333, 0, 0))).Location;
 
 	// Flip if Nessesary
 	if (IsDirectionValidAtLocation(Direction, FIntPoint::ZeroValue))
 	{
-		Location.X = -Location.X;
+		ReturnValue.X = -ReturnValue.X;
 	}
 
-	return Location;
+	return ReturnValue;
 }
 
 /*
@@ -173,13 +184,14 @@ FIntPoint UGridLibrary::PointLocationInDirection(EGridDirection Direction, FIntP
  * @param Location - The given set of  locations.
  * @return Where the a given relative location of a shape would be if its root was pointed in a given direction.
  */
-TSet<FIntPoint> UGridLibrary::PointShapeInDirection(EGridDirection Direction, TSet<FIntPoint> TileLocations)
+TSet<FIntPoint> UGridLibrary::PointShapeInDirection(const EGridDirection Direction, const TSet<FIntPoint> TileLocations)
 {
-	for (FIntPoint& EachTileLocation : TileLocations)
+	TSet<FIntPoint> RotatedTileLocations = TileLocations;
+	for (FIntPoint& EachTileLocation : RotatedTileLocations)
 	{
 		EachTileLocation = PointLocationInDirection(Direction, EachTileLocation);
 	}
-	return TileLocations;
+	return RotatedTileLocations;
 }
 
 /*
@@ -188,7 +200,7 @@ TSet<FIntPoint> UGridLibrary::PointShapeInDirection(EGridDirection Direction, TS
  * @param Location - The given location.
  * @return All the locations adjacent to a given location.
  */
-TMap<EGridDirection, FIntPoint> UGridLibrary::GetAdjacentGridLocations(FIntPoint Location)
+TMap<EGridDirection, FIntPoint> UGridLibrary::GetAdjacentGridLocations(const FIntPoint Location)
 {
 	TMap<EGridDirection, FIntPoint> AdjecentTiles = TMap<EGridDirection, FIntPoint>();
 	bool bFlip = IsGridLocationFlipped(Location);
@@ -207,10 +219,10 @@ TMap<EGridDirection, FIntPoint> UGridLibrary::GetAdjacentGridLocations(FIntPoint
  * @param Radius -  The Radius to get locations within.
  * @return All the grid locations within a radius of a given grid location.
  */
-TSet<FIntPoint> UGridLibrary::GetGridLocationsInRadius(FIntPoint Location, double Radius)
+TSet<FIntPoint> UGridLibrary::GetGridLocationsInRadius(const FIntPoint Location, const double Radius)
 {
-	Radius = FMath::Abs(Radius);
-	FIntPoint SearchArea = FIntPoint(FMath::CeilToDouble(Radius), FMath::CeilToDouble(Radius * 2 * 0.86602540378));
+	float AbsRadius = FMath::Abs(Radius);
+	FIntPoint SearchArea = FIntPoint(FMath::CeilToDouble(AbsRadius), FMath::CeilToDouble(AbsRadius * 2 * 0.86602540378));
 	double YSize = 1 / (2 * 0.86602540378);
 	TSet<FIntPoint> ReturnValue = TSet<FIntPoint>();
 
@@ -218,7 +230,7 @@ TSet<FIntPoint> UGridLibrary::GetGridLocationsInRadius(FIntPoint Location, doubl
 	{
 		for (int IndexY = -SearchArea.Y; IndexY <= 0; IndexY++)
 		{
-			if (IndexX * IndexX + IndexY * IndexY * YSize * YSize < Radius * Radius)
+			if (IndexX * IndexX + IndexY * IndexY * YSize * YSize < AbsRadius * AbsRadius)
 			{
 				ReturnValue.Add(FIntPoint( IndexX,  IndexY));
 				ReturnValue.Add(FIntPoint(-IndexX,  IndexY));
@@ -238,7 +250,7 @@ TSet<FIntPoint> UGridLibrary::GetGridLocationsInRadius(FIntPoint Location, doubl
  * @param Size -  The number of layers to add to the shape.
  * @return All the grid locations of a given shape when scaled up.
  */
-TSet<FIntPoint> UGridLibrary::ScaleShapeUp(TSet<FIntPoint> ShapeLocations, int Size, bool bChopPoints)
+TSet<FIntPoint> UGridLibrary::ScaleShapeUp(const TSet<FIntPoint> ShapeLocations, const int Size, const bool bChopPoints)
 {
 	// End if invalid size
 	if (Size < 1)
@@ -303,13 +315,10 @@ TSet<FIntPoint> UGridLibrary::ScaleShapeUp(TSet<FIntPoint> ShapeLocations, int S
  * @param LineStartOffset - The location along the line to start drawing it at.
  * @return All the grid locations of a line.
  */
-TSet<FIntPoint> UGridLibrary::GetLocationsInLine(FIntPoint LineOrigin, EGridDirection PerpendicularDirection, int Length, int LineStartOffset)
+TSet<FIntPoint> UGridLibrary::GetLocationsInLine(const FIntPoint LineOrigin, const EGridDirection PerpendicularDirection, const int Length, const int LineStartOffset)
 {
 	// Snap direction to location.
-	if (IsDirectionValidAtLocation(PerpendicularDirection, LineOrigin))
-	{
-		PerpendicularDirection = FlipDirection(PerpendicularDirection);
-	}
+	EGridDirection Direction = IsDirectionValidAtLocation(PerpendicularDirection, LineOrigin) ? FlipDirection(PerpendicularDirection) : PerpendicularDirection;
 
 	// Get the direction the line will move in based on direction.
 	FIntPoint LineDirection = FIntPoint::ZeroValue;
@@ -348,20 +357,23 @@ TSet<FIntPoint> UGridLibrary::GetLocationsInLine(FIntPoint LineOrigin, EGridDire
 	}
 
 	// Adjust line origin based off of offset.
-	while (LineStartOffset != 0)
+	FIntPoint LineLocation = LineOrigin;
+	int RemainingOffset = LineStartOffset;
+	while (RemainingOffset != 0)
 	{
-		LineOrigin += FIntPoint(FMath::Sign(LineStartOffset)) * ((IsGridLocationFlipped(LineOrigin) != LineStartOffset < 0) ? LineDirectionFliped : LineDirection);
-		LineStartOffset -= FMath::Sign(LineStartOffset);
+		LineLocation += FIntPoint(FMath::Sign(RemainingOffset)) * ((IsGridLocationFlipped(LineLocation) != RemainingOffset < 0) ? LineDirectionFliped : LineDirection);
+		RemainingOffset -= FMath::Sign(RemainingOffset);
 	}
 
 	//Get line locations.
 	TSet<FIntPoint> ReturnValue = TSet<FIntPoint>();
-	ReturnValue.Add(LineOrigin);
-	while (Length != 0)
+	ReturnValue.Add(LineLocation);
+	int RemainingLength = Length;
+	while (RemainingLength != 0)
 	{
-		LineOrigin += FIntPoint(FMath::Sign(Length)) * ((IsGridLocationFlipped(LineOrigin) != Length < 0) ? LineDirectionFliped : LineDirection);
-		ReturnValue.Add(LineOrigin);
-		Length -= FMath::Sign(Length);
+		LineLocation += FIntPoint(FMath::Sign(RemainingLength)) * ((IsGridLocationFlipped(LineLocation) != RemainingLength < 0) ? LineDirectionFliped : LineDirection);
+		ReturnValue.Add(LineLocation);
+		RemainingLength -= FMath::Sign(RemainingLength);
 	}
 
 	return ReturnValue;
@@ -383,7 +395,7 @@ bool UGridLibrary::OverlapGridLocation(const UObject* WorldContext, const FIntPo
 
 	FHitResult Hit = FHitResult();
 
-	FVector WorldLocation = GridLocationToWorldTransform(GridLocation).GetTranslation();
+	FVector WorldLocation = GridTransformToWorldTransform(GridLocation).GetTranslation();
 
 	bool ReturnValue = WorldContext->GetWorld()->LineTraceSingleByObjectType(Hit, WorldLocation, WorldLocation - FVector(0, 0, KINDA_SMALL_NUMBER), FCollisionObjectQueryParams::AllDynamicObjects, Params);
 	OverlapingTile = Cast<ATile>(Hit.GetActor());
