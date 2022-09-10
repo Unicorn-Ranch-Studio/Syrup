@@ -5,6 +5,10 @@
 
 #include "Tile.h"
 
+
+/* \/ ============ \/ *\
+|  \/ UGridLibrary \/  |
+\* \/ ============ \/ */
 /*
  * Gets the world transform of a grid transform.
  *
@@ -425,3 +429,6 @@ bool UGridLibrary::OverlapShape(const UObject* WorldContext, const TSet<FIntPoin
 	}
 	return (bool)(OverlapingTiles.Num());
 }
+/* /\ ============ /\ *\
+|  /\ UGridLibrary /\  |
+\* /\ ============ /\ */

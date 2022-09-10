@@ -6,6 +6,11 @@
 #include "Components/InstancedStaticMeshComponent.h"
 #include "DrawDebugHelpers.h"
 
+
+
+/* \/ ===== \/ *\
+|  \/ ATile \/  |
+\* \/ ===== \/ */
 ATile::ATile()
 {
 	TileLocations.Add(FIntPoint::ZeroValue);
@@ -77,3 +82,6 @@ FGridTransform ATile::GetGridTransform() const
 {
 	return UGridLibrary::WorldTransformToGridTransform(GetActorTransform());
 }
+/* /\ ===== /\ *\
+|  /\ ATile /\  |
+\* /\ ===== /\ */

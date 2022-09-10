@@ -8,6 +8,14 @@
 
 class ATile;
 
+
+/* \/ ============== \/ *\
+|  \/ EGridDirection \/  |
+\* \/ ============== \/ */
+/**
+ * Repersents the valid directions that a tile could face.
+ * Note: To flip the direction just add 1 and to get the next clockwise direction add 2.
+ */
 UENUM(BlueprintType)
 enum class EGridDirection : uint8
 {
@@ -18,7 +26,18 @@ enum class EGridDirection : uint8
 	UpRight		= 4		UMETA(DisplayName = "Up and to the Right"),
 	DownLeft	= 5		UMETA(DisplayName = "Down and to the Left")
 };
+/* /\ ============== /\ *\
+|  /\ EGridDirection /\  |
+\* /\ ============== /\ */
 
+
+
+/* \/ ============== \/ *\
+|  \/ FGridTransform \/  |
+\* \/ ============== \/ */
+/**
+ * Rerpsesnts the position of a tile or shape on the grid.
+ */
 USTRUCT(BlueprintType)
 struct SYRUP_API FGridTransform
 {
@@ -38,9 +57,20 @@ struct SYRUP_API FGridTransform
 		Direction = GridDirection;
 	}
 };
+/* /\ ============== /\ *\
+|  /\ FGridTransform /\  |
+\* /\ ============== /\ */
 
+
+/* \/ ============ \/ *\
+|  \/ UGridLibrary \/  |
+\* \/ ============ \/ */
 /**
  * A library for functions related to the in game grid.
+ * 
+ * Includes things like translateing between grid and world space, handeling 
+ * direction operations, transforming shapes in the grid, and querying the grid 
+ * for collisions.
  */
 UCLASS()
 class SYRUP_API UGridLibrary : public UBlueprintFunctionLibrary
@@ -223,3 +253,6 @@ private:
 	UPROPERTY()
 	double GridHeight = 51.9615242270663188058233902451761710082841576;
 };
+/* /\ ============ /\ *\
+|  /\ UGridLibrary /\  |
+\* /\ ============ /\ */
