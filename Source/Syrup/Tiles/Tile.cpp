@@ -11,6 +11,12 @@
 /* \/ ===== \/ *\
 |  \/ ATile \/  |
 \* \/ ===== \/ */
+/**
+ * Adjusts the subtile mesh location so that it is always snaped to the
+ * grid location and oreintation closest to its world transform.
+ *
+ * @param Transform - The new transform of the tile.
+ */
 ATile::ATile()
 {
 	TileLocations.Add(FIntPoint::ZeroValue);
@@ -32,6 +38,11 @@ ATile::ATile()
 	SubtileMesh->CastShadow = false;
 }
 
+/**
+ * Gets the grid transform this tile.
+ *
+ * @return The grid transform this tile.
+ */
 void ATile::OnConstruction(const FTransform& Transform)
 {
 	SetActorTransform(Transform * (FTransform(-FVector(0, 0, Transform.GetTranslation().Z))));

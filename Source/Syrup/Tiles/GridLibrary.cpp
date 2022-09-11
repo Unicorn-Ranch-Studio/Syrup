@@ -304,7 +304,7 @@ TSet<FIntPoint> UGridLibrary::ScaleShapeUp(const TSet<FIntPoint> ShapeLocations,
 				}
 			}
 
-			ReturnValue = ReturnValue.Union(GetLocationsInLine(StartLocations[1 + 2 * LayerIndex], EachLayerDetail.Get<EGridDirection>(), -Length));
+			ReturnValue = ReturnValue.Union(GetLocationsInLine(StartLocations[1 + 2 * LayerIndex], EachLayerDetail.Get<EGridDirection>(), Length));
 		}
 	}
 
