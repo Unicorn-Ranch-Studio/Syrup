@@ -12,7 +12,7 @@
 /*
  * Gets the world transform of a grid transform.
  *
- * @param Location - The transform on the grid to get the tranform of.
+ * @param Location - The transform on the grid to get the transform of.
  * @return The world transform of the grid transform.
  */
 FTransform UGridLibrary::GridTransformToWorldTransform(const FGridTransform GridTransform)
@@ -38,7 +38,7 @@ FGridTransform UGridLibrary::WorldTransformToGridTransform(const FTransform Worl
 	FVector2D GridLocation = FVector2D(WorldTransform.GetLocation()) / FVector2D(GetGridHeight(), GetGridSideLength() * 0.5);
 	GridLocation.Y += 0.5;
 
-	//Get the distance from the aproapreate edge.
+	//Get the distance from the appropriate edge.
 	FVector2D RelativeLocation = FVector2D(FMath::Fractional(GridLocation.X), FMath::Fractional(GridLocation.Y));
 	if (RelativeLocation.X < 0)
 	{
@@ -109,10 +109,10 @@ double UGridLibrary::GetGridSideLength()
 }
 
 /*
- * Gets whether or not a tile at a given grid location will be fliped.
+ * Gets whether or not a tile at a given grid location will be flipped.
  *
  * @param Location - The location of the tile.
- * @return Whether or not a tile at a given grid location will be fliped.
+ * @return Whether or not a tile at a given grid location will be flipped.
  */
 bool UGridLibrary::IsGridLocationFlipped(const FIntPoint Location)
 {
@@ -156,7 +156,7 @@ bool UGridLibrary::IsDirectionValidAtLocation(const EGridDirection Direction, co
 }
 
 /*
- * Gets where the a given relative location of a tile would be if its root was pointed in a given direction. Intial direction assumed to be up.
+ * Gets where the a given relative location of a tile would be if its root was pointed in a given direction. Initial direction assumed to be up.
  *
  * @param Direction - The given direction.
  * @param Location - The given location.
@@ -173,7 +173,7 @@ FIntPoint UGridLibrary::PointLocationInDirection(const EGridDirection Direction,
 	// Translates that back to grid space
 	ReturnValue = WorldTransformToGridTransform(FTransform(WorldLocation + FVector(GetGridHeight() * 0.33333333333333, 0, 0))).Location;
 
-	// Flip if Nessesary
+	// Flip if Necessary
 	if (IsDirectionValidAtLocation(Direction, FIntPoint::ZeroValue))
 	{
 		ReturnValue.X = -ReturnValue.X;
@@ -183,7 +183,7 @@ FIntPoint UGridLibrary::PointLocationInDirection(const EGridDirection Direction,
 }
 
 /*
- * Gets where the a given set of relative locations of a shape would be if its root was pointed in a given direction. Intial direction assumed to be up.
+ * Gets where the a given set of relative locations of a shape would be if its root was pointed in a given direction. Initial direction assumed to be up.
  *
  * @param Direction - The given direction.
  * @param Location - The given set of  locations.
@@ -286,14 +286,14 @@ TSet<FIntPoint> UGridLibrary::ScaleShapeUp(const TSet<FIntPoint> ShapeLocations,
 	// Create Layers
 	TSet<FIntPoint> ReturnValue = TSet<FIntPoint>(ShapeLocations);
 	
-	// For each layer details get the locations of a trapziod with one corner on the layer location.
+	// For each layer details get the locations of a trapezoid with one corner on the layer location.
 	for (TTuple<FIntPoint, EGridDirection, bool> EachLayerDetail : LayerDetails)
 	{
 		TArray<FIntPoint> StartLocations = (GetLocationsInLine(EachLayerDetail.Get<FIntPoint>(), GetNextDirection(EachLayerDetail.Get<EGridDirection>(), true), 2 * Size)).Array();
 		
 		for (int LayerIndex = 0; LayerIndex < Size; LayerIndex++)
 		{
-			// Adjust trapizode size if a cap is needed.
+			// Adjust trapezoid size if a cap is needed.
 			int Length = 2 + 2 * LayerIndex;
 			if (EachLayerDetail.Get<bool>())
 			{
@@ -414,7 +414,7 @@ bool UGridLibrary::OverlapGridLocation(const UObject* WorldContext, const FIntPo
  * @param ShapeGridLocations - The given shape's grid locations to check.
  * @param OverlapingTiles - Will be set to the tile at the given location if there is one, otherwise is nullptr.
  * @param IgnoredTiles - The tiles to ignore when querying.
- * @return Whether or not a tile was at overlaping the given shape.
+ * @return Whether or not a tile was at overlapping the given shape.
  */
 bool UGridLibrary::OverlapShape(const UObject* WorldContext, const TSet<FIntPoint>& ShapeGridLocations, TSet<ATile*>& OverlapingTiles, const TArray<AActor*>& IgnoredTiles)
 {
