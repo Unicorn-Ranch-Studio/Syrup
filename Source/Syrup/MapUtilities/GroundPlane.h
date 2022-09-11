@@ -21,6 +21,8 @@ enum class EFieldType : uint8
 |  /\ EFieldType /\  |
 \* /\ ========== /\ */
 
+
+
 /* \/ ============== \/ *\
 |  \/ AGroundPlane \/  |
 \* \/ ============== \/ */
@@ -56,9 +58,17 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void RemoveField(EFieldType Type, TSet<FIntPoint> Locations);
 
+	/**
+	 * Creates and sets up the ground mesh.
+	 */
 	AGroundPlane();
+
+	/**
+	 * Sets the size of the ground mesh.
+	 * 
+	 * @param Transform - The new transform.
+	 */
 	virtual void OnConstruction(const FTransform& Transform) override;
-	virtual void BeginPlay() override;
 
 protected:
 	//The plane used to render the fields

@@ -29,6 +29,9 @@ void AGroundPlane::RemoveField(EFieldType Type, TSet<FIntPoint> Locations)
 	AddFieldStrength(Type, -1, Locations);
 }
 
+/**
+ * Creates and sets up the ground mesh.
+ */
 AGroundPlane::AGroundPlane()
 {
 	RootComponent = CreateDefaultSubobject<USceneComponent>(FName("Root"));
@@ -48,7 +51,12 @@ AGroundPlane::AGroundPlane()
 	GroundMesh->NumCustomDataFloats = 2;
 }
 
-/**/
+
+/**
+ * Sets the size of the ground mesh.
+ * 
+ * @param Transform - The new transform.
+ */
 void AGroundPlane::OnConstruction(const FTransform& Transform)
 {
 	if (LocationsToInstanceIndices.Num() != PlaneSize.X * PlaneSize.Y)
