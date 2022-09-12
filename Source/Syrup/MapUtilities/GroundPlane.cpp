@@ -89,6 +89,10 @@ void AGroundPlane::AddFieldStrength(const EFieldType FieldType, const int Streng
 	{
 		FieldTypeToLocationToStrengths.Add(FieldType, TMap<FIntPoint, int>());
 	}
+	if (LocationsToInstanceIndices.IsEmpty())
+	{
+		OnConstruction(GetActorTransform());
+	}
 
 	for (FIntPoint EachLocation : Locations)
 	{
