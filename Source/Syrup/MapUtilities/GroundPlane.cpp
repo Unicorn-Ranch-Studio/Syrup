@@ -63,6 +63,7 @@ void AGroundPlane::OnConstruction(const FTransform& Transform)
 	{
 		GroundMesh->ClearInstances();
 		LocationsToInstanceIndices.Empty();
+		FieldTypeToLocationToStrengths.Empty();
 
 		for (int IndexX = -(PlaneSize.X / 2); IndexX < PlaneSize.X / 2 + PlaneSize.X % 2; IndexX++)
 		{
@@ -85,13 +86,13 @@ void AGroundPlane::OnConstruction(const FTransform& Transform)
 void AGroundPlane::AddFieldStrength(const EFieldType FieldType, const int Strength, const TSet<FIntPoint> Locations)
 {
 	//Create field map if not it doesn't exist
-	if (!FieldTypeToLocationToStrengths.Contains(FieldType))
-	{
-		FieldTypeToLocationToStrengths.Add(FieldType, TMap<FIntPoint, int>());
-	}
 	if (LocationsToInstanceIndices.IsEmpty())
 	{
 		OnConstruction(GetActorTransform());
+	}
+	if (!FieldTypeToLocationToStrengths.Contains(FieldType))
+	{
+		FieldTypeToLocationToStrengths.Add(FieldType, TMap<FIntPoint, int>());
 	}
 
 	for (FIntPoint EachLocation : Locations)

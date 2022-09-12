@@ -28,9 +28,11 @@ void UApplyField::AffectLocations(TSet<FIntPoint> EffectedLocations, ATile* Affe
 			}
 		}
 	}
-	check(IsValid(GroundPlane));
-
-	GroundPlane->ApplyField(FieldType, EffectedLocations);
+	if (IsValid(GroundPlane))
+	{
+		GroundPlane->ApplyField(FieldType, EffectedLocations);
+		UE_LOG(LogTemp, Warning, TEXT("Apply"));
+	}
 }
 
 /*
@@ -41,9 +43,22 @@ void UApplyField::AffectLocations(TSet<FIntPoint> EffectedLocations, ATile* Affe
  */
 void UApplyField::UnaffectLocations(TSet<FIntPoint> EffectedLocations, ATile* AffecterTile) 
 {
-	check(IsValid(GroundPlane));
-
-	GroundPlane->RemoveField(FieldType, EffectedLocations);
+	if (!IsValid(GroundPlane))
+	{
+		for (TActorIterator<AGroundPlane> Iterator = TActorIterator<AGroundPlane>(AffecterTile->GetWorld()); Iterator; ++Iterator)
+		{
+			if (IsValid(*Iterator))
+			{
+				GroundPlane = *Iterator;
+				break;
+			}
+		}
+	}
+	if (IsValid(GroundPlane))
+	{
+		GroundPlane->RemoveField(FieldType, EffectedLocations);
+		UE_LOG(LogTemp, Warning, TEXT("Remove"));
+	}
 }
 /* /\ =========== /\ *\
 |  /\ UTileEffect /\  |
