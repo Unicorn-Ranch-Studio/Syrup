@@ -12,15 +12,13 @@
 |  \/ ATile \/  |
 \* \/ ===== \/ */
 /**
- * Adjusts the subtile mesh location so that it is always snaped to the
- * grid location and oreintation closest to its world transform.
+ * Adjusts the sub-tile mesh location so that it is always snapped to the
+ * grid location and orientation closest to its world transform.
  *
  * @param Transform - The new transform of the tile.
  */
 ATile::ATile()
 {
-	TileLocations.Add(FIntPoint::ZeroValue);
-
 	//Create Root
 	RootComponent = CreateDefaultSubobject<USceneComponent>(FName("Root"));
 	
@@ -29,7 +27,7 @@ ATile::ATile()
 	TileMesh = MeshRef.Object;
 	check(TileMesh != nullptr);
 
-	//Create subtile mesh
+	//Create sub-tile mesh
 	SubtileMesh = CreateDefaultSubobject<UInstancedStaticMeshComponent>(FName("Subtile Mesh Instances"));
 	SubtileMesh->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
 	SubtileMesh->SetAbsolute(true, true);
@@ -56,10 +54,11 @@ void ATile::OnConstruction(const FTransform& Transform)
 	SubtileMesh->InstancingRandomSeed = FMath::Rand();
 	SubtileMesh->SetWorldTransform(UGridLibrary::GridTransformToWorldTransform(GridTransform));
 
-	//Ensure tile has valid orign
+	//Ensure tile has valid origin
+	TSet<FIntPoint> TileLocations = GetTileLocations();
 	TileLocations.Add(FIntPoint::ZeroValue);
 
-	//Get subtile transforms
+	//Get sub-tile transforms
 	TArray<FTransform> TileWorldTransforms = TArray<FTransform>();
 	for (FIntPoint EachTileLocation : TileLocations)
 	{
@@ -75,7 +74,7 @@ void ATile::OnConstruction(const FTransform& Transform)
 			ATile* OverlapedTile = nullptr;
 			if (UGridLibrary::OverlapGridLocation(this, RotatedGridLocation + GridTransform.Location, OverlapedTile, TArray<AActor*>()))
 			{
-				UE_LOG(LogLevel, Warning, TEXT("%s is overlaping %s at: %s"), *GetName(), *OverlapedTile->GetName(), *TileWorldLocation.ToString());
+				UE_LOG(LogLevel, Warning, TEXT("%s is overlapping %s at: %s"), *GetName(), *OverlapedTile->GetName(), *TileWorldLocation.ToString());
 				DrawDebugPoint(GetWorld(), TileWorldTransforms.Last().GetTranslation() + FVector(0, 0, 1), 50, FColor::Red, false, 5);
 			}
 		);
@@ -92,6 +91,18 @@ void ATile::OnConstruction(const FTransform& Transform)
 FGridTransform ATile::GetGridTransform() const
 {
 	return UGridLibrary::WorldTransformToGridTransform(GetActorTransform());
+}
+
+/*
+ * The relative locations of all of the sub-tiles of this tile.
+ *
+ * @return The relative locations of all of the sub-tiles of this tile.
+ */
+TSet<FIntPoint> ATile::GetTileLocations() const
+{
+	TSet<FIntPoint> ReturnValue = TSet<FIntPoint>();
+	ReturnValue.Add(FIntPoint::ZeroValue);
+	return ReturnValue;
 }
 /* /\ ===== /\ *\
 |  /\ ATile /\  |

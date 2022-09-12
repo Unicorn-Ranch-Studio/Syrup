@@ -37,7 +37,7 @@ AGroundPlane::AGroundPlane()
 	RootComponent = CreateDefaultSubobject<USceneComponent>(FName("Root"));
 
 	//Get Tile Mesh
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> MeshRef(TEXT("/Game/Tiles/SM_Tile.SM_Tile"));
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> MeshRef(TEXT("/Game/LevelUtilities/SM_GroundPlane.SM_GroundPlane"));
 	UStaticMesh* TileMesh = MeshRef.Object;
 	check(TileMesh != nullptr);
 

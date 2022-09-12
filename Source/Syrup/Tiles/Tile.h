@@ -17,20 +17,20 @@
  * 
  * May take up multiple grid locations by adding to the grid locations array.
  */
-UCLASS()
+UCLASS(Abstract)
 class SYRUP_API ATile : public AActor
 {
 	GENERATED_BODY()
 	
 public:	
 	/**
-	 * Sets up the root and subtile mesh compoenents.
+	 * Sets up the root and sub-tile mesh components.
 	 */
 	ATile();
 
 	/**
-	 * Adjusts the subtile mesh location so that it is always snaped to the
-	 * grid location and oreintation closest to its world transform.
+	 * Adjusts the sub-tile mesh location so that it is always snapped to the
+	 * grid location and orientation closest to its world transform.
 	 * 
 	 * @param Transform - The new transform of the tile.
 	 */
@@ -51,11 +51,15 @@ protected:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
 	UInstancedStaticMeshComponent* SubtileMesh;
 
-private:
-	//The relative locations of all of the tiles on this tile.
-	UPROPERTY(EditDefaultsOnly)
-	TSet<FIntPoint> TileLocations = TSet<FIntPoint>();
+	/*
+	 * The relative locations of all of the sub-tiles of this tile.
+	 * 
+	 * @return The relative locations of all of the sub-tiles of this tile.
+	 */
+	UFUNCTION(BlueprintPure)
+	virtual TSet<FIntPoint> GetTileLocations() const;
 
+private:
 	//The mesh used for each tile as the ground.
 	UPROPERTY()
 	UStaticMesh* TileMesh;

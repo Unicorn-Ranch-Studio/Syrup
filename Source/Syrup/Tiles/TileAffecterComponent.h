@@ -7,7 +7,7 @@
 #include "CoreMinimal.h"
 #include "Tile.h"
 #include "Engine/DataAsset.h"
-#include "AffecterTile.generated.h"
+#include "TileAffecterComponent.generated.h"
 
 /* \/ ============= \/ *\
 |  \/ AAffecterTile \/  |
@@ -43,6 +43,8 @@ private:
 	 */
 	UFUNCTION()
 	void GetEffectedTilesAndLocations(TSet<ATile*>& EffectedTiles, TSet<FIntPoint>& EffectedLocations) const;
+
+	AGroundPlane* GroundPlane = nullptr;
 };
 /* /\ ============= /\ *\
 |  /\ AAffecterTile /\  |
@@ -95,21 +97,41 @@ class SYRUP_API UTileEffect : public UObject
 {
 	GENERATED_BODY()
 public:
-	//Affects the set of effected tiles with this effect.
+	/*
+	 * Affects the set of effected tiles with this effect.
+	 * 
+	 * @param EffectedTiles - The tiles to effect.
+	 * @param AffecterTile - The tile doing the affecting.
+	 */
 	UFUNCTION()
-	virtual void AffectTiles(TSet<ATile*> EffectedTiles);
+	virtual void AffectTiles(TSet<ATile*> EffectedTiles, ATile* AffecterTile);
 	
-	//Affects the set of locations without tiles with this effect.
+	/*
+	 * Affects the set of locations without tiles with this effect.
+	 *
+	 * @param EffectedTiles - The locations to effect.
+	 * @param AffecterTile - The tile doing the affecting.
+	 */
 	UFUNCTION()
-	virtual void AffectLocations(TSet<FIntPoint> EffectedLocations);
-	
-	//Undoes the affects of this on the set of effected tiles.
+	virtual void AffectLocations(TSet<FIntPoint> EffectedLocations, ATile* AffecterTile);
+
+	/*
+	 * Undoes the affects of this on the set of effected tiles.
+	 *
+	 * @param EffectedTiles - The tiles to undo the effect on.
+	 * @param AffecterTile - The tile doing the affecting.
+	 */
 	UFUNCTION()
-	virtual void UnaffectTiles(TSet<ATile*> EffectedTiles);
-	
-	//Undoes the affects of this on the set of effected locations without tiles.
+	virtual void UnaffectTiles(TSet<ATile*> EffectedTiles, ATile* AffecterTile);
+
+	/*
+	 * Undoes the affects of this on the set of effected locations without tiles.
+	 *
+	 * @param EffectedLocations - The locations to undo the effect on.
+	 * @param AffecterTile - The tile doing the affecting.
+	 */
 	UFUNCTION()
-	virtual void UnaffectLocations(TSet<FIntPoint> EffectedLocations);
+	virtual void UnaffectLocations(TSet<FIntPoint> EffectedLocations, ATile* AffecterTile);
 };
 /* /\ =========== /\ *\
 |  /\ UTileEffect /\  |
