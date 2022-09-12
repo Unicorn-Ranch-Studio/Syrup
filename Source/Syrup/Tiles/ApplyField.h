@@ -5,7 +5,7 @@
 #include "Syrup/MapUtilities/GroundPlane.h"
 
 #include "CoreMinimal.h"
-#include "Tiles/TileAffecterComponent.h"
+#include "TileEffect.h"
 #include "ApplyField.generated.h"
 
 /**

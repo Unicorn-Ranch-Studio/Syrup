@@ -3,6 +3,7 @@
 
 #include "ApplyField.h"
 
+#include "Tile.h"
 #include "EngineUtils.h"
 
 /* \/ =========== \/ *\
@@ -42,7 +43,7 @@ void UApplyField::UnaffectLocations(TSet<FIntPoint> EffectedLocations, ATile* Af
 {
 	check(IsValid(GroundPlane));
 
-	GroundPlane->ApplyField(FieldType, EffectedLocations);
+	GroundPlane->RemoveField(FieldType, EffectedLocations);
 }
 /* /\ =========== /\ *\
 |  /\ UTileEffect /\  |
