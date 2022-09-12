@@ -55,7 +55,7 @@ void ATile::OnConstruction(const FTransform& Transform)
 	SubtileMesh->SetWorldTransform(UGridLibrary::GridTransformToWorldTransform(GridTransform));
 
 	//Ensure tile has valid origin
-	TSet<FIntPoint> TileLocations = GetTileLocations();
+	TSet<FIntPoint> TileLocations = GetRelativeSubTileLocations();
 	TileLocations.Add(FIntPoint::ZeroValue);
 
 	//Get sub-tile transforms
@@ -98,11 +98,28 @@ FGridTransform ATile::GetGridTransform() const
  *
  * @return The relative locations of all of the sub-tiles of this tile.
  */
-TSet<FIntPoint> ATile::GetTileLocations() const
+TSet<FIntPoint> ATile::GetRelativeSubTileLocations() const
 {
 	TSet<FIntPoint> ReturnValue = TSet<FIntPoint>();
 	ReturnValue.Add(FIntPoint::ZeroValue);
 	return ReturnValue;
+}
+
+/*
+ * The locations of all of the sub-tiles of this tile.
+ *
+ * @return The locations of all of the sub-tiles of this tile.
+ */
+TSet<FIntPoint> ATile::GetSubTileLocations() const
+{
+	FGridTransform GridTransform = GetGridTransform();
+	TSet<FIntPoint> ReturnValues = UGridLibrary::PointShapeInDirection(GridTransform.Direction, GetRelativeSubTileLocations());
+	for (FIntPoint& EachReturnValue : ReturnValues)
+	{
+		EachReturnValue += GridTransform.Location;
+	}
+
+	return ReturnValues;
 }
 /* /\ ===== /\ *\
 |  /\ ATile /\  |

@@ -14,27 +14,21 @@
  */
 void UTileAffecterComponent::ApplyEffect()
 {
-	if (!IsValid(GroundPlane))
-	{
-		for (TActorIterator<AGroundPlane> Iterator = TActorIterator<AGroundPlane>(GetWorld()); Iterator; Iterator++)
-		{
-			GroundPlane = *Iterator;
-			break;
-		}
-	}
-
 	ATile* AffectingTile = Cast<ATile>(GetOwner());
 
 	TSet<ATile*> EffectedTiles;
-	TSet<FIntPoint> EffectedLocations;
-	GetEffectedTilesAndLocations(EffectedTiles, EffectedLocations);
+	TSet<FIntPoint> EffectedNonTileLocations;
+	TSet<FIntPoint> EffectedLocations = GetEffectedTilesAndLocations(EffectedTiles, EffectedNonTileLocations);
 
-	for (UTileEffect* EachEffect : Data->Effects)
+	for (UTileEffect* EachEffect : Effects)
 	{
-		EachEffect->AffectTiles(EffectedTiles, AffectingTile);
-		EachEffect->AffectLocations(EffectedLocations, AffectingTile);
+		if (IsValid(EachEffect))
+		{
+			EachEffect->AffectLocations(EffectedLocations, AffectingTile);
+			EachEffect->AffectTiles(EffectedTiles, AffectingTile);
+			EachEffect->AffectNonTileLocations(EffectedNonTileLocations, AffectingTile);
+		}
 	}
-	GroundPlane->ApplyField()
 }
 
 /**
@@ -45,23 +39,32 @@ void UTileAffecterComponent::UndoEffect()
 	ATile* AffectingTile = Cast<ATile>(GetOwner());
 
 	TSet<ATile*> EffectedTiles;
-	TSet<FIntPoint> EffectedLocations;
-	GetEffectedTilesAndLocations(EffectedTiles, EffectedLocations);
+	TSet<FIntPoint> EffectedNonTileLocations;
+	TSet<FIntPoint> EffectedLocations = GetEffectedTilesAndLocations(EffectedTiles, EffectedNonTileLocations);
 
-	for (UTileEffect* EachEffect : Data->Effects)
+	for (UTileEffect* EachEffect : Effects)
 	{
-		EachEffect->UnaffectTiles(EffectedTiles, AffectingTile);
-		EachEffect->UnaffectLocations(EffectedLocations, AffectingTile);
+		if (IsValid(EachEffect))
+		{
+			EachEffect->UnaffectLocations(EffectedLocations, AffectingTile);
+			EachEffect->UnaffectTiles(EffectedTiles, AffectingTile);
+			EachEffect->UnaffectNonTileLocations(EffectedNonTileLocations, AffectingTile);
+		}
 	}
 }
 
 /**
  * Gets all of the locations and tiles that will be affected.
+ *
+ * @param EffectedTiles - Is set to contain all of the effected tiles.
+ * @param EffectedLocations - Is set to contain all of the effected locations that are not covered by tiles.
+ *
+ * @return All of the effected locations.
  */
-void UTileAffecterComponent::GetEffectedTilesAndLocations(TSet<ATile*>& EffectedTiles, TSet<FIntPoint>& EffectedLocations) const
+TSet<FIntPoint> UTileAffecterComponent::GetEffectedTilesAndLocations(TSet<ATile*>& EffectedTiles, TSet<FIntPoint>& EffectedNonTileLocations) const
 {
-	TSet<FIntPoint> AffectLocationLocations = UGridLibrary::ScaleShapeUp(Data->ShapeLocations, Data->Range);
-	for (FIntPoint EachAffectedLocation : AffectLocationLocations)
+	TSet<FIntPoint> AffectLocations = UGridLibrary::ScaleShapeUp(ShapeLocations, Range);
+	for (FIntPoint EachAffectedLocation : AffectLocations)
 	{
 		ATile* OverlapedTile;
 		if (UGridLibrary::OverlapGridLocation(GetWorld(), EachAffectedLocation, OverlapedTile, TArray<AActor*>()))
@@ -70,9 +73,10 @@ void UTileAffecterComponent::GetEffectedTilesAndLocations(TSet<ATile*>& Effected
 		}
 		else
 		{
-			EffectedLocations.Add(EachAffectedLocation);
+			EffectedNonTileLocations.Add(EachAffectedLocation);
 		}
 	}
+	return AffectLocations;
 }
 /* /\ ============= /\ *\
 |  /\ AAffecterTile /\  |
@@ -84,15 +88,20 @@ void UTileAffecterComponent::GetEffectedTilesAndLocations(TSet<ATile*>& Effected
 |  \/ UTileEffect \/  |
 \* \/ =========== \/ */
 /*
+ * Affects the set of all locations this effect.
+ *
+ * @param EffectedTiles - The locations to effect.
+ * @param AffecterTile - The tile doing the affecting.
+ */
+void UTileEffect::AffectLocations(TSet<FIntPoint> EffectedLocations, ATile* AffecterTile) {}
+
+/*
  * Affects the set of effected tiles with this effect.
  *
  * @param EffectedTiles - The tiles to effect.
  * @param AffecterTile - The tile doing the affecting.
  */
-void UTileEffect::AffectTiles(TSet<ATile*> EffectedTiles, ATile* AffecterTile)
-{
-
-}
+void UTileEffect::AffectTiles(TSet<ATile*> EffectedTiles, ATile* AffecterTile) {}
 
 /*
  * Affects the set of locations without tiles with this effect.
@@ -100,10 +109,15 @@ void UTileEffect::AffectTiles(TSet<ATile*> EffectedTiles, ATile* AffecterTile)
  * @param EffectedTiles - The locations to effect.
  * @param AffecterTile - The tile doing the affecting.
  */
-void UTileEffect::AffectLocations(TSet<FIntPoint> EffectedLocations, ATile* AffecterTile)
-{
+void UTileEffect::AffectNonTileLocations(TSet<FIntPoint> EffectedLocations, ATile* AffecterTile) {}
 
-}
+/*
+ * Undoes the affects of this on the set of a effected locations.
+ *
+ * @param EffectedLocations - The locations to undo the effect on.
+ * @param AffecterTile - The tile doing the affecting.
+ */
+void UTileEffect::UnaffectLocations(TSet<FIntPoint> EffectedLocations, ATile* AffecterTile) {}
 
 /*
  * Undoes the affects of this on the set of effected tiles.
@@ -111,10 +125,7 @@ void UTileEffect::AffectLocations(TSet<FIntPoint> EffectedLocations, ATile* Affe
  * @param EffectedTiles - The tiles to undo the effect on.
  * @param AffecterTile - The tile doing the affecting.
  */
-void UTileEffect::UnaffectTiles(TSet<ATile*> EffectedTiles, ATile* AffecterTile)
-{
-
-}
+void UTileEffect::UnaffectTiles(TSet<ATile*> EffectedTiles, ATile* AffecterTile) {}
 
 /*
  * Undoes the affects of this on the set of effected locations without tiles.
@@ -122,10 +133,7 @@ void UTileEffect::UnaffectTiles(TSet<ATile*> EffectedTiles, ATile* AffecterTile)
  * @param EffectedLocations - The locations to undo the effect on.
  * @param AffecterTile - The tile doing the affecting.
  */
-void UTileEffect::UnaffectLocations(TSet<FIntPoint> EffectedLocations, ATile* AffecterTile)
-{
-
-}
+void UTileEffect::UnaffectNonTileLocations(TSet<FIntPoint> EffectedLocations, ATile* AffecterTile) {}
 /* /\ =========== /\ *\
 |  /\ UTileEffect /\  |
 \* /\ =========== /\ */

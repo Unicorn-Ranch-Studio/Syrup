@@ -57,7 +57,15 @@ protected:
 	 * @return The relative locations of all of the sub-tiles of this tile.
 	 */
 	UFUNCTION(BlueprintPure)
-	virtual TSet<FIntPoint> GetTileLocations() const;
+	virtual TSet<FIntPoint> GetRelativeSubTileLocations() const;
+
+	/*
+	 * The locations of all of the sub-tiles of this tile.
+	 * 
+	 * @return The locations of all of the sub-tiles of this tile.
+	 */
+	UFUNCTION(BlueprintPure)
+	TSet<FIntPoint> GetSubTileLocations() const;
 
 private:
 	//The mesh used for each tile as the ground.
