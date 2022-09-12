@@ -4,26 +4,55 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Camera/CameraComponent.h"
 #include "SyrupPlayerCharacter.generated.h"
 
+/* \/ ===================== \/ *\
+|  \/ ASyrupPlayerCharacter \/  |
+\* \/ ===================== \/ */
 UCLASS()
 class SYRUP_API ASyrupPlayerCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
+	/* ---------------- *\
+	\* \/ Components \/ */
+
+private:
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+	UCameraComponent* Camera;
+
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+	USceneComponent* CameraRoot;
+	
+	/* /\ Components /\ *\
+	\* ---------------- */
+
+	/* --------------- *\
+	\* \/ Functions \/ */
 public:
-	// Sets default values for this character's properties
+	// Sets default AxisValues for this character's properties
 	ASyrupPlayerCharacter();
 
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
 
 public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+
+private:
+	/**
+	 * Moves ASyrupPlayerCharacter by the movement speed multiplied the input axis values.
+	 *
+	 * @param AxisValue - Takes input axis value of "MoveForward" and "MoveRight".
+	 */
+	void MoveForward(float AxisValue);
+
+	void MoveRight(float AxisValue);
+	
+	/* /\ Functions /\ *\
+	\* --------------- */
 };
+/* /\ ===================== /\ *\
+|  /\ ASyrupPlayerCharacter /\  |
+\* /\ ===================== /\ */
