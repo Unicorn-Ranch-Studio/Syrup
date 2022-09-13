@@ -15,11 +15,12 @@
  */
 void UTileAffecterComponent::ApplyEffect()
 {
-	ATile* AffectingTile = Cast<ATile>(GetOwner());
-
 	TSet<ATile*> EffectedTiles;
 	TSet<FIntPoint> EffectedNonTileLocations;
 	TSet<FIntPoint> EffectedLocations = GetEffectedTilesAndLocations(EffectedTiles, EffectedNonTileLocations);
+
+	ATile* AffectingTile = Cast<ATile>(GetOwner());
+	EffectedTiles.Add(AffectingTile);
 
 	EffectedNonTileLocations = EffectedLocations.Difference(LastEffectedLocations);
 	EffectedTiles = EffectedTiles.Difference(LastEffectedTiles);

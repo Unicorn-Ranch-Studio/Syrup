@@ -31,7 +31,6 @@ void UApplyField::AffectLocations(TSet<FIntPoint> EffectedLocations, ATile* Affe
 	if (IsValid(GroundPlane))
 	{
 		GroundPlane->ApplyField(FieldType, EffectedLocations);
-		UE_LOG(LogTemp, Warning, TEXT("Apply"));
 	}
 }
 
@@ -71,7 +70,6 @@ void UApplyField::UnaffectLocations(TSet<FIntPoint> EffectedLocations, ATile* Af
 	if (IsValid(GroundPlane))
 	{
 		GroundPlane->RemoveField(FieldType, EffectedLocations);
-		UE_LOG(LogTemp, Warning, TEXT("Remove"));
 	}
 }
 
