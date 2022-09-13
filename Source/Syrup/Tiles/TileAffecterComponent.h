@@ -34,7 +34,7 @@ public:
 	TArray<TObjectPtr<UTileEffect>> Effects = TArray<TObjectPtr<UTileEffect>>();
 
 	/**
-	 * Applies all of this affecter's effects.
+	 * Applies all of this affecter's effects. Note effects will only be applied once per effected location/tile.
 	 */
 	UFUNCTION(BlueprintCallable)
 	void ApplyEffect();
@@ -55,6 +55,19 @@ public:
 	 */
 	UFUNCTION(BlueprintPure)
 	TSet<FIntPoint> GetEffectedTilesAndLocations(TSet<ATile*>& EffectedTiles, TSet<FIntPoint>& EffectedNonTileLocations) const;
+
+private:
+	//The last effected locations.
+	UPROPERTY()
+	TSet<FIntPoint> LastEffectedLocations = TSet<FIntPoint>();
+
+	//The last effected tiles.
+	UPROPERTY()
+	TSet<ATile*> LastEffectedTiles = TSet<ATile*>();
+
+	//The last effected non-tile locations.
+	UPROPERTY()
+	TSet<FIntPoint> LastEffectedNonTileLocations = TSet<FIntPoint>();
 };
 /* /\ ============= /\ *\
 |  /\ AAffecterTile /\  |

@@ -11,7 +11,7 @@
 |  \/ AAffecterTile \/  |
 \* \/ ============= \/ */
 /**
- * Applies all of this affecter's effects.
+ * Applies all of this affecter's effects. Note effects will only be applied once per effected location/tile.
  */
 void UTileAffecterComponent::ApplyEffect()
 {
@@ -20,6 +20,10 @@ void UTileAffecterComponent::ApplyEffect()
 	TSet<ATile*> EffectedTiles;
 	TSet<FIntPoint> EffectedNonTileLocations;
 	TSet<FIntPoint> EffectedLocations = GetEffectedTilesAndLocations(EffectedTiles, EffectedNonTileLocations);
+
+	EffectedNonTileLocations = EffectedLocations.Difference(LastEffectedLocations);
+	EffectedTiles = EffectedTiles.Difference(LastEffectedTiles);
+	EffectedNonTileLocations = EffectedNonTileLocations.Difference(LastEffectedNonTileLocations);
 
 	for (TObjectPtr<UTileEffect> EachEffect : Effects)
 	{
@@ -30,6 +34,10 @@ void UTileAffecterComponent::ApplyEffect()
 			EachEffect->AffectNonTileLocations(EffectedNonTileLocations, AffectingTile);
 		}
 	}
+
+	LastEffectedLocations = EffectedLocations.Union(LastEffectedLocations);
+	LastEffectedTiles = EffectedTiles.Union(LastEffectedTiles);
+	LastEffectedNonTileLocations = EffectedNonTileLocations.Union(LastEffectedNonTileLocations);
 }
 
 /**
@@ -39,19 +47,19 @@ void UTileAffecterComponent::UndoEffect()
 {
 	ATile* AffectingTile = Cast<ATile>(GetOwner());
 
-	TSet<ATile*> EffectedTiles;
-	TSet<FIntPoint> EffectedNonTileLocations;
-	TSet<FIntPoint> EffectedLocations = GetEffectedTilesAndLocations(EffectedTiles, EffectedNonTileLocations);
-
 	for (TObjectPtr<UTileEffect> EachEffect : Effects)
 	{
 		if (IsValid(EachEffect))
 		{
-			EachEffect->UnaffectLocations(EffectedLocations, AffectingTile);
-			EachEffect->UnaffectTiles(EffectedTiles, AffectingTile);
-			EachEffect->UnaffectNonTileLocations(EffectedNonTileLocations, AffectingTile);
+			EachEffect->UnaffectLocations(LastEffectedLocations, AffectingTile);
+			EachEffect->UnaffectTiles(LastEffectedTiles, AffectingTile);
+			EachEffect->UnaffectNonTileLocations(LastEffectedNonTileLocations, AffectingTile);
 		}
 	}
+
+	LastEffectedLocations.Empty();
+	LastEffectedTiles.Empty();
+	LastEffectedNonTileLocations.Empty();
 }
 
 /**
