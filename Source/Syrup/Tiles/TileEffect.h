@@ -23,7 +23,7 @@ public:
 	 * @param AffecterTile - The tile doing the affecting.
 	 */
 	UFUNCTION()
-		virtual void AffectLocations(TSet<FIntPoint> EffectedLocations, ATile* AffecterTile);
+	virtual void AffectLocations(TSet<FIntPoint> EffectedLocations, ATile* AffecterTile);
 
 	/*
 	 * Affects the set of effected tiles with this effect.
@@ -32,7 +32,7 @@ public:
 	 * @param AffecterTile - The tile doing the affecting.
 	 */
 	UFUNCTION()
-		virtual void AffectTiles(TSet<ATile*> EffectedTiles, ATile* AffecterTile);
+	virtual void AffectTiles(TSet<ATile*> EffectedTiles, ATile* AffecterTile);
 
 	/*
 	 * Affects the set of locations without tiles with this effect.
@@ -41,7 +41,7 @@ public:
 	 * @param AffecterTile - The tile doing the affecting.
 	 */
 	UFUNCTION()
-		virtual void AffectNonTileLocations(TSet<FIntPoint> EffectedLocations, ATile* AffecterTile);
+	virtual void AffectNonTileLocations(TSet<FIntPoint> EffectedLocations, ATile* AffecterTile);
 
 	/*
 	 * Undoes the affects of this on the set of a effected locations.
@@ -50,7 +50,7 @@ public:
 	 * @param AffecterTile - The tile doing the affecting.
 	 */
 	UFUNCTION()
-		virtual void UnaffectLocations(TSet<FIntPoint> EffectedLocations, ATile* AffecterTile);
+	virtual void UnaffectLocations(TSet<FIntPoint> EffectedLocations, ATile* AffecterTile);
 
 	/*
 	 * Undoes the affects of this on the set of effected tiles.
@@ -59,7 +59,7 @@ public:
 	 * @param AffecterTile - The tile doing the affecting.
 	 */
 	UFUNCTION()
-		virtual void UnaffectTiles(TSet<ATile*> EffectedTiles, ATile* AffecterTile);
+	virtual void UnaffectTiles(TSet<ATile*> EffectedTiles, ATile* AffecterTile);
 
 	/*
 	 * Undoes the affects of this on the set of effected locations without tiles.
@@ -68,7 +68,7 @@ public:
 	 * @param AffecterTile - The tile doing the affecting.
 	 */
 	UFUNCTION()
-		virtual void UnaffectNonTileLocations(TSet<FIntPoint> EffectedLocations, ATile* AffecterTile);
+	virtual void UnaffectNonTileLocations(TSet<FIntPoint> EffectedLocations, ATile* AffecterTile);
 };
 /* /\ =========== /\ *\
 |  /\ UTileEffect /\  |

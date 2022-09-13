@@ -2,26 +2,13 @@
 
 #pragma once
 
+#include "FieldType.h"
+
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "GroundPlane.generated.h"
 
 class ATile;
-
-/* \/ ========== \/ *\
-|  \/ EFieldType \/  |
-\* \/ ========== \/ */
-UENUM(BlueprintType)
-enum class EFieldType : uint8
-{
-	Protection	UMETA(DisplayName = "Protection Radius"),
-	Damage		UMETA(DisplayName = "Damage Radius")
-};
-/* /\ ========== /\ *\
-|  /\ EFieldType /\  |
-\* /\ ========== /\ */
-
-
 
 /* \/ ============== \/ *\
 |  \/ AGroundPlane \/  |

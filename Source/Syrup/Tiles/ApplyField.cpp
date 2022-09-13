@@ -36,6 +36,20 @@ void UApplyField::AffectLocations(TSet<FIntPoint> EffectedLocations, ATile* Affe
 }
 
 /*
+ * Affects the set of effected tiles with this effect.
+ *
+ * @param EffectedTiles - The tiles to effect.
+ * @param AffecterTile - The tile doing the affecting.
+ */
+void UApplyField::AffectTiles(TSet<ATile*> EffectedTiles, ATile* AffecterTile)
+{
+	for (ATile* EachEffectedTile : EffectedTiles)
+	{
+		EachEffectedTile->ApplyField(FieldType);
+	}
+}
+
+/*
  * Undoes the affects of this on the set of a effected locations.
  *
  * @param EffectedLocations - The locations to undo the effect on.
@@ -58,6 +72,20 @@ void UApplyField::UnaffectLocations(TSet<FIntPoint> EffectedLocations, ATile* Af
 	{
 		GroundPlane->RemoveField(FieldType, EffectedLocations);
 		UE_LOG(LogTemp, Warning, TEXT("Remove"));
+	}
+}
+
+/*
+ * Undoes the affects of this on the set of effected tiles.
+ *
+ * @param EffectedTiles - The tiles to undo the effect on.
+ * @param AffecterTile - The tile doing the affecting.
+ */
+void UApplyField::UnaffectTiles(TSet<ATile*> EffectedTiles, ATile* AffecterTile)
+{
+	for (ATile* EachEffectedTile : EffectedTiles)
+	{
+		EachEffectedTile->RemoveField(FieldType);
 	}
 }
 /* /\ =========== /\ *\

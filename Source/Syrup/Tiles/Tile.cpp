@@ -33,6 +33,7 @@ ATile::ATile()
 	SubtileMesh->SetAbsolute(true, true);
 	SubtileMesh->SetStaticMesh(TileMesh);
 	SubtileMesh->SetMaterial(0, TileMaterial);
+	SubtileMesh->NumCustomDataFloats = 2;
 	SubtileMesh->CastShadow = false;
 }
 
@@ -44,6 +45,7 @@ ATile::ATile()
 void ATile::OnConstruction(const FTransform& Transform)
 {
 	SetActorTransform(Transform * (FTransform(-FVector(0, 0, Transform.GetTranslation().Z))));
+	FieldsToStrengths = TMap<EFieldType, int>();
 	if(ensure(IsValid(SubtileMesh)))
 	{
 		SubtileMesh->SetMaterial(0, TileMaterial);
@@ -94,6 +96,50 @@ void ATile::OnConstruction(const FTransform& Transform)
 FGridTransform ATile::GetGridTransform() const
 {
 	return UGridLibrary::WorldTransformToGridTransform(GetActorTransform());
+}
+
+/**
+ * Applies a field to this tile.
+ *
+ * @param Type - The type of field to apply.
+ */
+void ATile::ApplyField(EFieldType Type)
+{
+	if (FieldsToStrengths.Contains(Type))
+	{
+		FieldsToStrengths.Add(Type, FieldsToStrengths.FindRef(Type) + 1);
+		return;
+	}
+	FieldsToStrengths.Add(Type,  1);
+	for (int InstanceIndex = 0; InstanceIndex < SubtileMesh->PerInstanceSMCustomData.Num(); InstanceIndex++)
+	{
+		SubtileMesh->SetCustomDataValue(InstanceIndex, (uint8)Type, 1, true);
+	}
+}
+
+/**
+ * Removes a field to this tile.
+ *
+ * @param Type - The type of field to remove.
+ */
+void ATile::RemoveField(EFieldType Type)
+{
+	if (FieldsToStrengths.Contains(Type))
+	{
+		int NewStrength = FieldsToStrengths.FindRef(Type) - 1;
+		if (NewStrength > 0)
+		{
+			FieldsToStrengths.Add(Type, NewStrength);
+		}
+		else
+		{
+			FieldsToStrengths.Remove(Type);
+			for (int InstanceIndex = 0; InstanceIndex < SubtileMesh->PerInstanceSMCustomData.Num(); InstanceIndex++)
+			{
+				SubtileMesh->SetCustomDataValue(InstanceIndex, (uint8)Type, 0, true);
+			}
+		}
+	}
 }
 
 /*

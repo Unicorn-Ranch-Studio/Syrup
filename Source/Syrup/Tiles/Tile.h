@@ -3,6 +3,7 @@
 #pragma once
 
 #include "GridLibrary.h"
+#include "Syrup/MapUtilities/FieldType.h"
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
@@ -44,6 +45,21 @@ public:
 	UFUNCTION(BlueprintPure)
 	FGridTransform GetGridTransform() const;
 
+	/**
+	 * Applies a field to this tile.
+	 *
+	 * @param Type - The type of field to apply.
+	 */
+	UFUNCTION()
+	void ApplyField(EFieldType Type);
+
+	/**
+	 * Removes a field to this tile.
+	 *
+	 * @param Type - The type of field to remove.
+	 */
+	UFUNCTION()
+	void RemoveField(EFieldType Type);
 protected:
 	UPROPERTY(EditDefaultsOnly)
 	UMaterialInterface* TileMaterial;
@@ -71,6 +87,10 @@ private:
 	//The mesh used for each tile as the ground.
 	UPROPERTY()
 	UStaticMesh* TileMesh;
+
+	//The field data for this tile.
+	UPROPERTY(Transient)
+	TMap<EFieldType, int> FieldsToStrengths = TMap<EFieldType, int>();
 };
 /* /\ ===== /\ *\
 |  /\ ATile /\  |
