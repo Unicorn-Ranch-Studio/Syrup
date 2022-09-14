@@ -55,5 +55,5 @@ public:
 
 private:
 	UPROPERTY()
-	AGroundPlane* GroundPlane = nullptr;
+	TSet<AGroundPlane*> GroundPlanes = TSet<AGroundPlane*>();
 };

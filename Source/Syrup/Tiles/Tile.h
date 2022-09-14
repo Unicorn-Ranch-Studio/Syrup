@@ -60,6 +60,7 @@ public:
 	 */
 	UFUNCTION()
 	void RemoveField(EFieldType Type);
+
 protected:
 	UPROPERTY(EditDefaultsOnly)
 	UMaterialInterface* TileMaterial;

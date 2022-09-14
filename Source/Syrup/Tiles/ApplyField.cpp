@@ -17,20 +17,29 @@
  */
 void UApplyField::AffectLocations(TSet<FIntPoint> EffectedLocations, ATile* AffecterTile) 
 {
-	if (!IsValid(GroundPlane))
+	if (GroundPlanes.IsEmpty())
 	{
 		for (TActorIterator<AGroundPlane> Iterator = TActorIterator<AGroundPlane>(AffecterTile->GetWorld()); Iterator; ++Iterator)
 		{
 			if (IsValid(*Iterator))
 			{
-				GroundPlane = *Iterator;
-				break;
+				if (Iterator->ApplyField(FieldType, EffectedLocations))
+				{
+					GroundPlanes.Add(*Iterator);
+					break;
+				}
 			}
 		}
 	}
-	if (IsValid(GroundPlane))
+	else
 	{
-		GroundPlane->ApplyField(FieldType, EffectedLocations);
+		for (AGroundPlane* EachGroundPlane : GroundPlanes)
+		{
+			if (IsValid(EachGroundPlane))
+			{
+				EachGroundPlane->ApplyField(FieldType, EffectedLocations);
+			}
+		}
 	}
 }
 
@@ -56,20 +65,29 @@ void UApplyField::AffectTiles(TSet<ATile*> EffectedTiles, ATile* AffecterTile)
  */
 void UApplyField::UnaffectLocations(TSet<FIntPoint> EffectedLocations, ATile* AffecterTile) 
 {
-	if (!IsValid(GroundPlane))
+	if (GroundPlanes.IsEmpty())
 	{
 		for (TActorIterator<AGroundPlane> Iterator = TActorIterator<AGroundPlane>(AffecterTile->GetWorld()); Iterator; ++Iterator)
 		{
 			if (IsValid(*Iterator))
 			{
-				GroundPlane = *Iterator;
-				break;
+				if (Iterator->RemoveField(FieldType, EffectedLocations))
+				{
+					GroundPlanes.Add(*Iterator);
+					break;
+				}
 			}
 		}
 	}
-	if (IsValid(GroundPlane))
+	else
 	{
-		GroundPlane->RemoveField(FieldType, EffectedLocations);
+		for (AGroundPlane* EachGroundPlane : GroundPlanes)
+		{
+			if (IsValid(EachGroundPlane))
+			{
+				EachGroundPlane->RemoveField(FieldType, EffectedLocations);
+			}
+		}
 	}
 }
 
