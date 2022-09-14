@@ -12,10 +12,12 @@
  *
  * @param FieldType - The type of the field. Fields of different types are independent.
  * @param Locations - The locations to add the field in.
+ * 
+ * @return If this plane was in any of the effected locations.
  */
-void AGroundPlane::ApplyField(EFieldType Type, TSet<FIntPoint> Locations)
+bool AGroundPlane::ApplyField(EFieldType Type, TSet<FIntPoint> Locations)
 {
-	AddFieldStrength(Type, 1, Locations);
+	return AddFieldStrength(Type, 1, Locations);
 }
 
 /**
@@ -23,10 +25,12 @@ void AGroundPlane::ApplyField(EFieldType Type, TSet<FIntPoint> Locations)
  *
  * @param FieldType - The type of the field. Fields of different types are independent.
  * @param Locations - The locations to remove the field from.
+ * 
+ * @return If this plane was in any of the effected locations.
  */
-void AGroundPlane::RemoveField(EFieldType Type, TSet<FIntPoint> Locations)
+bool AGroundPlane::RemoveField(EFieldType Type, TSet<FIntPoint> Locations)
 {
-	AddFieldStrength(Type, -1, Locations);
+	return AddFieldStrength(Type, -1, Locations);
 }
 
 /**
@@ -59,19 +63,16 @@ AGroundPlane::AGroundPlane()
  */
 void AGroundPlane::OnConstruction(const FTransform& Transform)
 {
-	if (LocationsToInstanceIndices.Num() != PlaneSize.X * PlaneSize.Y)
-	{
-		GroundMesh->ClearInstances();
-		LocationsToInstanceIndices.Empty();
-		FieldTypeToLocationToStrengths.Empty();
+	GroundMesh->ClearInstances();
+	LocationsToInstanceIndices.Empty();
+	FieldTypeToLocationToStrengths.Empty();
 
-		for (int IndexX = -(PlaneSize.X / 2); IndexX < PlaneSize.X / 2 + PlaneSize.X % 2; IndexX++)
+	for (int IndexX = -(PlaneSize.X / 2); IndexX < PlaneSize.X / 2 + PlaneSize.X % 2; IndexX++)
+	{
+		for (int IndexY = -(PlaneSize.Y / 2); IndexY < PlaneSize.Y / 2 + PlaneSize.Y % 2; IndexY++)
 		{
-			for (int IndexY = -(PlaneSize.Y / 2); IndexY < PlaneSize.Y / 2 + PlaneSize.Y % 2; IndexY++)
-			{
-				FIntPoint GridLocation = FIntPoint(IndexX, IndexY);
-				LocationsToInstanceIndices.Add(GridLocation, GroundMesh->AddInstance(UGridLibrary::GridTransformToWorldTransform(FGridTransform(GridLocation)) * FTransform(FVector(0, 0, -1)), true));
-			}
+			FIntPoint GridLocation = FIntPoint(IndexX, IndexY) + Offset;
+			LocationsToInstanceIndices.Add(GridLocation, GroundMesh->AddInstance(UGridLibrary::GridTransformToWorldTransform(FGridTransform(GridLocation)) * FTransform(FVector(0, 0, -1)), true));
 		}
 	}
 }
@@ -82,9 +83,13 @@ void AGroundPlane::OnConstruction(const FTransform& Transform)
  * @param FieldType - The type of the field. Fields of different types have independent strengths.
  * @param Strength - The value to add to the field strength. Note: Field values clamped to >= 0.
  * @param Locations - The locations to change the field strength in.
+ * 
+ * @return If this plane was in any of the effected locations.
  */
-void AGroundPlane::AddFieldStrength(const EFieldType FieldType, const int Strength, const TSet<FIntPoint> Locations)
+bool AGroundPlane::AddFieldStrength(const EFieldType FieldType, const int Strength, const TSet<FIntPoint> Locations)
 {
+	bool ReturnValue = false;
+
 	//Create field map if not it doesn't exist
 	if (LocationsToInstanceIndices.IsEmpty())
 	{
@@ -100,6 +105,7 @@ void AGroundPlane::AddFieldStrength(const EFieldType FieldType, const int Streng
 		//Skip if outside domain
 		if (!LocationsToInstanceIndices.Contains(EachLocation))
 		{
+			ReturnValue = true;
 			continue;
 		}
 
@@ -129,4 +135,6 @@ void AGroundPlane::AddFieldStrength(const EFieldType FieldType, const int Streng
 			}
 		}
 	}
+
+	return ReturnValue;
 }
