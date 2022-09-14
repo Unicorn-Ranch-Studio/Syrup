@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "TileEffectTrigger.h"
 #include "TileEffect.generated.h"
 
 class ATile;
@@ -18,6 +19,10 @@ class SYRUP_API UTileEffect : public UObject
 {
 	GENERATED_BODY()
 public:
+	//The trigger that will cause this effect.
+	UPROPERTY(EditAnywhere)
+	ETileEffectTrigger Trigger = ETileEffectTrigger::Persistent;
+
 	/*
 	 * Causes this effect.
 	 *
