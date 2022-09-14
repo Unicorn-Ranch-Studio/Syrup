@@ -11,7 +11,7 @@
 /**
  * A single effect that a tile effector can have.
  */
-UCLASS(DefaultToInstanced, abstract, editinlinenew)
+UCLASS(DefaultToInstanced, Abstract, EditInlineNew)
 class SYRUP_API UTileEffect : public UObject
 {
 	GENERATED_BODY()
