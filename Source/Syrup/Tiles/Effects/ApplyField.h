@@ -8,6 +8,9 @@
 #include "TileEffect.h"
 #include "ApplyField.generated.h"
 
+/* \/ =========== \/ *\
+|  \/ UApplyField \/  |
+\* \/ =========== \/ */
 /**
  * Applies a field in the affect area.
  */
@@ -21,39 +24,29 @@ public:
 	EFieldType FieldType = EFieldType::Protection;
 
 	/*
-	 * Affects the set of all locations this effect.
+	 * Causes this effect.
 	 *
-	 * @param EffectedTiles - The locations to effect.
-	 * @param AffecterTile - The tile doing the affecting.
-	 */
-	virtual void AffectLocations(TSet<FIntPoint> EffectedLocations, ATile* AffecterTile) override;
-
-	
-	/*
-	 * Affects the set of effected tiles with this effect.
-	 *
+	 * @param EffectedLocations - The locations to effect.
 	 * @param EffectedTiles - The tiles to effect.
+	 * @param EffectedNonTileLocations - The locations that are not covered by tiles to effect.
 	 * @param AffecterTile - The tile doing the affecting.
 	 */
-	virtual void AffectTiles(TSet<ATile*> EffectedTiles, ATile* AffecterTile) override;
+	virtual void Affect(TSet<FIntPoint> EffectedLocations, TSet<ATile*> EffectedTiles, TSet<FIntPoint> EffectedNonTileLocations, ATile* AffecterTile) override;
 
 	/*
-	 * Undoes the affects of this on the set of a effected locations.
+	 * Undoes the effect of this.
 	 *
-	 * @param EffectedLocations - The locations to undo the effect on.
+	 * @param EffectedLocations - The locations that were effected.
+	 * @param EffectedTiles - The tiles that were effected.
+	 * @param EffectedNonTileLocations - The locations that are not covered by tiles to that were effected.
 	 * @param AffecterTile - The tile doing the affecting.
 	 */
-	virtual void UnaffectLocations(TSet<FIntPoint> EffectedLocations, ATile* AffecterTile) override;
-
-	/*
-	 * Undoes the affects of this on the set of effected tiles.
-	 *
-	 * @param EffectedTiles - The tiles to undo the effect on.
-	 * @param AffecterTile - The tile doing the affecting.
-	 */
-	virtual void UnaffectTiles(TSet<ATile*> EffectedTiles, ATile* AffecterTile) override;
+	virtual void Unaffect(TSet<FIntPoint> EffectedLocations, TSet<ATile*> EffectedTiles, TSet<FIntPoint> EffectedNonTileLocations, ATile* AffecterTile) override;
 
 private:
 	UPROPERTY()
 	TSet<AGroundPlane*> GroundPlanes = TSet<AGroundPlane*>();
 };
+/* /\ =========== /\ *\
+|  /\ UApplyField /\  |
+\* /\ =========== /\ */
