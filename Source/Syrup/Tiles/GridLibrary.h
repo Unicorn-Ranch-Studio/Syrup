@@ -13,7 +13,7 @@ class ATile;
 |  \/ EGridDirection \/  |
 \* \/ ============== \/ */
 /**
- * Repersents the valid directions that a tile could face.
+ * Represents the valid directions that a tile could face.
  * Note: To flip the direction just add 1 and to get the next clockwise direction add 2.
  */
 UENUM(BlueprintType)
@@ -36,7 +36,7 @@ enum class EGridDirection : uint8
 |  \/ FGridTransform \/  |
 \* \/ ============== \/ */
 /**
- * Rerpsesnts the position of a tile or shape on the grid.
+ * Represents the position of a tile or shape on the grid.
  */
 USTRUCT(BlueprintType)
 struct SYRUP_API FGridTransform
@@ -68,7 +68,7 @@ struct SYRUP_API FGridTransform
 /**
  * A library for functions related to the in game grid.
  * 
- * Includes things like translateing between grid and world space, handeling 
+ * Includes things like translating between grid and world space, handling 
  * direction operations, transforming shapes in the grid, and querying the grid 
  * for collisions.
  */
@@ -82,7 +82,7 @@ public:
 	/*
 	 * Gets the world transform of a grid transform.
 	 * 
-	 * @param Location - The transform on the grid to get the tranform of.
+	 * @param Location - The transform on the grid to get the transform of.
 	 * @return The world transform of the grid transform.
 	 */
 	UFUNCTION(BlueprintPure, Category="Transformation|Grid")
@@ -101,7 +101,7 @@ public:
 	 * Gets snaps a given transform to the grid.
 	 * 
 	 * @param Location - The transform in the world to snap.
-	 * @return The snaped transform.
+	 * @return The snapped transform.
 	 */
 	UFUNCTION(BlueprintPure, Category="Transformation|Grid")
 	static FTransform SnapWorldTransformToGrid(const FTransform Transform);
@@ -123,10 +123,10 @@ public:
 	static double GetGridSideLength();
 
 	/*
-	 * Gets whether or not a tile at a given grid location will be fliped.
+	 * Gets whether or not a tile at a given grid location will be flipped.
 	 *
 	 * @param Location - The location of the tile.
-	 * @return Whether or not a tile at a given grid location will be fliped.
+	 * @return Whether or not a tile at a given grid location will be flipped.
 	 */
 	UFUNCTION(BlueprintPure, Category = "Transformation|Grid")
 	static bool IsGridLocationFlipped(const FIntPoint Location);
