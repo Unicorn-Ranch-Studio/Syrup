@@ -40,6 +40,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FIntPoint PlaneSize = FIntPoint(100, 100);
 
+	//The grid offset of this plane.
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FIntPoint Offset = FIntPoint(0, 0);
+
 	/**
 	 * Applies a field in a given area.
 	 *

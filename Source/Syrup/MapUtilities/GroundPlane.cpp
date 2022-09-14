@@ -59,18 +59,15 @@ AGroundPlane::AGroundPlane()
  */
 void AGroundPlane::OnConstruction(const FTransform& Transform)
 {
-	if (LocationsToInstanceIndices.Num() != PlaneSize.X * PlaneSize.Y)
-	{
-		GroundMesh->ClearInstances();
-		LocationsToInstanceIndices.Empty();
+	GroundMesh->ClearInstances();
+	LocationsToInstanceIndices.Empty();
 
-		for (int IndexX = -(PlaneSize.X / 2); IndexX < PlaneSize.X / 2 + PlaneSize.X % 2; IndexX++)
+	for (int IndexX = -(PlaneSize.X / 2); IndexX < PlaneSize.X / 2 + PlaneSize.X % 2; IndexX++)
+	{
+		for (int IndexY = -(PlaneSize.Y / 2); IndexY < PlaneSize.Y / 2 + PlaneSize.Y % 2; IndexY++)
 		{
-			for (int IndexY = -(PlaneSize.Y / 2); IndexY < PlaneSize.Y / 2 + PlaneSize.Y % 2; IndexY++)
-			{
-				FIntPoint GridLocation = FIntPoint(IndexX, IndexY);
-				LocationsToInstanceIndices.Add(GridLocation, GroundMesh->AddInstance(UGridLibrary::GridTransformToWorldTransform(FGridTransform(GridLocation)) * FTransform(FVector(0, 0, -1)), true));
-			}
+			FIntPoint GridLocation = FIntPoint(IndexX, IndexY) + Offset;
+			LocationsToInstanceIndices.Add(GridLocation, GroundMesh->AddInstance(UGridLibrary::GridTransformToWorldTransform(FGridTransform(GridLocation)) * FTransform(FVector(0, 0, -1)), true));
 		}
 	}
 }
