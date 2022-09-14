@@ -49,18 +49,22 @@ public:
 	 *
 	 * @param FieldType - The type of the field. Fields of different types are independent.
 	 * @param Locations - The locations to add the field in.
+	 * 
+	 * @return If this plane was in any of the effected locations.
 	 */
 	UFUNCTION(BlueprintCallable)
-	void ApplyField(EFieldType Type, TSet<FIntPoint> Locations);
+	bool ApplyField(EFieldType Type, TSet<FIntPoint> Locations);
 
 	/**
 	 * Removes a field from a given area.
 	 *
 	 * @param FieldType - The type of the field. Fields of different types are independent.
 	 * @param Locations - The locations to remove the field from.
+	 * 
+	 * @return If this plane was in any of the effected locations.
 	 */
 	UFUNCTION(BlueprintCallable)
-	void RemoveField(EFieldType Type, TSet<FIntPoint> Locations);
+	bool RemoveField(EFieldType Type, TSet<FIntPoint> Locations);
 
 	/**
 	 * Creates and sets up the ground mesh.
@@ -90,9 +94,11 @@ private:
 	 * @param FieldType - The type of the field. Fields of different types have independent strengths.
 	 * @param Strength - The value to add to the field strength. Note: Field values clamped to >= 0.
 	 * @param Locations - The locations to change the field strength in.
+	 * 
+	 * @return If this plane was in any of the effected locations.
 	 */
 	UFUNCTION(BlueprintCallable)
-	void AddFieldStrength(const EFieldType FieldType, const int Strength, const TSet<FIntPoint> Locations);
+	bool AddFieldStrength(const EFieldType FieldType, const int Strength, const TSet<FIntPoint> Locations);
 
 	//Stores the grid locations of each ground mesh instance
 	UPROPERTY(Transient)
