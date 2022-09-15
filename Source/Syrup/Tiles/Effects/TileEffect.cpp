@@ -8,52 +8,25 @@
 |  \/ UTileEffect \/  |
 \* \/ =========== \/ */
 /*
- * Affects the set of all locations this effect.
+ * Causes this effect.
  *
- * @param EffectedTiles - The locations to effect.
- * @param AffecterTile - The tile doing the affecting.
- */
-void UTileEffect::AffectLocations(TSet<FIntPoint> EffectedLocations, ATile* AffecterTile) {}
-
-/*
- * Affects the set of effected tiles with this effect.
- *
+ * @param EffectedLocations - The locations to effect.
  * @param EffectedTiles - The tiles to effect.
+ * @param EffectedNonTileLocations - The locations that are not covered by tiles to effect.
  * @param AffecterTile - The tile doing the affecting.
  */
-void UTileEffect::AffectTiles(TSet<ATile*> EffectedTiles, ATile* AffecterTile) {}
+void UTileEffect::Affect(TSet<FIntPoint> EffectedLocations, TSet<ATile*> EffectedTiles, TSet<FIntPoint> EffectedNonTileLocations, ATile* AffecterTile) {}
 
 /*
- * Affects the set of locations without tiles with this effect.
+ * Undoes the effect of this.
  *
- * @param EffectedTiles - The locations to effect.
+ * @param EffectedLocations - The locations that were effected.
+ * @param EffectedTiles - The tiles that were effected.
+ * @param EffectedNonTileLocations - The locations that are not covered by tiles to that were effected.
  * @param AffecterTile - The tile doing the affecting.
  */
-void UTileEffect::AffectNonTileLocations(TSet<FIntPoint> EffectedLocations, ATile* AffecterTile) {}
-
-/*
- * Undoes the affects of this on the set of a effected locations.
- *
- * @param EffectedLocations - The locations to undo the effect on.
- * @param AffecterTile - The tile doing the affecting.
- */
-void UTileEffect::UnaffectLocations(TSet<FIntPoint> EffectedLocations, ATile* AffecterTile) {}
-
-/*
- * Undoes the affects of this on the set of effected tiles.
- *
- * @param EffectedTiles - The tiles to undo the effect on.
- * @param AffecterTile - The tile doing the affecting.
- */
-void UTileEffect::UnaffectTiles(TSet<ATile*> EffectedTiles, ATile* AffecterTile) {}
-
-/*
- * Undoes the affects of this on the set of effected locations without tiles.
- *
- * @param EffectedLocations - The locations to undo the effect on.
- * @param AffecterTile - The tile doing the affecting.
- */
-void UTileEffect::UnaffectNonTileLocations(TSet<FIntPoint> EffectedLocations, ATile* AffecterTile) {}
+UFUNCTION()
+void UTileEffect::Unaffect(TSet<FIntPoint> EffectedLocations, TSet<ATile*> EffectedTiles, TSet<FIntPoint> EffectedNonTileLocations, ATile* AffecterTile) {}
 /* /\ =========== /\ *\
 |  /\ UTileEffect /\  |
 \* /\ =========== /\ */

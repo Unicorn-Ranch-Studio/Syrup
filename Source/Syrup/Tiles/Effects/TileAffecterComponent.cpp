@@ -5,7 +5,7 @@
 
 #include "EngineUtils.h"
 #include "TileEffect.h"
-#include "GridLibrary.h"
+#include "Syrup/Tiles/GridLibrary.h"
 
 /* \/ ============= \/ *\
 |  \/ AAffecterTile \/  |
@@ -30,9 +30,7 @@ void UTileAffecterComponent::ApplyEffect()
 	{
 		if (IsValid(EachEffect))
 		{
-			EachEffect->AffectLocations(EffectedLocations, AffectingTile);
-			EachEffect->AffectTiles(EffectedTiles, AffectingTile);
-			EachEffect->AffectNonTileLocations(EffectedNonTileLocations, AffectingTile);
+			EachEffect->Affect(EffectedLocations, EffectedTiles, EffectedNonTileLocations, AffectingTile);
 		}
 	}
 
@@ -52,9 +50,7 @@ void UTileAffecterComponent::UndoEffect()
 	{
 		if (IsValid(EachEffect))
 		{
-			EachEffect->UnaffectLocations(LastEffectedLocations, AffectingTile);
-			EachEffect->UnaffectTiles(LastEffectedTiles, AffectingTile);
-			EachEffect->UnaffectNonTileLocations(LastEffectedNonTileLocations, AffectingTile);
+			EachEffect->Unaffect(LastEffectedLocations, LastEffectedTiles, LastEffectedNonTileLocations, AffectingTile);
 		}
 	}
 

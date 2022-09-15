@@ -3,19 +3,21 @@
 
 #include "ApplyField.h"
 
-#include "Tile.h"
+#include "Syrup/Tiles/Tile.h"
 #include "EngineUtils.h"
 
 /* \/ =========== \/ *\
 |  \/ UApplyField \/  |
 \* \/ =========== \/ */
 /*
- * Affects the set of all locations this effect.
+ * Causes this effect.
  *
- * @param EffectedTiles - The locations to effect.
+ * @param EffectedLocations - The locations to effect.
+ * @param EffectedTiles - The tiles to effect.
+ * @param EffectedNonTileLocations - The locations that are not covered by tiles to effect.
  * @param AffecterTile - The tile doing the affecting.
  */
-void UApplyField::AffectLocations(TSet<FIntPoint> EffectedLocations, ATile* AffecterTile) 
+void UApplyField::Affect(TSet<FIntPoint> EffectedLocations, TSet<ATile*> EffectedTiles, TSet<FIntPoint> EffectedNonTileLocations, ATile* AffecterTile)
 {
 	if (GroundPlanes.IsEmpty())
 	{
@@ -41,16 +43,7 @@ void UApplyField::AffectLocations(TSet<FIntPoint> EffectedLocations, ATile* Affe
 			}
 		}
 	}
-}
 
-/*
- * Affects the set of effected tiles with this effect.
- *
- * @param EffectedTiles - The tiles to effect.
- * @param AffecterTile - The tile doing the affecting.
- */
-void UApplyField::AffectTiles(TSet<ATile*> EffectedTiles, ATile* AffecterTile)
-{
 	for (ATile* EachEffectedTile : EffectedTiles)
 	{
 		EachEffectedTile->ApplyField(FieldType);
@@ -58,12 +51,14 @@ void UApplyField::AffectTiles(TSet<ATile*> EffectedTiles, ATile* AffecterTile)
 }
 
 /*
- * Undoes the affects of this on the set of a effected locations.
+ * Undoes the effect of this.
  *
- * @param EffectedLocations - The locations to undo the effect on.
+ * @param EffectedLocations - The locations that were effected.
+ * @param EffectedTiles - The tiles that were effected.
+ * @param EffectedNonTileLocations - The locations that are not covered by tiles to that were effected.
  * @param AffecterTile - The tile doing the affecting.
  */
-void UApplyField::UnaffectLocations(TSet<FIntPoint> EffectedLocations, ATile* AffecterTile) 
+void UApplyField::Unaffect(TSet<FIntPoint> EffectedLocations, TSet<ATile*> EffectedTiles, TSet<FIntPoint> EffectedNonTileLocations, ATile* AffecterTile)
 {
 	if (GroundPlanes.IsEmpty())
 	{
@@ -89,16 +84,7 @@ void UApplyField::UnaffectLocations(TSet<FIntPoint> EffectedLocations, ATile* Af
 			}
 		}
 	}
-}
 
-/*
- * Undoes the affects of this on the set of effected tiles.
- *
- * @param EffectedTiles - The tiles to undo the effect on.
- * @param AffecterTile - The tile doing the affecting.
- */
-void UApplyField::UnaffectTiles(TSet<ATile*> EffectedTiles, ATile* AffecterTile)
-{
 	for (ATile* EachEffectedTile : EffectedTiles)
 	{
 		EachEffectedTile->RemoveField(FieldType);

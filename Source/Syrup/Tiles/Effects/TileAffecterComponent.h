@@ -3,11 +3,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Tile.h"
+#include "Syrup/Tiles/Tile.h"
 #include "TileAffecterComponent.generated.h"
 
 class UTileEffect;
-class ATile;
 
 /* \/ ============= \/ *\
 |  \/ AAffecterTile \/  |
