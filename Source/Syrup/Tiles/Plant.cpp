@@ -54,7 +54,11 @@ bool APlant::IsGrown() const
  */
 TSet<FIntPoint> APlant::GetRelativeSubTileLocations() const
 {
-	return Data->GetShape();
+	if (IsValid(Data))
+	{
+		return Data->GetShape();
+	}
+	return Super::GetRelativeSubTileLocations();
 }
 
 /**
@@ -74,25 +78,28 @@ void APlant::OnConstruction(const FTransform& Transform)
 {
 	Super::OnConstruction(Transform);
 
-	Mesh->SetStaticMesh(Data->GetMesh());
-	Health = Data->GetMaxHealth();
-	TimeUntilGrown = Data->GetTimeUntilGrown() + 1;
-
-	TriggersToAffectors.Empty();
-	for (UTileEffect* EachEffect : Data->GetEffects())
+	if (IsValid(Data))
 	{
-		ETileEffectTrigger TriggerType = EachEffect->Trigger;
+		Mesh->SetStaticMesh(Data->GetMesh());
+		Health = Data->GetMaxHealth();
+		TimeUntilGrown = Data->GetTimeUntilGrown() + 1;
 
-		if (!TriggersToAffectors.Contains(TriggerType))
+		TriggersToAffectors.Empty();
+		for (UTileEffect* EachEffect : Data->GetEffects())
 		{
-			TriggersToAffectors.Add(TriggerType, NewObject<UTileAffecterComponent>(this));
-			TriggersToAffectors.FindRef(TriggerType)->RegisterComponent();
+			ETileEffectTrigger TriggerType = EachEffect->Trigger;
+
+			if (!TriggersToAffectors.Contains(TriggerType))
+			{
+				TriggersToAffectors.Add(TriggerType, NewObject<UTileAffecterComponent>(this));
+				TriggersToAffectors.FindRef(TriggerType)->RegisterComponent();
+			}
+
+			TriggersToAffectors.FindRef(TriggerType)->Effects.Add(EachEffect);
 		}
 
-		TriggersToAffectors.FindRef(TriggerType)->Effects.Add(EachEffect);
+		Grow();
 	}
-
-	Grow();
 }
 
 /**
@@ -154,7 +161,7 @@ void APlant::Grow()
 	if (!IsGrown())
 	{
 		TimeUntilGrown--;
-		Mesh->SetRelativeScale3D(FVector(1 / (1 + TimeUntilGrown)));
+		Mesh->SetRelativeScale3D(FVector(1.f / (1 + TimeUntilGrown)));
 		if (IsGrown())
 		{
 			TriggersToAffectors.FindRef(ETileEffectTrigger::Persistent)->ApplyEffect(GetEffectLocations());
