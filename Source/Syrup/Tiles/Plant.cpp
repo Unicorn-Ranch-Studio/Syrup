@@ -27,9 +27,14 @@ APlant::APlant()
  *
  * @return Whether or not this plant was killed by the damage.
  */
-bool APlant::TakeDamage(int Amount)
+bool APlant::ReciveDamage(int Amount)
 {
 	Health -= FMath::Max(0, Amount);
+	if (Health <= 0)
+	{
+		Destroy();
+	}
+	return Health <= 0;
 }
 
 /**
@@ -94,9 +99,9 @@ void APlant::OnConstruction(const FTransform& Transform)
  * Activates the appropriate effects given the trigger.
  *
  * @param TriggerType - The type of trigger that was activated.
- * @param LocationsToTrigger - The Locations where the trigger applies an effect.
+ * @param LocationsToTrigger - The Locations where the trigger applies an effect. If this is empty all effect locations will be effected.
  */
-void APlant::ReceiveEffectTrigger(ETileEffectTrigger TriggerType, TSet<FIntPoint> LocationsToTrigger)
+void APlant::ReceiveEffectTrigger(const ETileEffectTrigger TriggerType, const TSet<FIntPoint> LocationsToTrigger)
 {
 	switch (TriggerType)
 	{
@@ -119,7 +124,15 @@ void APlant::ReceiveEffectTrigger(ETileEffectTrigger TriggerType, TSet<FIntPoint
 
 	if (IsGrown())
 	{
-		TriggersToAffectors.FindRef(TriggerType)->ApplyEffect();
+		const TSet<FIntPoint> EffectLocations = GetEffectLocations();
+		if (LocationsToTrigger.IsEmpty())
+		{
+			TriggersToAffectors.FindRef(TriggerType)->ApplyEffect(EffectLocations);
+		}
+		else
+		{
+			TriggersToAffectors.FindRef(TriggerType)->ApplyEffect(LocationsToTrigger.Union(EffectLocations));
+		}
 	}
 }
 
@@ -128,7 +141,7 @@ void APlant::ReceiveEffectTrigger(ETileEffectTrigger TriggerType, TSet<FIntPoint
  *
  * @return A set of all locations where the effects of this plant will apply.
  */
-TSet<FIntPoint> APlant::GetEffectLocation() const
+TSet<FIntPoint> APlant::GetEffectLocations() const
 {
 	return UGridLibrary::ScaleShapeUp(Data->GetShape(), Data->GetRange());
 }
@@ -144,7 +157,7 @@ void APlant::Grow()
 		Mesh->SetRelativeScale3D(FVector(1 / (1 + TimeUntilGrown)));
 		if (IsGrown())
 		{
-			TriggersToAffectors.FindRef(ETileEffectTrigger::Persistent)->ApplyEffect();
+			TriggersToAffectors.FindRef(ETileEffectTrigger::Persistent)->ApplyEffect(GetEffectLocations());
 		}
 	}
 }

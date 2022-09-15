@@ -42,7 +42,7 @@ public:
 	 * @return Whether or not this plant was killed by the damage.
 	 */
 	UFUNCTION(BlueprintCallable)
-	bool TakeDamage(int Amount);
+	bool ReciveDamage(int Amount);
 
 	/**
 	 * Gets the current health of this plant.
@@ -101,10 +101,10 @@ private:
 	 * Activates the appropriate effects given the trigger.
 	 * 
 	 * @param TriggerType - The type of trigger that was activated.
-	 * @param LocationsToTrigger - The Locations where the trigger applies an effect.
+	 * @param LocationsToTrigger - The Locations where the trigger applies an effect. If this is empty all effect locations will be effected.
 	 */
 	UFUNCTION()
-	void ReceiveEffectTrigger(ETileEffectTrigger TriggerType, TSet<FIntPoint> LocationsToTrigger);
+	void ReceiveEffectTrigger(const ETileEffectTrigger TriggerType, const TSet<FIntPoint> LocationsToTrigger);
 	
 	/**
 	 * Gets the locations where the effects of this plant will apply.
@@ -112,7 +112,7 @@ private:
 	 * @return A set of all locations where the effects of this plant will apply.
 	 */
 	UFUNCTION()
-	TSet<FIntPoint> GetEffectLocation() const;
+	TSet<FIntPoint> GetEffectLocations() const;
 
 	/**
 	 * Updates the plants so that it is 1 turn closer to fully grown, and causes the effects of being fully grown if needed.
