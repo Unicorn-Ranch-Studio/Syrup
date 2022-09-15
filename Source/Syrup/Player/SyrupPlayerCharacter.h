@@ -28,17 +28,31 @@ private:
 	/* /\ Components /\ *\
 	\* ---------------- */
 
-	/* --------------- *\
-	\* \/ Functions \/ */
+
 public:
 	// Sets default AxisValues for this character's properties
 	ASyrupPlayerCharacter();
 
+	/* --------------- *\
+	\* \/ Variables \/ */
+private:
+	//Stores most recent X and Y input values from MoveForward() and MoveRight()
+	float recentInputX = 0.f, recentInputY = 0.f;
 
+	/* /\ Variables /\ *\
+	\* --------------- */
+
+
+	/* --------------- *\
+	\* \/ Functions \/ */
 public:	
 	// Called to bind functionality to input
+	/**
+	 * Sets up movement axis and inputs
+	 *
+	 * @param UInputComponent*
+	 */
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
 
 private:
 	/**
@@ -49,7 +63,7 @@ private:
 	void MoveForward(float AxisValue);
 
 	void MoveRight(float AxisValue);
-	
+
 	/* /\ Functions /\ *\
 	\* --------------- */
 };

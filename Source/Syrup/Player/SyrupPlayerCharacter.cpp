@@ -17,9 +17,7 @@ ASyrupPlayerCharacter::ASyrupPlayerCharacter()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	/**
-	* 
-	*/
+
 	//Create Camera Root
 	CameraRoot = CreateDefaultSubobject<USceneComponent>(FName("Camera Root"));
 	CameraRoot->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
@@ -34,6 +32,11 @@ ASyrupPlayerCharacter::ASyrupPlayerCharacter()
 	
 	//Auto Posess
 	AutoPossessPlayer = EAutoReceiveInput::Player0;
+
+	//Rotate on Acceleration
+	bUseControllerRotationPitch, bUseControllerRotationRoll, bUseControllerRotationYaw = false;
+	GetCharacterMovement()->bOrientRotationToMovement = true;
+	GetCharacterMovement()->bUseControllerDesiredRotation = false;
 }
 
 /**
@@ -55,6 +58,8 @@ void ASyrupPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInp
 void ASyrupPlayerCharacter::MoveForward(float AxisValue)
 {
 	GetCharacterMovement()->AddInputVector(FVector(AxisValue, 0.f, 0.f));
+	recentInputX = AxisValue;
+	RotateCharacter(recentInputX, recentInputY);
 }
 
 /**
@@ -65,6 +70,8 @@ void ASyrupPlayerCharacter::MoveForward(float AxisValue)
 void ASyrupPlayerCharacter::MoveRight(float AxisValue)
 {
 	GetCharacterMovement()->AddInputVector(FVector(0.f, AxisValue, 0.f));
+	recentInputY = AxisValue;
+	RotateCharacter(recentInputX, recentInputY);
 }
 
 /* /\ ===================== /\ *\
