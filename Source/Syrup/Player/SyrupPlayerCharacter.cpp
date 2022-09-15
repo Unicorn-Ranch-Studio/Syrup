@@ -59,7 +59,6 @@ void ASyrupPlayerCharacter::MoveForward(float AxisValue)
 {
 	GetCharacterMovement()->AddInputVector(FVector(AxisValue, 0.f, 0.f));
 	recentInputX = AxisValue;
-	RotateCharacter(recentInputX, recentInputY);
 }
 
 /**
@@ -71,7 +70,6 @@ void ASyrupPlayerCharacter::MoveRight(float AxisValue)
 {
 	GetCharacterMovement()->AddInputVector(FVector(0.f, AxisValue, 0.f));
 	recentInputY = AxisValue;
-	RotateCharacter(recentInputX, recentInputY);
 }
 
 /* /\ ===================== /\ *\
