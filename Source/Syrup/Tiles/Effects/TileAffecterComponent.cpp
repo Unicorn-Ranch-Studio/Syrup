@@ -13,16 +13,16 @@
 /**
  * Applies all of this affecter's effects. Note effects will only be applied once per effected location/tile.
  */
-void UTileAffecterComponent::ApplyEffect()
+void UTileAffecterComponent::ApplyEffect(TSet<FIntPoint> Locations)
 {
 	TSet<ATile*> EffectedTiles;
 	TSet<FIntPoint> EffectedNonTileLocations;
-	TSet<FIntPoint> EffectedLocations = GetEffectedTilesAndLocations(EffectedTiles, EffectedNonTileLocations);
+	GetEffectedTilesAndLocations(Locations, EffectedTiles, EffectedNonTileLocations);
 
 	ATile* AffectingTile = Cast<ATile>(GetOwner());
 	EffectedTiles.Add(AffectingTile);
 
-	EffectedNonTileLocations = EffectedLocations.Difference(LastEffectedLocations);
+	EffectedNonTileLocations = Locations.Difference(LastEffectedLocations);
 	EffectedTiles = EffectedTiles.Difference(LastEffectedTiles);
 	EffectedNonTileLocations = EffectedNonTileLocations.Difference(LastEffectedNonTileLocations);
 
@@ -30,11 +30,11 @@ void UTileAffecterComponent::ApplyEffect()
 	{
 		if (IsValid(EachEffect))
 		{
-			EachEffect->Affect(EffectedLocations, EffectedTiles, EffectedNonTileLocations, AffectingTile);
+			EachEffect->Affect(Locations, EffectedTiles, EffectedNonTileLocations, AffectingTile);
 		}
 	}
 
-	LastEffectedLocations = EffectedLocations.Union(LastEffectedLocations);
+	LastEffectedLocations = Locations.Union(LastEffectedLocations);
 	LastEffectedTiles = EffectedTiles.Union(LastEffectedTiles);
 	LastEffectedNonTileLocations = EffectedNonTileLocations.Union(LastEffectedNonTileLocations);
 }
@@ -60,29 +60,26 @@ void UTileAffecterComponent::UndoEffect()
 }
 
 /**
- * Gets all of the locations and tiles that will be affected.
+ * Gets all of the non-tile locations and tiles that will be affected by the given locations.
  *
+ * @param EffectedLocations - All of the effected locations.
  * @param EffectedTiles - Is set to contain all of the effected tiles.
  * @param EffectedLocations - Is set to contain all of the effected locations that are not covered by tiles.
- *
- * @return All of the effected locations.
  */
-TSet<FIntPoint> UTileAffecterComponent::GetEffectedTilesAndLocations(TSet<ATile*>& EffectedTiles, TSet<FIntPoint>& EffectedNonTileLocations) const
+void UTileAffecterComponent::GetEffectedTilesAndLocations(TSet<FIntPoint> EffectedLocations, TSet<ATile*>& EffectedTiles, TSet<FIntPoint>& EffectedNonTileLocations) const
 {
-	TSet<FIntPoint> AffectLocations = UGridLibrary::ScaleShapeUp(ShapeLocations, Range);
-	for (FIntPoint EachAffectedLocation : AffectLocations)
+	for (FIntPoint EachEffectedLocation : EffectedLocations)
 	{
 		ATile* OverlapedTile;
-		if (UGridLibrary::OverlapGridLocation(GetWorld(), EachAffectedLocation, OverlapedTile, TArray<AActor*>()))
+		if (UGridLibrary::OverlapGridLocation(GetWorld(), EachEffectedLocation, OverlapedTile, TArray<AActor*>()))
 		{
 			EffectedTiles.Add(OverlapedTile);
 		}
 		else
 		{
-			EffectedNonTileLocations.Add(EachAffectedLocation);
+			EffectedNonTileLocations.Add(EachEffectedLocation);
 		}
 	}
-	return AffectLocations;
 }
 /* /\ ============= /\ *\
 |  /\ AAffecterTile /\  |
