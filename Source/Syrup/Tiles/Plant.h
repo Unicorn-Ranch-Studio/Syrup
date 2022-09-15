@@ -22,6 +22,8 @@ class UTileAffecterComponent;
 UCLASS()
 class SYRUP_API APlant : public ATile
 {
+	GENERATED_BODY()
+
 public:
 	/**
 	 * Creates the mesh component.
@@ -31,6 +33,32 @@ public:
 	//All of the information about this plants functionality.
 	UPROPERTY(EditInstanceOnly)
 	UPlantData* Data = nullptr;
+
+	/**
+	 * Causes this plant to take damage.
+	 * 
+	 * @param Amount - The number of damage points to damage this plant by.
+	 * 
+	 * @return Whether or not this plant was killed by the damage.
+	 */
+	UFUNCTION(BlueprintCallable)
+	bool TakeDamage(int Amount);
+
+	/**
+	 * Gets the current health of this plant.
+	 * 
+	 * @return The number of damage points this plant can take before dying.
+	 */
+	UFUNCTION(BlueprintPure)
+	FORCEINLINE int GetHealth() const { return Health; };
+
+	/**
+	 * Gets whether or not this plant is fully grown.
+	 * 
+	 * @return Whether or not this plant is fully grown.
+	 */
+	UFUNCTION(BlueprintPure)
+	bool IsGrown() const;
 
 protected:
 	//The mesh of this plant.
@@ -49,12 +77,25 @@ protected:
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly)
 	int TimeUntilGrown = 1;
 
+	/**
+	 * The relative locations of all of the sub-tiles of this plant.
+	 * 
+	 * @return The relative locations of all of the sub-tiles of this plant.
+	 */
+	virtual TSet<FIntPoint> GetRelativeSubTileLocations() const override;
 
 private:
 	/**
-	 * Initializes Health, Range, and TimeUntilGrown; and sets the appropriate mesh.
+	 * Binds effect triggers.
 	 */
-	OnConstruct();
+	virtual void BeginPlay() override;
+
+	/**
+	 * Initializes Health, Range, and TimeUntilGrown; and sets the appropriate mesh.
+	 * 
+	 * @param Transform - The new transform of the plant.
+	 */
+	virtual void OnConstruction(const FTransform& Transform) override;
 
 	/**
 	 * Activates the appropriate effects given the trigger.
@@ -63,12 +104,26 @@ private:
 	 * @param LocationsToTrigger - The Locations where the trigger applies an effect.
 	 */
 	UFUNCTION()
-	void ReceiveEffectTrigger(ETileEffectTrigger TriggerType, TSet<FIntPoints> LocationsToTrigger);
+	void ReceiveEffectTrigger(ETileEffectTrigger TriggerType, TSet<FIntPoint> LocationsToTrigger);
+	
+	/**
+	 * Gets the locations where the effects of this plant will apply.
+	 * 
+	 * @return A set of all locations where the effects of this plant will apply.
+	 */
+	UFUNCTION()
+	TSet<FIntPoint> GetEffectLocation() const;
+
+	/**
+	 * Updates the plants so that it is 1 turn closer to fully grown, and causes the effects of being fully grown if needed.
+	 */
+	UFUNCTION()
+	void Grow();
 
 	//The affecters linked to each effect trigger.
 	UPROPERTY()
-	TMap<UTileAffecterComponent*> TriggersToAffectors = TMap<UTileAffecterComponent*>();
+	TMap<ETileEffectTrigger, UTileAffecterComponent*> TriggersToAffectors = TMap<ETileEffectTrigger, UTileAffecterComponent*>();
 };
-/* /\ ===== /\ *\
-|  /\ ATile /\  |
-\* /\ ===== /\ */
+/* /\ ====== /\ *\
+|  /\ APlant /\  |
+\* /\ ====== /\ */

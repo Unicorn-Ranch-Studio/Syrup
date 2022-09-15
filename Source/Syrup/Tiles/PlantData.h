@@ -13,7 +13,7 @@ class UTileEffect;
 |  \/ UPlantData \/  |
 \* \/ ========== \/ */
 /**
- * All of the stats of a plant.
+ * All of the stats of a plant type.
  */
 UCLASS()
 class SYRUP_API UPlantData : public UDataAsset
@@ -26,7 +26,7 @@ public:
 	 * @return The text to use when referring to a plant of this type.
 	 */
 	UFUNCTION(BlueprintPure)
-	FORCEINLINE FText GetDisplayName() { return DisplayName; };
+	FORCEINLINE FText GetDisplayName() const { return DisplayName; };
 
 	/**
 	 * Gets the mesh of this plant type.
@@ -34,7 +34,7 @@ public:
 	 * @return The static mesh to use for this plant type.
 	 */
 	UFUNCTION(BlueprintPure)
-	FORCEINLINE UStaticMesh* GetMesh() { return Mesh; };
+	FORCEINLINE UStaticMesh* GetMesh() const { return Mesh; };
 
 	/**
 	 * Gets the shape of this plant type.
@@ -42,7 +42,7 @@ public:
 	 * @return A set containing all of the relative locations of the sub-tiles making up the shape of this plant type.
 	 */
 	UFUNCTION(BlueprintPure)
-	FORCEINLINE TSet<FIntPoint> GetShape() { return Shape; };
+	FORCEINLINE TSet<FIntPoint> GetShape() const { return Shape; };
 
 	/**
 	 * Gets the max health of this plant type.
@@ -50,7 +50,7 @@ public:
 	 * @return The number of damage points a plant of this type can take before dying.
 	 */
 	UFUNCTION(BlueprintPure)
-	FORCEINLINE int GetMaxHealth() { return MaxHealth; };
+	FORCEINLINE int GetMaxHealth() const { return MaxHealth; };
 
 	/**
 	 * Gets the turns taken for this plant type to grow.
@@ -58,7 +58,7 @@ public:
 	 * @return The number of turns it takes for this plant type's effects to begin taking effect.
 	 */
 	UFUNCTION(BlueprintPure)
-	FORCEINLINE int GetTimeToGrown() { return TimeToGrown; };
+	FORCEINLINE int GetTimeUntilGrown() const { return TimeUntilGrown; };
 
 	/**
 	 * Gets cost to plant this plant type.
@@ -66,7 +66,7 @@ public:
 	 * @return The amount of energy required to plant a plant of this type.
 	 */
 	UFUNCTION(BlueprintPure)
-	FORCEINLINE int GetPlantingCost() { return PlantingCost; };
+	FORCEINLINE int GetPlantingCost() const { return PlantingCost; };
 
 	/**
 	 * Gets the range of this plant type's effects.
@@ -74,7 +74,7 @@ public:
 	 * @return The scale applied to the shape of this plant type to get all effected locations of this plant type's effects.
 	 */
 	UFUNCTION(BlueprintPure)
-	FORCEINLINE int GetRange() { return Range; };
+	FORCEINLINE int GetRange() const { return Range; };
 
 	/**
 	 * Gets the effects that this plant type will have.
@@ -82,12 +82,12 @@ public:
 	 * @return An array containing all of the effects that this plant type will have inside its range.
 	 */
 	UFUNCTION(BlueprintPure)
-	FORCEINLINE TArray<UTileEffect*> GetEffects() { return Effects; };
+	FORCEINLINE TArray<UTileEffect*> GetEffects() const { return Effects; };
 
 protected:
 	//The text to use when referring to a plant of this type.
 	UPROPERTY(EditDefaultsOnly)
-	FText DisplayName = FText("Unnamed Plant");
+	FText DisplayName = FText();
 
 	//The static mesh to use for this plant type.
 	UPROPERTY(EditDefaultsOnly)
@@ -103,7 +103,7 @@ protected:
 
 	//The number of turns it takes for this plant type's effects to begin taking effect.
 	UPROPERTY(EditDefaultsOnly, Meta = (ClampMin = "0"))
-	int TimeToGrown = 1;
+	int TimeUntilGrown = 1;
 
 	//The amount of energy required to plant a plant of this type.
 	UPROPERTY(EditDefaultsOnly, Meta = (ClampMin = "0"))
