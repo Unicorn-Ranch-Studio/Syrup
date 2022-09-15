@@ -20,23 +20,18 @@ class SYRUP_API UTileAffecterComponent : public UActorComponent
 	GENERATED_BODY()
 	
 public:	
-	//The number of layers to add to the shape of this affecter's effect zone.
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Meta = (ClampMin = "0"))
-	int Range = 1;
-
-	//The positions the comprise the shape of this affecter's effect zone.
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	TSet<FIntPoint>	ShapeLocations = TSet<FIntPoint>();
-
 	//The effects that this affecter will have.
 	UPROPERTY(EditAnywhere, AdvancedDisplay, Instanced)
 	TArray<TObjectPtr<UTileEffect>> Effects = TArray<TObjectPtr<UTileEffect>>();
 
 	/**
-	 * Applies all of this affecter's effects. Note effects will only be applied once per effected location/tile.
+	 * Applies all of this affecter's effects in the given locations. 
+	 * Note: effects will only be applied once per effected location/tile.
+	 * 
+	 * @param Locations - The locations to apply the effects at.
 	 */
 	UFUNCTION(BlueprintCallable)
-	void ApplyEffect();
+	void ApplyEffect(TSet<FIntPoint> Locations);
 
 	/**
 	 * Undoes all of this affecter's effects.
@@ -45,15 +40,14 @@ public:
 	void UndoEffect();
 
 	/**
-	 * Gets all of the locations and tiles that will be affected.
-	 * 
+	 * Gets all of the non-tile locations and tiles that will be affected by the given locations.
+	 *
+	 * @param EffectedLocations - All of the effected locations.
 	 * @param EffectedTiles - Is set to contain all of the effected tiles.
 	 * @param EffectedLocations - Is set to contain all of the effected locations that are not covered by tiles.
-	 * 
-	 * @return All of the effected locations.
 	 */
 	UFUNCTION(BlueprintPure)
-	TSet<FIntPoint> GetEffectedTilesAndLocations(TSet<ATile*>& EffectedTiles, TSet<FIntPoint>& EffectedNonTileLocations) const;
+	void GetEffectedTilesAndLocations(TSet<FIntPoint> EffectedLocations, TSet<ATile*>& EffectedTiles, TSet<FIntPoint>& EffectedNonTileLocations) const;
 
 private:
 	//The last effected locations.
