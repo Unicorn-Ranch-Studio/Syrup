@@ -21,7 +21,7 @@ class SYRUP_API UTileEffect : public UObject
 public:
 	//The trigger that will cause this effect.
 	UPROPERTY(EditAnywhere)
-	ETileEffectTrigger Trigger = ETileEffectTrigger::Persistent;
+	ETileEffectTriggerType Trigger = ETileEffectTriggerType::Persistent;
 
 	/*
 	 * Causes this effect.

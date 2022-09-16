@@ -104,7 +104,7 @@ private:
 	 * @param LocationsToTrigger - The Locations where the trigger applies an effect. If this is empty all effect locations will be effected.
 	 */
 	UFUNCTION()
-	void ReceiveEffectTrigger(const ETileEffectTrigger TriggerType, const TSet<FIntPoint> LocationsToTrigger);
+	void ReceiveEffectTrigger(const ETileEffectTriggerType TriggerType, const TSet<FIntPoint> LocationsToTrigger);
 	
 	/**
 	 * Gets the locations where the effects of this plant will apply.
@@ -122,7 +122,7 @@ private:
 
 	//The affecters linked to each effect trigger.
 	UPROPERTY()
-	TMap<ETileEffectTrigger, UTileAffecterComponent*> TriggersToAffectors = TMap<ETileEffectTrigger, UTileAffecterComponent*>();
+	TMap<ETileEffectTriggerType, UTileAffecterComponent*> TriggersToAffectors = TMap<ETileEffectTriggerType, UTileAffecterComponent*>();
 };
 /* /\ ====== /\ *\
 |  /\ APlant /\  |

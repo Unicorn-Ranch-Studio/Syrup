@@ -87,7 +87,7 @@ void APlant::OnConstruction(const FTransform& Transform)
 		TriggersToAffectors.Empty();
 		for (UTileEffect* EachEffect : Data->GetEffects())
 		{
-			ETileEffectTrigger TriggerType = EachEffect->Trigger;
+			ETileEffectTriggerType TriggerType = EachEffect->Trigger;
 
 			if (!TriggersToAffectors.Contains(TriggerType))
 			{
@@ -108,21 +108,21 @@ void APlant::OnConstruction(const FTransform& Transform)
  * @param TriggerType - The type of trigger that was activated.
  * @param LocationsToTrigger - The Locations where the trigger applies an effect. If this is empty all effect locations will be effected.
  */
-void APlant::ReceiveEffectTrigger(const ETileEffectTrigger TriggerType, const TSet<FIntPoint> LocationsToTrigger)
+void APlant::ReceiveEffectTrigger(const ETileEffectTriggerType TriggerType, const TSet<FIntPoint> LocationsToTrigger)
 {
 	switch (TriggerType)
 	{
-	case ETileEffectTrigger::Persistent:
+	case ETileEffectTriggerType::Persistent:
 		break;
-	case ETileEffectTrigger::PlantActive:
+	case ETileEffectTriggerType::PlantActive:
 		break;
-	case ETileEffectTrigger::TrashDamage:
+	case ETileEffectTriggerType::TrashDamage:
 		break;
-	case ETileEffectTrigger::TrashActive:
+	case ETileEffectTriggerType::TrashActive:
 		break;
-	case ETileEffectTrigger::TrashSpread:
+	case ETileEffectTriggerType::TrashSpread:
 		break;
-	case ETileEffectTrigger::PlantsGrow:
+	case ETileEffectTriggerType::PlantsGrow:
 		Grow();
 		break;
 	default:
@@ -164,7 +164,7 @@ void APlant::Grow()
 		Mesh->SetRelativeScale3D(FVector(1.f / (1 + TimeUntilGrown)));
 		if (IsGrown())
 		{
-			TriggersToAffectors.FindRef(ETileEffectTrigger::Persistent)->ApplyEffect(GetEffectLocations());
+			TriggersToAffectors.FindRef(ETileEffectTriggerType::Persistent)->ApplyEffect(GetEffectLocations());
 		}
 	}
 }
