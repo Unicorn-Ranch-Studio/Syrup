@@ -42,7 +42,7 @@ public:
 	 * @return Whether or not this plant was killed by the damage.
 	 */
 	UFUNCTION(BlueprintCallable)
-	bool ReciveDamage(int Amount);
+	bool ReceiveDamage(int Amount);
 
 	/**
 	 * Gets the current health of this plant.
@@ -97,15 +97,18 @@ private:
 	 */
 	virtual void OnConstruction(const FTransform& Transform) override;
 
+public:
+	//TODO: Make private once events have been bound.
 	/**
 	 * Activates the appropriate effects given the trigger.
 	 * 
 	 * @param TriggerType - The type of trigger that was activated.
 	 * @param LocationsToTrigger - The Locations where the trigger applies an effect. If this is empty all effect locations will be effected.
 	 */
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void ReceiveEffectTrigger(const ETileEffectTriggerType TriggerType, const TSet<FIntPoint> LocationsToTrigger);
-	
+private:
+
 	/**
 	 * Gets the locations where the effects of this plant will apply.
 	 * 

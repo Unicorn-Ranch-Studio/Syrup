@@ -210,7 +210,7 @@ public:
 	 * @return All the grid locations of a given shape when scaled up.
 	 */
 	UFUNCTION(BlueprintPure, Category = "Transformation|Grid|Adjacency")
-	static TSet<FIntPoint> ScaleShapeUp(const TSet<FIntPoint> Shape, const int Size, const bool bChopPoints = false);
+	static TSet<FIntPoint> ScaleShapeUp(const TSet<FIntPoint>& ShapeLocations, const int Size, const bool bChopPoints = false);
 
 	/*
 	 * Gets all the grid locations of a line.

@@ -255,28 +255,30 @@ TSet<FIntPoint> UGridLibrary::GetGridLocationsInRadius(const FIntPoint Location,
  * @param Size -  The number of layers to add to the shape.
  * @return All the grid locations of a given shape when scaled up.
  */
-TSet<FIntPoint> UGridLibrary::ScaleShapeUp(const TSet<FIntPoint> ShapeLocations, const int Size, const bool bChopPoints)
+TSet<FIntPoint> UGridLibrary::ScaleShapeUp(const TSet<FIntPoint>& ShapeLocations, const int Size, const bool bChopPoints)
 {
+	TSet<FIntPoint> ShapeLocationsRehashed = TSet<FIntPoint>(ShapeLocations.Array());
+
 	// End if invalid size
 	if (Size < 1)
 	{
-		return ShapeLocations;
+		return ShapeLocationsRehashed;
 	}
 
 	// Get the details of the layers that need to be added
 	TSet<TTuple<FIntPoint, EGridDirection, bool>> LayerDetails = TSet<TTuple<FIntPoint, EGridDirection, bool>>();
-	for (FIntPoint EachShapeLocation : ShapeLocations)
+	for (FIntPoint EachShapeLocation : ShapeLocationsRehashed)
 	{
 		// Get the adjacent locations of the shape and check to see if they are not contained in the shape
 		TMap<EGridDirection, FIntPoint> AdjacentLocations = GetAdjacentGridLocations(EachShapeLocation);
 		for (EGridDirection DirectionIndex = (EGridDirection)IsGridLocationFlipped(EachShapeLocation); (uint8)DirectionIndex < 6; DirectionIndex = (EGridDirection)((uint8)DirectionIndex + 2))
 		{
-			bool bShouldLayerBeAdded = !ShapeLocations.Contains(AdjacentLocations.FindRef(DirectionIndex));
+			bool bShouldLayerBeAdded = !ShapeLocationsRehashed.Contains(AdjacentLocations.FindRef(DirectionIndex));
 			if (bShouldLayerBeAdded)
 			{
 				// If next adjacent location is also outside the shape then add cap
-				bool bShouldCapBeAdded = bShouldLayerBeAdded && !ShapeLocations.Contains(AdjacentLocations.FindRef(GetNextDirection(DirectionIndex)));
-
+				bool bShouldCapBeAdded = !ShapeLocationsRehashed.Contains(AdjacentLocations.FindRef(GetNextDirection(DirectionIndex)));
+				
 				LayerDetails.Add(TTuple<FIntPoint, EGridDirection, bool>(AdjacentLocations.FindRef(DirectionIndex), DirectionIndex, bShouldCapBeAdded));
 			}
 		}
@@ -284,7 +286,7 @@ TSet<FIntPoint> UGridLibrary::ScaleShapeUp(const TSet<FIntPoint> ShapeLocations,
 
 
 	// Create Layers
-	TSet<FIntPoint> ReturnValue = TSet<FIntPoint>(ShapeLocations);
+	TSet<FIntPoint> ReturnValue = TSet<FIntPoint>(ShapeLocationsRehashed);
 	
 	// For each layer details get the locations of a trapezoid with one corner on the layer location.
 	for (TTuple<FIntPoint, EGridDirection, bool> EachLayerDetail : LayerDetails)

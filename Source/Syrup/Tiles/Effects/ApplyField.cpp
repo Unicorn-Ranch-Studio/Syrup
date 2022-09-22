@@ -19,6 +19,13 @@
  */
 void UApplyField::Affect(TSet<FIntPoint> EffectedLocations, TSet<ATile*> EffectedTiles, TSet<FIntPoint> EffectedNonTileLocations, ATile* AffecterTile)
 {
+	for (TSet<AGroundPlane*>::TIterator Itterator = GroundPlanes.CreateIterator(); Itterator; ++Itterator)
+	{
+		if (!IsValid(*Itterator))
+		{
+			Itterator.RemoveCurrent();
+		}
+	}
 	if (GroundPlanes.IsEmpty())
 	{
 		for (TActorIterator<AGroundPlane> Iterator = TActorIterator<AGroundPlane>(AffecterTile->GetWorld()); Iterator; ++Iterator)
@@ -60,6 +67,13 @@ void UApplyField::Affect(TSet<FIntPoint> EffectedLocations, TSet<ATile*> Effecte
  */
 void UApplyField::Unaffect(TSet<FIntPoint> EffectedLocations, TSet<ATile*> EffectedTiles, TSet<FIntPoint> EffectedNonTileLocations, ATile* AffecterTile)
 {
+	for (TSet<AGroundPlane*>::TIterator Itterator = GroundPlanes.CreateIterator(); Itterator; ++Itterator)
+	{
+		if (!IsValid(*Itterator))
+		{
+			Itterator.RemoveCurrent();
+		}
+	}
 	if (GroundPlanes.IsEmpty())
 	{
 		for (TActorIterator<AGroundPlane> Iterator = TActorIterator<AGroundPlane>(AffecterTile->GetWorld()); Iterator; ++Iterator)

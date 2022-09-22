@@ -27,7 +27,7 @@ APlant::APlant()
  *
  * @return Whether or not this plant was killed by the damage.
  */
-bool APlant::ReciveDamage(int Amount)
+bool APlant::ReceiveDamage(int Amount)
 {
 	Health -= FMath::Max(0, Amount);
 	if (Health <= 0)
@@ -66,6 +66,7 @@ TSet<FIntPoint> APlant::GetRelativeSubTileLocations() const
  */
 void APlant::BeginPlay()
 {
+	Super::BeginPlay();
 	//TODO: Implement bindings to ReciveEffectTriggers once turn system is completed.
 }
 
@@ -83,6 +84,7 @@ void APlant::OnConstruction(const FTransform& Transform)
 		Mesh->SetStaticMesh(Data->GetMesh());
 		Health = Data->GetMaxHealth();
 		TimeUntilGrown = Data->GetTimeUntilGrown() + 1;
+		Range = Data->GetRange();
 
 		TriggersToAffectors.Empty();
 		for (UTileEffect* EachEffect : Data->GetEffects())
@@ -129,7 +131,7 @@ void APlant::ReceiveEffectTrigger(const ETileEffectTriggerType TriggerType, cons
 		break;
 	}
 
-	if (IsGrown())
+	if (IsGrown() && TriggersToAffectors.Contains(TriggerType))
 	{
 		const TSet<FIntPoint> EffectLocations = GetEffectLocations();
 		if (LocationsToTrigger.IsEmpty())
@@ -150,7 +152,7 @@ void APlant::ReceiveEffectTrigger(const ETileEffectTriggerType TriggerType, cons
  */
 TSet<FIntPoint> APlant::GetEffectLocations() const
 {
-	return UGridLibrary::ScaleShapeUp(Data->GetShape(), Data->GetRange());
+	return UGridLibrary::ScaleShapeUp(GetSubTileLocations(), Range);
 }
 
 /**
@@ -162,7 +164,7 @@ void APlant::Grow()
 	{
 		TimeUntilGrown--;
 		Mesh->SetRelativeScale3D(FVector(1.f / (1 + TimeUntilGrown)));
-		if (IsGrown())
+		if (IsGrown() && TriggersToAffectors.Contains(ETileEffectTriggerType::Persistent))
 		{
 			TriggersToAffectors.FindRef(ETileEffectTriggerType::Persistent)->ApplyEffect(GetEffectLocations());
 		}

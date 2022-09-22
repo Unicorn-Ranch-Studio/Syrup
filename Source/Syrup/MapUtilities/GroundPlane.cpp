@@ -105,9 +105,9 @@ bool AGroundPlane::AddFieldStrength(const EFieldType FieldType, const int Streng
 		//Skip if outside domain
 		if (!LocationsToInstanceIndices.Contains(EachLocation))
 		{
-			ReturnValue = true;
 			continue;
 		}
+		ReturnValue = true;
 
 		//Create new entry if needed
 		if (!FieldTypeToLocationToStrengths.Find(FieldType)->Contains(EachLocation))
