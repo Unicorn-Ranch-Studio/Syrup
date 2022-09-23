@@ -23,7 +23,7 @@ public:
 	UPROPERTY(EditAnywhere)
 	ETileEffectTriggerType Trigger = ETileEffectTriggerType::Persistent;
 
-	/*
+	/**
 	 * Causes this effect.
 	 *
 	 * @param EffectedLocations - The locations to effect.
@@ -34,7 +34,7 @@ public:
 	UFUNCTION()
 	virtual void Affect(TSet<FIntPoint> EffectedLocations, TSet<ATile*> EffectedTiles, TSet<FIntPoint> EffectedNonTileLocations, ATile* AffecterTile);
 
-	/*
+	/**
 	 * Undoes the effect of this.
 	 *
 	 * @param EffectedLocations - The locations that were effected.
