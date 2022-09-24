@@ -20,7 +20,7 @@ class SYRUP_API UApplyField : public UTileEffect
 	GENERATED_BODY()
 public:
 	//The type of field to apply
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "Effect")
 	EFieldType FieldType = EFieldType::Protection;
 
 	/*

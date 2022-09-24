@@ -6,6 +6,10 @@
 #include "Syrup/Tiles/Tile.h"
 #include "VolumetricEffectActor.h"
 
+
+/* \/ ================= \/ *\
+|  \/ UVolumetricEffect \/  |
+\* \/ ================= \/ */
 /**
  * Causes this effect.
  *
@@ -21,13 +25,19 @@ void UVolumetricEffect::Affect(TSet<FIntPoint> EffectedLocations, TSet<ATile*> E
 		FActorSpawnParameters SpawnParams = FActorSpawnParameters();
 		SpawnParams.Owner = AffecterTile;
 		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		SpawnParams.Name = FName(GetClass()->GetName() + " Actor");
+
 		VolumeActor = AffecterTile->GetWorld()->SpawnActor<AVolumetricEffectActor>(SpawnParams);
+		VolumeActor->SetActorLabel(GetClass()->GetName() + " Actor");
 		VolumeActor->SetOverlapedChannels(GetOverlappedChannels());
 		VolumeActor->OnActorBeginOverlap.AddDynamic(this, &UVolumetricEffect::OnBeginOverlap);
 		VolumeActor->OnActorEndOverlap.AddDynamic(this, &UVolumetricEffect::OnEndOverlap);
 	}
 
-	VolumeActor->AddTiles(EffectedLocations);
+	if (IsValid(VolumeActor))
+	{
+		VolumeActor->AddTiles(EffectedLocations);
+	}
 }
 
 /**
@@ -40,5 +50,11 @@ void UVolumetricEffect::Affect(TSet<FIntPoint> EffectedLocations, TSet<ATile*> E
  */
 void UVolumetricEffect::Unaffect(TSet<FIntPoint> EffectedLocations, TSet<ATile*> EffectedTiles, TSet<FIntPoint> EffectedNonTileLocations, ATile* AffecterTile)
 {
-	VolumeActor->Destroy();
+	if (IsValid(VolumeActor))
+	{
+		VolumeActor->RemoveTiles(EffectedLocations);
+	}
 }
+/* /\ ================= /\ *\
+|  /\ UVolumetricEffect /\  |
+\* /\ ================= /\ */

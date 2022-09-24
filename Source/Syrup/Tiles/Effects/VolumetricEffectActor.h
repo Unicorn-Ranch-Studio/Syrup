@@ -6,6 +6,10 @@
 #include "GameFramework/Actor.h"
 #include "VolumetricEffectActor.generated.h"
 
+
+/* \/ ====================== \/ *\
+|  \/ AVolumetricEffectActor \/  |
+\* \/ ====================== \/ */
 UCLASS()
 class SYRUP_API AVolumetricEffectActor : public AActor
 {
@@ -23,7 +27,7 @@ public:
 	 * @param Channels - A bitwise int specifying all the channels to enable.
 	 */
 	UFUNCTION()
-	void SetOverlapedChannels(int Channels);
+	void SetOverlapedChannels(TSet<TEnumAsByte<ECollisionChannel>> Channels);
 
 	/**
 	 * Adds tiles to this effect volume.
@@ -33,8 +37,23 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void AddTiles(TSet<FIntPoint> TileLocations);
 
-private:
+	/**
+	 * Removes tiles from this effect volume.
+	 * 
+	 * @param TileLocations - The locations of the tiles to remove from the volume.
+	 */
+	UFUNCTION(BlueprintCallable)
+	void RemoveTiles(TSet<FIntPoint> TileLocations);
+
+//private:
 	//The mesh used to generate overlap events.
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere)
 	UInstancedStaticMeshComponent* CollisionMesh;
+
+	//The instances used to represent each location.
+	UPROPERTY()
+	TMap<FIntPoint, int> InstanceLocationsToIndices = TMap<FIntPoint, int>();
 };
+/* /\ ====================== /\ *\
+|  /\ AVolumetricEffectActor /\  |
+\* /\ ====================== /\ */

@@ -8,6 +8,9 @@
 
 class AVolumetricEffectActor;
 
+/* \/ ================= \/ *\
+|  \/ UVolumetricEffect \/  |
+\* \/ ================= \/ */
 /**
  * A type of effect applied things entering the effect volume.
  */
@@ -63,8 +66,12 @@ protected:
 	 * @return A bitwise integer specifying which channels will be overlapped.
 	 */
 	UFUNCTION()
-	virtual FORCEINLINE int GetOverlappedChannels() { return 0; };
+	virtual FORCEINLINE TSet<TEnumAsByte<ECollisionChannel>> GetOverlappedChannels() const { return TSet<TEnumAsByte<ECollisionChannel>>(); };
 
 private:
+	UPROPERTY()
 	AVolumetricEffectActor* VolumeActor;
 };
+/* /\ ================= /\ *\
+|  /\ UVolumetricEffect /\  |
+\* /\ ================= /\ */

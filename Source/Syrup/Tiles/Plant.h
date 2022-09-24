@@ -11,6 +11,8 @@
 class UPlantData;
 class UTileAffecterComponent;
 
+DECLARE_LOG_CATEGORY_EXTERN(LogPlant, Log, All);
+
 /* \/ ====== \/ *\
 |  \/ APlant \/  |
 \* \/ ====== \/ */

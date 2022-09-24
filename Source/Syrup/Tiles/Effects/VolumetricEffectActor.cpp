@@ -6,6 +6,9 @@
 #include "Components/InstancedStaticMeshComponent.h"
 #include "Syrup/Tiles/GridLibrary.h"
 
+/* \/ ====================== \/ *\
+|  \/ AVolumetricEffectActor \/  |
+\* \/ ====================== \/ */
 /**
  * Creates the instanced static mesh used for collision
  */
@@ -22,7 +25,8 @@ AVolumetricEffectActor::AVolumetricEffectActor()
 	check(VolumeMat != nullptr);
 
 	//Create mesh component
-	RootComponent = (CollisionMesh = CreateDefaultSubobject<UInstancedStaticMeshComponent>(FName("Collision Mesh")));
+	CollisionMesh = CreateDefaultSubobject<UInstancedStaticMeshComponent>(FName("Collision Mesh"));
+	RootComponent = CollisionMesh;
 	CollisionMesh->SetStaticMesh(VolumeMesh);
 	CollisionMesh->SetMaterial(0, VolumeMat);
 	CollisionMesh->SetCollisionObjectType(ECollisionChannel::ECC_GameTraceChannel1);
@@ -36,15 +40,12 @@ AVolumetricEffectActor::AVolumetricEffectActor()
  *
  * @param Channels - A bitwise int specifying all the channels to enable.
  */
-void AVolumetricEffectActor::SetOverlapedChannels(int Channels)
+void AVolumetricEffectActor::SetOverlapedChannels(TSet<TEnumAsByte<ECollisionChannel>> Channels)
 {
 	CollisionMesh->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
-	for (int Channel = 0; Channels > 0; Channels = Channels << 1, Channel++)
+	for (ECollisionChannel EachChannel : Channels)
 	{
-		if (Channels % 2)
-		{
-			CollisionMesh->SetCollisionResponseToChannel((ECollisionChannel)Channel, ECollisionResponse::ECR_Overlap);
-		}
+		CollisionMesh->SetCollisionResponseToChannel(EachChannel, ECollisionResponse::ECR_Block);
 	}
 }
 
@@ -55,10 +56,24 @@ void AVolumetricEffectActor::SetOverlapedChannels(int Channels)
  */
 void AVolumetricEffectActor::AddTiles(TSet<FIntPoint> TileLocations)
 {
-	TArray<FTransform> InstanceTransfroms = TArray<FTransform>();
 	for (FIntPoint EachTileLocation : TileLocations)
 	{
-		InstanceTransfroms.Add(UGridLibrary::GridTransformToWorldTransform(EachTileLocation));
+		InstanceLocationsToIndices.Add(EachTileLocation, CollisionMesh->AddInstance(UGridLibrary::GridTransformToWorldTransform(EachTileLocation)));
 	}
-	CollisionMesh->AddInstances(InstanceTransfroms, false);
 }
+
+/**
+ * Removes tiles from this effect volume.
+ *
+ * @param TileLocations - The locations of the tiles to remove from the volume.
+ */
+void AVolumetricEffectActor::RemoveTiles(TSet<FIntPoint> TileLocations)
+{
+	for (FIntPoint EachTileLocation : TileLocations)
+	{
+		CollisionMesh->RemoveInstance(InstanceLocationsToIndices.FindRef(EachTileLocation));
+	}
+}
+/* /\ ====================== /\ *\
+|  /\ AVolumetricEffectActor /\  |
+\* /\ ====================== /\ */

@@ -7,6 +7,8 @@
 #include "Effects/TileAffecterComponent.h"
 #include "Components/InstancedStaticMeshComponent.h"
 
+DEFINE_LOG_CATEGORY(LogPlant);
+
 /* \/ ====== \/ *\
 |  \/ APlant \/  |
 \* \/ ====== \/ */
@@ -89,15 +91,22 @@ void APlant::OnConstruction(const FTransform& Transform)
 		TriggersToAffectors.Empty();
 		for (UTileEffect* EachEffect : Data->GetEffects())
 		{
-			ETileEffectTriggerType TriggerType = EachEffect->Trigger;
-
-			if (!TriggersToAffectors.Contains(TriggerType))
+			if(IsValid(EachEffect))
 			{
-				TriggersToAffectors.Add(TriggerType, NewObject<UTileAffecterComponent>(this));
-				TriggersToAffectors.FindRef(TriggerType)->RegisterComponent();
-			}
+				ETileEffectTriggerType TriggerType = EachEffect->Trigger;
 
-			TriggersToAffectors.FindRef(TriggerType)->Effects.Add(EachEffect);
+				if (!TriggersToAffectors.Contains(TriggerType))
+				{
+					TriggersToAffectors.Add(TriggerType, NewObject<UTileAffecterComponent>(this));
+					TriggersToAffectors.FindRef(TriggerType)->RegisterComponent();
+				}
+
+				TriggersToAffectors.FindRef(TriggerType)->Effects.Add(EachEffect);
+			}
+			else
+			{
+				UE_LOG(LogPlant, Error, TEXT("Invalid Effect. Remove invalid effect on %s"), *Data->GetClass()->GetName())
+			}
 		}
 
 		Grow();

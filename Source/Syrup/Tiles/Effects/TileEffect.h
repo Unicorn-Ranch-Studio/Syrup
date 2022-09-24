@@ -20,7 +20,7 @@ class SYRUP_API UTileEffect : public UObject
 	GENERATED_BODY()
 public:
 	//The trigger that will cause this effect.
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "Effect")
 	ETileEffectTriggerType Trigger = ETileEffectTriggerType::Persistent;
 
 	/**
