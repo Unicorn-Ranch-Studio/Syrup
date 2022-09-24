@@ -91,6 +91,11 @@ void APlant::OnConstruction(const FTransform& Transform)
 		TimeUntilGrown = Data->GetTimeUntilGrown() + 1;
 		Range = Data->GetRange();
 		Mesh->SetRelativeLocation(FVector(Data->GetMeshOffset(), 0));
+		FString Underscore = "_";
+		FString Left = FString();
+		FString Label = FString();
+		GetName().Split(Underscore, &Left, &Label, ESearchCase::IgnoreCase, ESearchDir::FromEnd);
+		SetActorLabel(Data->GetName().RightChop(3) + "_" + Label);
 
 		TriggersToAffectors.Empty();
 		for (UTileEffect* EachEffect : Data->GetEffects())
