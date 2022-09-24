@@ -36,6 +36,15 @@ public:
 	UFUNCTION(BlueprintPure)
 	FORCEINLINE UStaticMesh* GetMesh() const { return Mesh; };
 
+	
+	/**
+	 * Gets the offset of the plant mesh.
+	 * 
+	 * @return The location of the mesh relative to the center of the (0,0) tile.
+	 */
+	UFUNCTION(BlueprintPure)
+	FORCEINLINE FVector2D GetMeshOffset() const { return MeshOffset; };
+
 	/**
 	 * Gets the shape of this plant type.
 	 * 
@@ -92,6 +101,10 @@ protected:
 	//The static mesh to use for this plant type.
 	UPROPERTY(EditDefaultsOnly)
 	UStaticMesh* Mesh = nullptr;
+
+	//The location of the mesh relative to the center of the (0,0) tile.
+	UPROPERTY(EditDefaultsOnly)
+	FVector2D MeshOffset = FVector2D::ZeroVector;
 
 	//A set containing all of the relative locations of the sub-tiles making up the shape of this plant type.
 	UPROPERTY(EditDefaultsOnly)

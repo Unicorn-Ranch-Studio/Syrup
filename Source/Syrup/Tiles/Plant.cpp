@@ -90,6 +90,7 @@ void APlant::OnConstruction(const FTransform& Transform)
 		Health = Data->GetMaxHealth();
 		TimeUntilGrown = Data->GetTimeUntilGrown() + 1;
 		Range = Data->GetRange();
+		Mesh->SetRelativeLocation(FVector(Data->GetMeshOffset(), 0));
 
 		TriggersToAffectors.Empty();
 		for (UTileEffect* EachEffect : Data->GetEffects())
