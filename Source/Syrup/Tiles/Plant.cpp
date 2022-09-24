@@ -2,7 +2,8 @@
 
 #include "Plant.h"
 
-#include "Effects/TileEffectTrigger.h"
+#include "PlantData.h"
+#include "Syrup/SyrupGameMode.h"
 #include "Effects/TileEffect.h"
 #include "Effects/TileAffecterComponent.h"
 #include "Components/InstancedStaticMeshComponent.h"
@@ -26,10 +27,11 @@ APlant::APlant()
  * Causes this plant to take damage.
  *
  * @param Amount - The number of damage points to damage this plant by.
+ * @param Cause - The tile that caused this damage.
  *
  * @return Whether or not this plant was killed by the damage.
  */
-bool APlant::ReceiveDamage(int Amount)
+bool APlant::ReceiveDamage(int Amount, ATile* Cause)
 {
 	Health -= FMath::Max(0, Amount);
 	if (Health <= 0)
@@ -69,7 +71,8 @@ TSet<FIntPoint> APlant::GetRelativeSubTileLocations() const
 void APlant::BeginPlay()
 {
 	Super::BeginPlay();
-	//TODO: Implement bindings to ReciveEffectTriggers once turn system is completed.
+	
+	ASyrupGameMode::GetTileEffectTriggerDelegate(this).AddDynamic(this, &APlant::ReceiveEffectTrigger);
 }
 
 /**

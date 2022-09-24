@@ -21,7 +21,11 @@ FTransform UGridLibrary::GridTransformToWorldTransform(const FGridTransform Grid
 	bool bIsFlipped = IsGridLocationFlipped(Location);
 	double XLocation = GetGridHeight() * Location.X + (!bIsFlipped ? GetGridHeight() *.333333333333 : GetGridHeight() * .666666666666);
 	double YLocation = GetGridSideLength() * Location.Y * 0.5;
-	FRotator Rotation = FRotator(0, (bIsFlipped ? -60 : -120) + (bIsFlipped ? 120 : -120) * (uint8)GridTransform.Direction, 0);
+	int Offset = (bIsFlipped ? 180 : 120);
+	int Direction = (bIsFlipped ? 120 : -120);
+	int Multiplier = (int)GridTransform.Direction;
+	FRotator Rotation = FRotator(0, Offset + Direction * Multiplier, 0);
+	UE_LOG(LogTemp, Warning, TEXT("%i + %i * %i = %i"), Offset, Direction, Multiplier, Offset + Direction * Multiplier);
 
 	return FTransform(Rotation, FVector(XLocation, YLocation, 0));
 }

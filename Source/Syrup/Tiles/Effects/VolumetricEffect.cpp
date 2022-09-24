@@ -25,10 +25,10 @@ void UVolumetricEffect::Affect(TSet<FIntPoint> EffectedLocations, TSet<ATile*> E
 		FActorSpawnParameters SpawnParams = FActorSpawnParameters();
 		SpawnParams.Owner = AffecterTile;
 		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-		SpawnParams.Name = FName(GetClass()->GetName() + " Actor");
+		SpawnParams.Name = FName(AffecterTile->GetName() + " " + GetClass()->GetName() + " Actor");
 
 		VolumeActor = AffecterTile->GetWorld()->SpawnActor<AVolumetricEffectActor>(SpawnParams);
-		VolumeActor->SetActorLabel(GetClass()->GetName() + " Actor");
+		VolumeActor->SetActorLabel(SpawnParams.Name.ToString());
 		VolumeActor->SetOverlapedChannels(GetOverlappedChannels());
 		VolumeActor->OnActorBeginOverlap.AddDynamic(this, &UVolumetricEffect::OnBeginOverlap);
 		VolumeActor->OnActorEndOverlap.AddDynamic(this, &UVolumetricEffect::OnEndOverlap);

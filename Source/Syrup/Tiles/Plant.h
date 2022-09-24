@@ -1,7 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 #pragma once
 
-#include "PlantData.h"
 #include "Effects/TileEffectTrigger.h"
 
 #include "CoreMinimal.h"
@@ -40,11 +39,12 @@ public:
 	 * Causes this plant to take damage.
 	 * 
 	 * @param Amount - The number of damage points to damage this plant by.
+	 * @param Cause - The tile that caused this damage.
 	 * 
 	 * @return Whether or not this plant was killed by the damage.
 	 */
 	UFUNCTION(BlueprintCallable)
-	bool ReceiveDamage(int Amount);
+	bool ReceiveDamage(int Amount, ATile* Cause);
 
 	/**
 	 * Gets the current health of this plant.
@@ -99,15 +99,13 @@ private:
 	 */
 	virtual void OnConstruction(const FTransform& Transform) override;
 
-public:
-	//TODO: Make private once events have been bound.
 	/**
 	 * Activates the appropriate effects given the trigger.
 	 * 
 	 * @param TriggerType - The type of trigger that was activated.
 	 * @param LocationsToTrigger - The Locations where the trigger applies an effect. If this is empty all effect locations will be effected.
 	 */
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION()
 	void ReceiveEffectTrigger(const ETileEffectTriggerType TriggerType, const TSet<FIntPoint> LocationsToTrigger);
 private:
 
