@@ -14,38 +14,39 @@
 /**
  * Applies a field in the affect area.
  */
-UCLASS()
+UCLASS(Meta = (BlueprintSpawnableComponent))
 class SYRUP_API UApplyField : public UTileEffect
 {
 	GENERATED_BODY()
 public:
 	//The type of field to apply
-	UPROPERTY(EditAnywhere, Category = "Effect")
+	UPROPERTY(EditDefaultsOnly, Category = "Effect")
 	EFieldType FieldType = EFieldType::Protection;
 
 	/*
 	 * Causes this effect.
 	 *
-	 * @param EffectedLocations - The locations to effect.
-	 * @param EffectedTiles - The tiles to effect.
-	 * @param EffectedNonTileLocations - The locations that are not covered by tiles to effect.
-	 * @param AffecterTile - The tile doing the affecting.
+	 * @param TriggerType - The type of effects that are currently being triggered.
+	 * @param Locations - The locations to effect.
 	 */
-	virtual void Affect(TSet<FIntPoint> EffectedLocations, TSet<ATile*> EffectedTiles, TSet<FIntPoint> EffectedNonTileLocations, ATile* AffecterTile) override;
+	virtual void Affect(const ETileEffectTriggerType TriggerType, const TSet<FIntPoint>& Locations) override;
 
 	/*
-	 * Undoes the effect of this.
+	 * Undoes this effect.
 	 *
-	 * @param EffectedLocations - The locations that were effected.
-	 * @param EffectedTiles - The tiles that were effected.
-	 * @param EffectedNonTileLocations - The locations that are not covered by tiles to that were effected.
-	 * @param AffecterTile - The tile doing the affecting.
+	 * @param TriggerType - The type of effects that are currently being undone.
+	 * @param Locations - The locations to undo the effect on.
 	 */
-	virtual void Unaffect(TSet<FIntPoint> EffectedLocations, TSet<ATile*> EffectedTiles, TSet<FIntPoint> EffectedNonTileLocations, ATile* AffecterTile) override;
+	virtual void Unaffect(const ETileEffectTriggerType TriggerType) override;
 
 private:
+	//All the tiles that have been effected.
 	UPROPERTY()
-	TSet<AGroundPlane*> GroundPlanes = TSet<AGroundPlane*>();
+	TSet<ATile*> EffectedTiles = TSet<ATile*>();
+
+	//All the ground planes that have been effected.
+	UPROPERTY()
+	TSet<AGroundPlane*> EffectedGroundPlanes = TSet<AGroundPlane*>();
 };
 /* /\ =========== /\ *\
 |  /\ UApplyField /\  |

@@ -12,38 +12,35 @@ class ATile;
 |  \/ UTileEffect \/  |
 \* \/ =========== \/ */
 /**
- * A single effect that a tile effector can have.
+ * A single effect way an actor can effect tiles.
  */
-UCLASS(DefaultToInstanced, Abstract, EditInlineNew)
-class SYRUP_API UTileEffect : public UObject
+UCLASS(Abstract, HideCategories = ("Sockets", "Tags", "ComponentTick", "ComponentReplication", "Activation", "Cooking", "Components|Activation", "AssetUserData", "Collision"))
+class SYRUP_API UTileEffect : public UActorComponent
 {
 	GENERATED_BODY()
 public:
-	//The trigger that will cause this effect.
-	UPROPERTY(EditAnywhere, Category = "Effect")
-	ETileEffectTriggerType Trigger = ETileEffectTriggerType::Persistent;
-
-	/**
+	/*
 	 * Causes this effect.
 	 *
-	 * @param EffectedLocations - The locations to effect.
-	 * @param EffectedTiles - The tiles to effect.
-	 * @param EffectedNonTileLocations - The locations that are not covered by tiles to effect.
-	 * @param AffecterTile - The tile doing the affecting.
+	 * @param TriggerType - The type of effects that are currently being triggered.
+	 * @param Locations - The locations to effect.
 	 */
-	UFUNCTION()
-	virtual void Affect(TSet<FIntPoint> EffectedLocations, TSet<ATile*> EffectedTiles, TSet<FIntPoint> EffectedNonTileLocations, ATile* AffecterTile);
+	UFUNCTION(BlueprintCallable, Category = "Effect", Meta = (AutoCreateRefTerm = "Locations"))
+	virtual FORCEINLINE void Affect(const ETileEffectTriggerType TriggerType, const TSet<FIntPoint>& Locations) { EffectedLocations = EffectedLocations.Union(Locations); };
 
-	/**
-	 * Undoes the effect of this.
+	/*
+	 * Undoes this effect.
 	 *
-	 * @param EffectedLocations - The locations that were effected.
-	 * @param EffectedTiles - The tiles that were effected.
-	 * @param EffectedNonTileLocations - The locations that are not covered by tiles to that were effected.
-	 * @param AffecterTile - The tile doing the affecting.
+	 * @param TriggerType - The type of effects that are currently being undone.
+	 * @param Locations - The locations to undo the effect on.
 	 */
-	UFUNCTION()
-	virtual void Unaffect(TSet<FIntPoint> EffectedLocations, TSet<ATile*> EffectedTiles, TSet<FIntPoint> EffectedNonTileLocations, ATile* AffecterTile);
+	UFUNCTION(BlueprintCallable, Category = "Effect")
+	virtual FORCEINLINE void Unaffect(const ETileEffectTriggerType TriggerType) {};
+
+protected:
+	//The locations that have been effected by this tile already.
+	UPROPERTY()
+	TSet<FIntPoint> EffectedLocations = TSet<FIntPoint>();
 };
 /* /\ =========== /\ *\
 |  /\ UTileEffect /\  |
