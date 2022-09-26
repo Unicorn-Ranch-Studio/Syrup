@@ -2,10 +2,8 @@
 
 #include "Plant.h"
 
-#include "PlantData.h"
 #include "Syrup/SyrupGameMode.h"
 #include "Effects/TileEffect.h"
-#include "Effects/TileAffecterComponent.h"
 #include "Components/InstancedStaticMeshComponent.h"
 
 DEFINE_LOG_CATEGORY(LogPlant);
@@ -18,9 +16,9 @@ DEFINE_LOG_CATEGORY(LogPlant);
  */
 APlant::APlant()
 {
-	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(FName("Plant Mesh"));
-	Mesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	Mesh->AttachToComponent(SubtileMesh, FAttachmentTransformRules::KeepRelativeTransform);
+	MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(FName("Plant Mesh"));
+	MeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	MeshComponent->AttachToComponent(SubtileMesh, FAttachmentTransformRules::KeepRelativeTransform);
 
 	//Get Plant Mat
 	static ConstructorHelpers::FObjectFinder<UMaterialInterface> MeshRef(TEXT("/Game/Tiles/Plants/MI_Plant.MI_Plant"));
@@ -65,22 +63,7 @@ bool APlant::IsGrown() const
  */
 TSet<FIntPoint> APlant::GetRelativeSubTileLocations() const
 {
-	if (IsValid(Data))
-	{
-		return Data->GetShape();
-	}
-	return Super::GetRelativeSubTileLocations();
-}
-
-/**
- * Undoes all the effects of the plant.
- */
-void APlant::Destroyed()
-{
-	for (TPair<ETileEffectTriggerType, UTileAffecterComponent*> EachTriggerToAffector : TriggersToAffectors)
-	{
-		EachTriggerToAffector.Value->UndoEffect();
-	}
+	return GetShape();
 }
 
 /**
@@ -102,42 +85,12 @@ void APlant::OnConstruction(const FTransform& Transform)
 {
 	Super::OnConstruction(Transform);
 
-	if (IsValid(Data))
-	{
-		Mesh->SetStaticMesh(Data->GetMesh());
-		Health = Data->GetMaxHealth();
-		TimeUntilGrown = Data->GetTimeUntilGrown() + 1;
-		Range = Data->GetRange();
-		Mesh->SetRelativeLocation(FVector(Data->GetMeshOffset(), 0));
-		FString Underscore = "_";
-		FString Left = FString();
-		FString Label = FString();
-		GetName().Split(Underscore, &Left, &Label, ESearchCase::IgnoreCase, ESearchDir::FromEnd);
-		SetActorLabel(Data->GetName().RightChop(3) + "_" + Label);
+	MeshComponent->SetStaticMesh(GetMesh());
+	Health = GetMaxHealth();
+	TimeUntilGrown = GetTimeUntilGrown() + 1;
+	Range = GetRange();
 
-		TriggersToAffectors.Empty();
-		for (UTileEffect* EachEffect : Data->GetEffects())
-		{
-			if(IsValid(EachEffect))
-			{
-				ETileEffectTriggerType TriggerType = EachEffect->Trigger;
-
-				if (!TriggersToAffectors.Contains(TriggerType))
-				{
-					TriggersToAffectors.Add(TriggerType, NewObject<UTileAffecterComponent>(this));
-					TriggersToAffectors.FindRef(TriggerType)->RegisterComponent();
-				}
-
-				TriggersToAffectors.FindRef(TriggerType)->Effects.Add(EachEffect);
-			}
-			else
-			{
-				UE_LOG(LogPlant, Error, TEXT("Invalid Effect. Remove invalid effect on %s"), *Data->GetClass()->GetName())
-			}
-		}
-
-		Grow();
-	}
+	Grow();
 }
 
 /**
@@ -167,16 +120,13 @@ void APlant::ReceiveEffectTrigger(const ETileEffectTriggerType TriggerType, cons
 		break;
 	}
 
-	if (IsGrown() && TriggersToAffectors.Contains(TriggerType))
+	if (IsGrown() || TriggerType == ETileEffectTriggerType::PlantsGrow)
 	{
-		const TSet<FIntPoint> EffectLocations = GetEffectLocations();
-		if (LocationsToTrigger.IsEmpty())
+		TInlineComponentArray<UActorComponent*> Components = TInlineComponentArray<UActorComponent*>();
+		GetComponents(UTileEffect::StaticClass(), Components);
+		for (UActorComponent* EachComponent : Components)
 		{
-			TriggersToAffectors.FindRef(TriggerType)->ApplyEffect(EffectLocations);
-		}
-		else
-		{
-			TriggersToAffectors.FindRef(TriggerType)->ApplyEffect(LocationsToTrigger.Union(EffectLocations));
+			Cast<UTileEffect>(EachComponent)->Affect(TriggerType, LocationsToTrigger);
 		}
 	}
 }
@@ -199,10 +149,10 @@ void APlant::Grow()
 	if (!IsGrown())
 	{
 		TimeUntilGrown--;
-		Mesh->SetRelativeScale3D(FVector(1.f / (1 + TimeUntilGrown)));
-		if (IsGrown() && TriggersToAffectors.Contains(ETileEffectTriggerType::Persistent))
+		MeshComponent->SetRelativeScale3D(FVector(1.f / (1 + TimeUntilGrown)));
+		if (IsGrown())
 		{
-			TriggersToAffectors.FindRef(ETileEffectTriggerType::Persistent)->ApplyEffect(GetEffectLocations());
+			ReceiveEffectTrigger(ETileEffectTriggerType::Persistent, TSet<FIntPoint>());
 		}
 	}
 }

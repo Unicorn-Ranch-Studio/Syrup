@@ -26,7 +26,7 @@ void UApplyField::Affect(const ETileEffectTriggerType TriggerType, const TSet<FI
 				Itterator.RemoveCurrent();
 			}
 		}
-		if (GroundPlanes.IsEmpty())
+		if (EffectedGroundPlanes.IsEmpty())
 		{
 			TSet<FIntPoint> NewlyEffectedLocations = Locations.Difference(EffectedLocations);
 
@@ -77,7 +77,7 @@ void UApplyField::Unaffect(const ETileEffectTriggerType TriggerType)
 {
 	if (TriggerType == ETileEffectTriggerType::Persistent)
 	{
-		for (TSet<AGroundPlane*>::TIterator Itterator = GroundPlanes.CreateIterator(); Itterator; ++Itterator)
+		for (TSet<AGroundPlane*>::TIterator Itterator = EffectedGroundPlanes.CreateIterator(); Itterator; ++Itterator)
 		{
 			if (!IsValid(*Itterator))
 			{
