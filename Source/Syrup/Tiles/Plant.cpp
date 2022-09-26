@@ -21,6 +21,13 @@ APlant::APlant()
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(FName("Plant Mesh"));
 	Mesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	Mesh->AttachToComponent(SubtileMesh, FAttachmentTransformRules::KeepRelativeTransform);
+
+	//Get Plant Mat
+	static ConstructorHelpers::FObjectFinder<UMaterialInterface> MeshRef(TEXT("/Game/Tiles/Plants/MI_Plant.MI_Plant"));
+	TileMaterial = MeshRef.Object;
+	check(TileMaterial != nullptr);
+
+	SubtileMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
 }
 
 /**
@@ -63,6 +70,17 @@ TSet<FIntPoint> APlant::GetRelativeSubTileLocations() const
 		return Data->GetShape();
 	}
 	return Super::GetRelativeSubTileLocations();
+}
+
+/**
+ * Undoes all the effects of the plant.
+ */
+void APlant::Destroyed()
+{
+	for (TPair<ETileEffectTriggerType, UTileAffecterComponent*> EachTriggerToAffector : TriggersToAffectors)
+	{
+		EachTriggerToAffector.Value->UndoEffect();
+	}
 }
 
 /**

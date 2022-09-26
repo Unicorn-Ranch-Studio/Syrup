@@ -25,7 +25,6 @@ FTransform UGridLibrary::GridTransformToWorldTransform(const FGridTransform Grid
 	int Direction = (bIsFlipped ? 120 : -120);
 	int Multiplier = (int)GridTransform.Direction;
 	FRotator Rotation = FRotator(0, Offset + Direction * Multiplier, 0);
-	UE_LOG(LogTemp, Warning, TEXT("%i + %i * %i = %i"), Offset, Direction, Multiplier, Offset + Direction * Multiplier);
 
 	return FTransform(Rotation, FVector(XLocation, YLocation, 0));
 }

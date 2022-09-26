@@ -86,6 +86,11 @@ protected:
 	 */
 	virtual TSet<FIntPoint> GetRelativeSubTileLocations() const override;
 
+	/**
+	 * Undoes all the effects of the plant.
+	 */
+	virtual void Destroyed() override;
+
 private:
 	/**
 	 * Binds effect triggers.
