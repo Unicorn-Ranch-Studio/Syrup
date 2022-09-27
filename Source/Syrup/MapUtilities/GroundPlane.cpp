@@ -15,7 +15,7 @@
  * 
  * @return If this plane was in any of the effected locations.
  */
-bool AGroundPlane::ApplyField(EFieldType Type, TSet<FIntPoint> Locations)
+bool AGroundPlane::ApplyField(const EFieldType Type, const TSet<FIntPoint>& Locations)
 {
 	return AddFieldStrength(Type, 1, Locations);
 }
@@ -28,7 +28,7 @@ bool AGroundPlane::ApplyField(EFieldType Type, TSet<FIntPoint> Locations)
  * 
  * @return If this plane was in any of the effected locations.
  */
-bool AGroundPlane::RemoveField(EFieldType Type, TSet<FIntPoint> Locations)
+bool AGroundPlane::RemoveField(const EFieldType Type, const TSet<FIntPoint>& Locations)
 {
 	return AddFieldStrength(Type, -1, Locations);
 }
@@ -86,7 +86,7 @@ void AGroundPlane::OnConstruction(const FTransform& Transform)
  * 
  * @return If this plane was in any of the effected locations.
  */
-bool AGroundPlane::AddFieldStrength(const EFieldType FieldType, const int Strength, const TSet<FIntPoint> Locations)
+bool AGroundPlane::AddFieldStrength(const EFieldType FieldType, const int Strength, const TSet<FIntPoint>& Locations)
 {
 	bool ReturnValue = false;
 
