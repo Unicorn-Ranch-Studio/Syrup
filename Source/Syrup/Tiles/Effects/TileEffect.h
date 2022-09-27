@@ -41,6 +41,19 @@ protected:
 	//The locations that have been effected by this tile already.
 	UPROPERTY()
 	TSet<FIntPoint> EffectedLocations = TSet<FIntPoint>();
+
+private:
+	/**
+	 * Called when a component is destroyed, and undoes this effect.
+	 *
+	 * @param	bDestroyingHierarchy  - True if the entire component hierarchy is being torn down, allows avoiding expensive operations
+	 */
+	virtual FORCEINLINE void OnComponentDestroyed(bool bDestroyingHierarchy) override { 
+		for (ETileEffectTriggerType EachType : TEnumRange<ETileEffectTriggerType>())
+		{
+			Unaffect(EachType);
+		}
+	};
 };
 /* /\ =========== /\ *\
 |  /\ UTileEffect /\  |
