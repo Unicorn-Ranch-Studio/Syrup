@@ -27,7 +27,7 @@ public:
 	 * @param Channels - A bitwise int specifying all the channels to enable.
 	 */
 	UFUNCTION()
-	void SetOverlapedChannels(TSet<TEnumAsByte<ECollisionChannel>> Channels);
+	void SetCollisionResponses(TSet<TEnumAsByte<ECollisionChannel>> OverlapedChannels, TSet<TEnumAsByte<ECollisionChannel>> BlockedChannels);
 
 	/**
 	 * Adds tiles to this effect volume.

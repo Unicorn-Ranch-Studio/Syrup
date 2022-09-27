@@ -10,7 +10,7 @@
  *
  * @return A bitwise integer specifying which channels will be overlapped.
  */
-TSet<TEnumAsByte<ECollisionChannel>> UPreventTrashSpawn::GetOverlappedChannels() const
+TSet<TEnumAsByte<ECollisionChannel>> UPreventTrashSpawn::GetBlockedChannels() const
 {
 	TSet<TEnumAsByte<ECollisionChannel>> ReturnValue = TSet<TEnumAsByte<ECollisionChannel>>();
 	ReturnValue.Add(ECollisionChannel::ECC_GameTraceChannel2);

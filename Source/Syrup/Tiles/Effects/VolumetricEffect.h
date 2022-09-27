@@ -21,25 +21,21 @@ class SYRUP_API UVolumetricEffect : public UTileEffect
 
 public:
 
-	/**
+	/*
 	 * Causes this effect.
 	 *
-	 * @param EffectedLocations - The locations to effect.
-	 * @param EffectedTiles - The tiles to effect.
-	 * @param EffectedNonTileLocations - The locations that are not covered by tiles to effect.
-	 * @param AffecterTile - The tile doing the affecting.
+	 * @param TriggerType - The type of effects that are currently being triggered.
+	 * @param Locations - The locations to effect.
 	 */
-	virtual void Affect(TSet<FIntPoint> EffectedLocations, TSet<ATile*> EffectedTiles, TSet<FIntPoint> EffectedNonTileLocations, ATile* AffecterTile) override;
+	virtual void Affect(const ETileEffectTriggerType TriggerType, const TSet<FIntPoint>& Locations) override;
 
-	/**
-	 * Undoes the effect of this.
+	/*
+	 * Undoes this effect.
 	 *
-	 * @param EffectedLocations - The locations that were effected.
-	 * @param EffectedTiles - The tiles that were effected.
-	 * @param EffectedNonTileLocations - The locations that are not covered by tiles to that were effected.
-	 * @param AffecterTile - The tile doing the affecting.
+	 * @param TriggerType - The type of effects that are currently being undone.
+	 * @param Locations - The locations to undo the effect on.
 	 */
-	virtual void Unaffect(TSet<FIntPoint> EffectedLocations, TSet<ATile*> EffectedTiles, TSet<FIntPoint> EffectedNonTileLocations, ATile* AffecterTile) override;
+	virtual void Unaffect(const ETileEffectTriggerType TriggerType) override;
 
 protected:
 	/**
@@ -67,6 +63,14 @@ protected:
 	 */
 	UFUNCTION()
 	virtual FORCEINLINE TSet<TEnumAsByte<ECollisionChannel>> GetOverlappedChannels() const { return TSet<TEnumAsByte<ECollisionChannel>>(); };
+
+	/**
+	 * Gets the collision channels that this volume will block.
+	 * 
+	 * @return A bitwise integer specifying which channels will be block.
+	 */
+	UFUNCTION()
+	virtual FORCEINLINE TSet<TEnumAsByte<ECollisionChannel>> GetBlockedChannels() const { return TSet<TEnumAsByte<ECollisionChannel>>(); };
 
 private:
 	UPROPERTY()

@@ -40,12 +40,18 @@ AVolumetricEffectActor::AVolumetricEffectActor()
  *
  * @param Channels - A bitwise int specifying all the channels to enable.
  */
-void AVolumetricEffectActor::SetOverlapedChannels(TSet<TEnumAsByte<ECollisionChannel>> Channels)
+void AVolumetricEffectActor::SetCollisionResponses(TSet<TEnumAsByte<ECollisionChannel>> OverlapedChannels, TSet<TEnumAsByte<ECollisionChannel>> BlockedChannels)
 {
 	CollisionMesh->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
-	for (ECollisionChannel EachChannel : Channels)
+	
+	for (ECollisionChannel EachOverlapedChannel : OverlapedChannels)
 	{
-		CollisionMesh->SetCollisionResponseToChannel(EachChannel, ECollisionResponse::ECR_Block);
+		CollisionMesh->SetCollisionResponseToChannel(EachOverlapedChannel, ECollisionResponse::ECR_Overlap);
+	}
+	
+	for (ECollisionChannel EachBlockedChannel : BlockedChannels)
+	{
+		CollisionMesh->SetCollisionResponseToChannel(EachBlockedChannel, ECollisionResponse::ECR_Block);
 	}
 }
 

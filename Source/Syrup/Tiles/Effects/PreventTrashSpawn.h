@@ -12,7 +12,7 @@
 /**
  * Prevents trash from spawning in the effect volume.
  */
-UCLASS()
+UCLASS(ClassGroup = (TileEffects), Meta = (BlueprintSpawnableComponent))
 class SYRUP_API UPreventTrashSpawn : public UVolumetricEffect
 {
 	GENERATED_BODY()
@@ -23,7 +23,7 @@ public:
 	 * 
 	 * @return A bitwise integer specifying which channels will be overlapped.
 	 */
-	virtual TSet<TEnumAsByte<ECollisionChannel>> GetOverlappedChannels() const override;
+	virtual TSet<TEnumAsByte<ECollisionChannel>> GetBlockedChannels() const override;
 
 };
 /* /\ ================== /\ *\

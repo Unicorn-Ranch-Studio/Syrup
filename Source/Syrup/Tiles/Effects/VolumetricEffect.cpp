@@ -18,18 +18,18 @@
  * @param EffectedNonTileLocations - The locations that are not covered by tiles to effect.
  * @param AffecterTile - The tile doing the affecting.
  */
-void UVolumetricEffect::Affect(TSet<FIntPoint> EffectedLocations, TSet<ATile*> EffectedTiles, TSet<FIntPoint> EffectedNonTileLocations, ATile* AffecterTile)
+void UVolumetricEffect::Affect(const ETileEffectTriggerType TriggerType, const TSet<FIntPoint>& Locations)
 {
 	if (!IsValid(VolumeActor))
 	{
 		FActorSpawnParameters SpawnParams = FActorSpawnParameters();
-		SpawnParams.Owner = AffecterTile;
+		SpawnParams.Owner = GetOwner();
 		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-		SpawnParams.Name = FName(AffecterTile->GetName() + " " + GetClass()->GetName() + " Actor");
+		SpawnParams.Name = FName(GetOwner()->GetName() + " " + GetClass()->GetName() + " Actor");
 
-		VolumeActor = AffecterTile->GetWorld()->SpawnActor<AVolumetricEffectActor>(SpawnParams);
+		VolumeActor = GetWorld()->SpawnActor<AVolumetricEffectActor>(SpawnParams);
 		VolumeActor->SetActorLabel(SpawnParams.Name.ToString());
-		VolumeActor->SetOverlapedChannels(GetOverlappedChannels());
+		VolumeActor->SetCollisionResponses(GetOverlappedChannels(), GetBlockedChannels());
 		VolumeActor->OnActorBeginOverlap.AddDynamic(this, &UVolumetricEffect::OnBeginOverlap);
 		VolumeActor->OnActorEndOverlap.AddDynamic(this, &UVolumetricEffect::OnEndOverlap);
 	}
@@ -48,11 +48,11 @@ void UVolumetricEffect::Affect(TSet<FIntPoint> EffectedLocations, TSet<ATile*> E
  * @param EffectedNonTileLocations - The locations that are not covered by tiles to that were effected.
  * @param AffecterTile - The tile doing the affecting.
  */
-void UVolumetricEffect::Unaffect(TSet<FIntPoint> EffectedLocations, TSet<ATile*> EffectedTiles, TSet<FIntPoint> EffectedNonTileLocations, ATile* AffecterTile)
+void UVolumetricEffect::Unaffect(const ETileEffectTriggerType TriggerType)
 {
 	if (IsValid(VolumeActor))
 	{
-		VolumeActor->RemoveTiles(EffectedLocations);
+		VolumeActor->Destroy();
 	}
 }
 /* /\ ================= /\ *\

@@ -14,7 +14,7 @@
 /**
  * Applies a field in the affect area.
  */
-UCLASS(Meta = (BlueprintSpawnableComponent))
+UCLASS(ClassGroup = (TileEffects), Meta = (BlueprintSpawnableComponent))
 class SYRUP_API UApplyField : public UTileEffect
 {
 	GENERATED_BODY()
