@@ -21,6 +21,9 @@ enum class ETileEffectTriggerType : uint8
 	TrashSpread		UMETA(DysplayName = "Trash Spread Phase", ToolTip = "This effect will be triggered right after the player ends their turn."),
 	PlantsGrow		UMETA(DysplayName = "Plant Growing Phase", ToolTip = "This effect will be triggered right before the player starts their turn.")
 };
+
+//Creates an iterator for this enum. Make sure the 2nd value == the last enum value.
+ENUM_RANGE_BY_COUNT(ETileEffectTriggerType, ETileEffectTriggerType::PlantsGrow)
 /* /\ ================== /\ *\
 |  /\ ETileEffectTrigger /\  |
 \* /\ ================== /\ */
