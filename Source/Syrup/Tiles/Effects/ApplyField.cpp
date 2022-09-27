@@ -26,44 +26,42 @@ void UApplyField::Affect(const ETileEffectTriggerType TriggerType, const TSet<FI
 				Itterator.RemoveCurrent();
 			}
 		}
+
+		TSet<FIntPoint> NewlyEffectedLocations = Locations.Difference(EffectedLocations);
+
 		if (EffectedGroundPlanes.IsEmpty())
 		{
-			TSet<FIntPoint> NewlyEffectedLocations = Locations.Difference(EffectedLocations);
-
-			if (EffectedGroundPlanes.IsEmpty())
+			for (TActorIterator<AGroundPlane> Iterator = TActorIterator<AGroundPlane>(GetWorld()); Iterator; ++Iterator)
 			{
-				for (TActorIterator<AGroundPlane> Iterator = TActorIterator<AGroundPlane>(GetWorld()); Iterator; ++Iterator)
+				if (IsValid(*Iterator))
 				{
-					if (IsValid(*Iterator))
+					if (Iterator->ApplyField(FieldType, NewlyEffectedLocations))
 					{
-						if (Iterator->ApplyField(FieldType, NewlyEffectedLocations))
-						{
-							EffectedGroundPlanes.Add(*Iterator);
-							break;
-						}
+						EffectedGroundPlanes.Add(*Iterator);
+						break;
 					}
 				}
 			}
-			else
-			{
-				for (AGroundPlane* EachGroundPlane : EffectedGroundPlanes)
-				{
-					if (IsValid(EachGroundPlane))
-					{
-						EachGroundPlane->ApplyField(FieldType, NewlyEffectedLocations);
-					}
-				}
-			}
-
-			TSet<ATile*> NewlyEffectedTiles;
-			UGridLibrary::OverlapShape(GetWorld(), NewlyEffectedLocations, NewlyEffectedTiles, TArray<AActor*>());
-			for (ATile* EachNewlyEffectedTile : NewlyEffectedTiles)
-			{
-				EachNewlyEffectedTile->ApplyField(FieldType);
-				EffectedTiles.Add(EachNewlyEffectedTile);
-			}
-			Super::Affect(TriggerType, Locations);
 		}
+		else
+		{
+			for (AGroundPlane* EachGroundPlane : EffectedGroundPlanes)
+			{
+				if (IsValid(EachGroundPlane))
+				{
+					EachGroundPlane->ApplyField(FieldType, NewlyEffectedLocations);
+				}
+			}
+		}
+
+		TSet<ATile*> NewlyEffectedTiles;
+		UGridLibrary::OverlapShape(GetWorld(), NewlyEffectedLocations, NewlyEffectedTiles, TArray<AActor*>());
+		for (ATile* EachNewlyEffectedTile : NewlyEffectedTiles)
+		{
+			EachNewlyEffectedTile->ApplyField(FieldType);
+			EffectedTiles.Add(EachNewlyEffectedTile);
+		}
+		Super::Affect(TriggerType, Locations);
 	}
 }
 
@@ -85,29 +83,9 @@ void UApplyField::Unaffect(const ETileEffectTriggerType TriggerType)
 			}
 		}
 
-		if (EffectedGroundPlanes.IsEmpty())
+		for (AGroundPlane* EachGroundPlane : EffectedGroundPlanes)
 		{
-			for (TActorIterator<AGroundPlane> Iterator = TActorIterator<AGroundPlane>(GetWorld()); Iterator; ++Iterator)
-			{
-				if (IsValid(*Iterator))
-				{
-					if (Iterator->RemoveField(FieldType, EffectedLocations))
-					{
-						EffectedGroundPlanes.Add(*Iterator);
-						break;
-					}
-				}
-			}
-		}
-		else
-		{
-			for (AGroundPlane* EachGroundPlane : EffectedGroundPlanes)
-			{
-				if (IsValid(EachGroundPlane))
-				{
-					EachGroundPlane->RemoveField(FieldType, EffectedLocations);
-				}
-			}
+			EachGroundPlane->RemoveField(FieldType, EffectedLocations);
 		}
 
 		for (ATile* EachEffectedTile : EffectedTiles)

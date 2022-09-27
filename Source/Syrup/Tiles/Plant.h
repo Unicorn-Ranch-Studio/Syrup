@@ -17,7 +17,7 @@ DECLARE_LOG_CATEGORY_EXTERN(LogPlant, Log, All);
  *
  * May take up multiple grid locations by adding to the grid locations array.
  */
-UCLASS()
+UCLASS(HideCategories = ("ActorTick", "Tile", "Replication", "Rendering", "Collision", "Actor", "Input", "HLOD", "WorldPartition", "Cooking", "DataLayers"))
 class SYRUP_API APlant : public ATile
 {
 	GENERATED_BODY()
@@ -127,7 +127,7 @@ public:
 protected:
 
 	//The health of this plant.
-	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "Plant|Health", Meta = (ClampMin = "1"))
+	UPROPERTY(EditDefaultsOnly, Category = "Plant|Health", Meta = (ClampMin = "1"))
 	int Health = 1;
 
 	/* /\ Health /\ *\
@@ -173,7 +173,7 @@ public:
 protected:
 
 	//The turns remaining until this plant is fully grown.
-	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "Plant|Growth", Meta = (ClampMin = "1"))
+	UPROPERTY(EditDefaultsOnly, Category = "Plant|Growth", Meta = (ClampMin = "1"))
 	int TimeUntilGrown = 1;
 	
 	//The amount of energy required to plant a plant of this type.
@@ -219,7 +219,7 @@ private:
 	 * @param LocationsToTrigger - The Locations where the trigger applies an effect. If this is empty all effect locations will be effected.
 	 */
 	UFUNCTION()
-	void ReceiveEffectTrigger(const ETileEffectTriggerType TriggerType, const TSet<FIntPoint> LocationsToTrigger);
+	void ReceiveEffectTrigger(const ETileEffectTriggerType TriggerType, const TSet<FIntPoint>& LocationsToTrigger);
 
 	/**
 	 * Gets the locations where the effects of this plant will apply.

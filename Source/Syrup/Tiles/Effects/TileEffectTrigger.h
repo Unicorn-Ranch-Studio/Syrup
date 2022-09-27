@@ -29,4 +29,4 @@ ENUM_RANGE_BY_COUNT(ETileEffectTriggerType, ETileEffectTriggerType::PlantsGrow)
 \* /\ ================== /\ */
 
 UDELEGATE()
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FTileEffecTrigger, ETileEffectTriggerType, TriggerType, TSet<FIntPoint>, Locations);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FTileEffecTrigger, const ETileEffectTriggerType, TriggerType, const TSet<FIntPoint>&, Locations);

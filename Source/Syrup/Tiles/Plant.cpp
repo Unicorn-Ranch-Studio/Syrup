@@ -55,6 +55,7 @@ void APlant::OnConstruction(const FTransform& Transform)
 	Health = GetMaxHealth();
 	TimeUntilGrown = GetTimeUntilGrown() + 1;
 	Range = GetRange();
+	Shape.Add(FIntPoint::ZeroValue);
 
 	Grow();
 }
@@ -132,7 +133,7 @@ void APlant::Grow()
  * @param TriggerType - The type of trigger that was activated.
  * @param LocationsToTrigger - The Locations where the trigger applies an effect. If this is empty all effect locations will be effected.
  */
-void APlant::ReceiveEffectTrigger(const ETileEffectTriggerType TriggerType, const TSet<FIntPoint> LocationsToTrigger)
+void APlant::ReceiveEffectTrigger(const ETileEffectTriggerType TriggerType, const TSet<FIntPoint>& LocationsToTrigger)
 {
 	switch (TriggerType)
 	{
@@ -155,11 +156,17 @@ void APlant::ReceiveEffectTrigger(const ETileEffectTriggerType TriggerType, cons
 
 	if (IsGrown() || TriggerType == ETileEffectTriggerType::PlantsGrow)
 	{
+		TSet<FIntPoint> EffectedLocations = LocationsToTrigger;
+		if (EffectedLocations.IsEmpty())
+		{
+			EffectedLocations = GetEffectLocations();
+		}
+
 		TInlineComponentArray<UActorComponent*> Components = TInlineComponentArray<UActorComponent*>();
 		GetComponents(UTileEffect::StaticClass(), Components);
 		for (UActorComponent* EachComponent : Components)
 		{
-			Cast<UTileEffect>(EachComponent)->Affect(TriggerType, LocationsToTrigger);
+			Cast<UTileEffect>(EachComponent)->Affect(TriggerType, EffectedLocations);
 		}
 	}
 }
