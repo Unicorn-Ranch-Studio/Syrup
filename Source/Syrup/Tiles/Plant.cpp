@@ -3,7 +3,8 @@
 #include "Plant.h"
 
 #include "Syrup/SyrupGameMode.h"
-#include "Effects/TileEffect.h"
+#include "Effects/ApplyField.h"
+#include "Effects/PreventTrashSpawn.h"
 #include "Components/InstancedStaticMeshComponent.h"
 
 DEFINE_LOG_CATEGORY(LogPlant);
@@ -20,9 +21,17 @@ DEFINE_LOG_CATEGORY(LogPlant);
  */
 APlant::APlant()
 {
+	//Init Mesh
 	MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(FName("Plant Mesh"));
 	MeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	MeshComponent->AttachToComponent(SubtileMesh, FAttachmentTransformRules::KeepRelativeTransform);
+
+	//Init Grass
+	GrassComponent = CreateDefaultSubobject<UApplyField>(FName("Grass Zone"));
+	GrassComponent->FieldType = EFieldType::Protection;
+
+	//Init Prevent Trash Spawn
+	PreventTrashComponent = CreateDefaultSubobject<UPreventTrashSpawn>(FName("Protection Zone"));
 
 	//Get Plant Mat
 	static ConstructorHelpers::FObjectFinder<UMaterialInterface> MeshRef(TEXT("/Game/Tiles/Plants/MI_Plant.MI_Plant"));

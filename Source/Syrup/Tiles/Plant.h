@@ -7,6 +7,9 @@
 #include "Tile.h"
 #include "Plant.generated.h"
 
+class UApplyField;
+class UPreventTrashSpawn;
+
 DECLARE_LOG_CATEGORY_EXTERN(LogPlant, Log, All);
 
 /* \/ ====== \/ *\
@@ -205,6 +208,14 @@ public:
 	FORCEINLINE int GetRange() const { return Range; };
 
 protected:
+
+	//Makes the plant grow grass in the effect area.
+	UPROPERTY(VisibleAnywhere, Category = "Plant|Effect")
+	UApplyField* GrassComponent;
+
+	//Makes the plant prevent trash from spawning within the effected area.
+	UPROPERTY(VisibleAnywhere, Category = "Plant|Effect")
+	UPreventTrashSpawn* PreventTrashComponent;
 
 	//The scale applied to the shape of this plant type to get all effected locations of this plant type's effects.
 	UPROPERTY(EditDefaultsOnly, Category = "Plant|Effect", Meta = (ClampMin = "0"))
