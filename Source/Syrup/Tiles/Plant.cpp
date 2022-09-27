@@ -11,6 +11,10 @@ DEFINE_LOG_CATEGORY(LogPlant);
 /* \/ ====== \/ *\
 |  \/ APlant \/  |
 \* \/ ====== \/ */
+
+/* -------------------- *\
+\* \/ Initialization \/ */
+
 /**
  * Creates the mesh component.
  */
@@ -29,50 +33,12 @@ APlant::APlant()
 }
 
 /**
- * Causes this plant to take damage.
- *
- * @param Amount - The number of damage points to damage this plant by.
- * @param Cause - The tile that caused this damage.
- *
- * @return Whether or not this plant was killed by the damage.
- */
-bool APlant::ReceiveDamage(int Amount, ATile* Cause)
-{
-	Health -= FMath::Max(0, Amount);
-	if (Health <= 0)
-	{
-		Destroy();
-	}
-	return Health <= 0;
-}
-
-/**
- * Gets whether or not this plant is fully grown.
- *
- * @return Whether or not this plant is fully grown.
- */
-bool APlant::IsGrown() const
-{
-	return TimeUntilGrown <= 0;
-}
-
-/*
- * The relative locations of all of the sub-tiles of this plant.
- *
- * @return The relative locations of all of the sub-tiles of this plant.
- */
-TSet<FIntPoint> APlant::GetRelativeSubTileLocations() const
-{
-	return GetShape();
-}
-
-/**
  * Binds effect triggers.
  */
 void APlant::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 	ASyrupGameMode::GetTileEffectTriggerDelegate(this).AddDynamic(this, &APlant::ReceiveEffectTrigger);
 }
 
@@ -92,6 +58,73 @@ void APlant::OnConstruction(const FTransform& Transform)
 
 	Grow();
 }
+
+/* /\ Initialization /\ *\
+\* -------------------- */
+
+/* ----------- *\
+\* \/ Shape \/ */
+
+/*
+ * The relative locations of all of the sub-tiles of this plant.
+ *
+ * @return The relative locations of all of the sub-tiles of this plant.
+ */
+TSet<FIntPoint> APlant::GetRelativeSubTileLocations() const
+{
+	return GetShape();
+}
+
+/* /\ Shape /\ *\
+\* ----------- */
+
+/* ------------ *\
+\* \/ Health \/ */
+/**
+ * Causes this plant to take damage.
+ *
+ * @param Amount - The number of damage points to damage this plant by.
+ * @param Cause - The tile that caused this damage.
+ *
+ * @return Whether or not this plant was killed by the damage.
+ */
+bool APlant::ReceiveDamage(int Amount, ATile* Cause)
+{
+	Health -= FMath::Max(0, Amount);
+	if (Health <= 0)
+	{
+		Destroy();
+	}
+	return Health <= 0;
+}
+
+/* /\ Health /\ *\
+\* ------------ */
+
+/* ------------ *\
+\* \/ Growth \/ */
+
+/**
+ * Updates the plants so that it is 1 turn closer to fully grown, and causes the effects of being fully grown if needed.
+ */
+void APlant::Grow()
+{
+	if (!IsGrown())
+	{
+		TimeUntilGrown--;
+		MeshComponent->SetRelativeScale3D(FVector(1.f / (1 + TimeUntilGrown)));
+		if (IsGrown())
+		{
+			ReceiveEffectTrigger(ETileEffectTriggerType::Persistent, TSet<FIntPoint>());
+		}
+	}
+}
+
+/* /\ Growth /\ *\
+\* ------------ */
+
+/* ------------ *\
+\* \/ Effect \/ */
 
 /**
  * Activates the appropriate effects given the trigger.
@@ -141,21 +174,9 @@ TSet<FIntPoint> APlant::GetEffectLocations() const
 	return UGridLibrary::ScaleShapeUp(GetSubTileLocations(), Range);
 }
 
-/**
- * Updates the plants so that it is 1 turn closer to fully grown, and causes the effects of being fully grown if needed.
- */
-void APlant::Grow()
-{
-	if (!IsGrown())
-	{
-		TimeUntilGrown--;
-		MeshComponent->SetRelativeScale3D(FVector(1.f / (1 + TimeUntilGrown)));
-		if (IsGrown())
-		{
-			ReceiveEffectTrigger(ETileEffectTriggerType::Persistent, TSet<FIntPoint>());
-		}
-	}
-}
+/* /\ Effect /\ *\
+\* ------------ */
+
 /* /\ ====== /\ *\
 |  /\ APlant /\  |
 \* /\ ====== /\ */
