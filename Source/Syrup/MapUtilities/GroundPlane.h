@@ -53,7 +53,7 @@ public:
 	 * @return If this plane was in any of the effected locations.
 	 */
 	UFUNCTION(BlueprintCallable)
-	bool ApplyField(EFieldType Type, TSet<FIntPoint> Locations);
+	bool ApplyField(const EFieldType Type, const TSet<FIntPoint>& Locations);
 
 	/**
 	 * Removes a field from a given area.
@@ -64,7 +64,7 @@ public:
 	 * @return If this plane was in any of the effected locations.
 	 */
 	UFUNCTION(BlueprintCallable)
-	bool RemoveField(EFieldType Type, TSet<FIntPoint> Locations);
+	bool RemoveField(const EFieldType Type, const TSet<FIntPoint>& Locations);
 
 	/**
 	 * Creates and sets up the ground mesh.
@@ -98,7 +98,7 @@ private:
 	 * @return If this plane was in any of the effected locations.
 	 */
 	UFUNCTION(BlueprintCallable)
-	bool AddFieldStrength(const EFieldType FieldType, const int Strength, const TSet<FIntPoint> Locations);
+	bool AddFieldStrength(const EFieldType FieldType, const int Strength, const TSet<FIntPoint>& Locations);
 
 	//Stores the grid locations of each ground mesh instance
 	UPROPERTY(Transient)
