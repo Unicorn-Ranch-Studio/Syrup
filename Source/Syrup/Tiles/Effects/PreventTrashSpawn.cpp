@@ -5,6 +5,35 @@
 /* \/ ================== \/ *\
 |  \/ UPreventTrashSpawn \/  |
 \* \/ ================== \/ */
+
+/*
+ * Causes this effect.
+ *
+ * @param TriggerType - The type of effects that are currently being triggered.
+ * @param Locations - The locations to effect.
+ */
+void UPreventTrashSpawn::Affect(const ETileEffectTriggerType TriggerType, const TSet<FIntPoint>& Locations)
+{
+	if (TriggerType == ETileEffectTriggerType::Persistent)
+	{
+		Super::Affect(TriggerType, Locations);
+	}
+}
+
+/*
+ * Undoes this effect.
+ *
+ * @param TriggerType - The type of effects that are currently being undone.
+ * @param Locations - The locations to undo the effect on.
+ */
+void UPreventTrashSpawn::Unaffect(const ETileEffectTriggerType TriggerType)
+{
+	if (TriggerType == ETileEffectTriggerType::Persistent)
+	{
+		Super::Unaffect(TriggerType);
+	}
+}
+
 /**
  * Gets the collision channels that this volume will overlap.
  *

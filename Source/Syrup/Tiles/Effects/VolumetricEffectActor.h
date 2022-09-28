@@ -27,7 +27,7 @@ public:
 	 * @param Channels - A bitwise int specifying all the channels to enable.
 	 */
 	UFUNCTION()
-	void SetCollisionResponses(TSet<TEnumAsByte<ECollisionChannel>> OverlapedChannels, TSet<TEnumAsByte<ECollisionChannel>> BlockedChannels);
+	void SetCollisionResponses(const TSet<TEnumAsByte<ECollisionChannel>>& OverlapedChannels, const TSet<TEnumAsByte<ECollisionChannel>>& BlockedChannels);
 
 	/**
 	 * Adds tiles to this effect volume.
@@ -35,7 +35,7 @@ public:
 	 * @param TileLocations - The locations of the tiles to add to the volume.
 	 */
 	UFUNCTION(BlueprintCallable)
-	void AddTiles(TSet<FIntPoint> TileLocations);
+	void AddTiles(const TSet<FIntPoint>& TileLocations);
 
 	/**
 	 * Removes tiles from this effect volume.
@@ -43,7 +43,7 @@ public:
 	 * @param TileLocations - The locations of the tiles to remove from the volume.
 	 */
 	UFUNCTION(BlueprintCallable)
-	void RemoveTiles(TSet<FIntPoint> TileLocations);
+	void RemoveTiles(const TSet<FIntPoint>& TileLocations);
 
 //private:
 	//The mesh used to generate overlap events.

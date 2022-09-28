@@ -36,7 +36,8 @@ void UVolumetricEffect::Affect(const ETileEffectTriggerType TriggerType, const T
 
 	if (IsValid(VolumeActor))
 	{
-		VolumeActor->AddTiles(EffectedLocations);
+		VolumeActor->AddTiles(Locations.Difference(EffectedLocations));
+		Super::Affect(TriggerType, Locations);
 	}
 }
 

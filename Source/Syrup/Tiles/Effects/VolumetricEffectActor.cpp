@@ -40,7 +40,7 @@ AVolumetricEffectActor::AVolumetricEffectActor()
  *
  * @param Channels - A bitwise int specifying all the channels to enable.
  */
-void AVolumetricEffectActor::SetCollisionResponses(TSet<TEnumAsByte<ECollisionChannel>> OverlapedChannels, TSet<TEnumAsByte<ECollisionChannel>> BlockedChannels)
+void AVolumetricEffectActor::SetCollisionResponses(const TSet<TEnumAsByte<ECollisionChannel>>& OverlapedChannels, const TSet<TEnumAsByte<ECollisionChannel>>& BlockedChannels)
 {
 	CollisionMesh->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 	
@@ -60,7 +60,7 @@ void AVolumetricEffectActor::SetCollisionResponses(TSet<TEnumAsByte<ECollisionCh
  *
  * @param TileLocations - The locations of the tiles to add to the volume.
  */
-void AVolumetricEffectActor::AddTiles(TSet<FIntPoint> TileLocations)
+void AVolumetricEffectActor::AddTiles(const TSet<FIntPoint>& TileLocations)
 {
 	for (FIntPoint EachTileLocation : TileLocations)
 	{
@@ -73,7 +73,7 @@ void AVolumetricEffectActor::AddTiles(TSet<FIntPoint> TileLocations)
  *
  * @param TileLocations - The locations of the tiles to remove from the volume.
  */
-void AVolumetricEffectActor::RemoveTiles(TSet<FIntPoint> TileLocations)
+void AVolumetricEffectActor::RemoveTiles(const TSet<FIntPoint>& TileLocations)
 {
 	for (FIntPoint EachTileLocation : TileLocations)
 	{
