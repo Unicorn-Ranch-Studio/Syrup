@@ -122,7 +122,8 @@ void APlant::Grow()
 	if (!IsGrown())
 	{
 		TimeUntilGrown--;
-		MeshComponent->SetRelativeScale3D(FVector(1.f / (1 + TimeUntilGrown)));
+		MeshComponent->SetRelativeScale3D(FVector((float)(GetInitialTimeUntilGrown() - GetTimeUntilGrown() + 1) / (GetInitialTimeUntilGrown() + 1)));
+
 		if (IsGrown())
 		{
 			ReceiveEffectTrigger(ETileEffectTriggerType::Persistent, TSet<FIntPoint>());
