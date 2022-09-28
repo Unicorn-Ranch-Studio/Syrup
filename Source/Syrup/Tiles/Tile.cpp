@@ -25,6 +25,7 @@ ATile::ATile()
 	Arrow->ArrowSize = 0.4;
 	Arrow->ArrowLength = 50;
 	Arrow->ArrowColor = FColor::Black;
+	Arrow->SetHiddenInGame(true);
 	RootComponent = Arrow;
 	
 	//Get Tile Mesh
