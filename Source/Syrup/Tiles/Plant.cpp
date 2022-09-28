@@ -48,6 +48,9 @@ void APlant::BeginPlay()
 {
 	Super::BeginPlay();
 
+	TimeUntilGrown = GetTimeUntilGrown() + 1;
+	Grow();
+
 	ASyrupGameMode::GetTileEffectTriggerDelegate(this).AddDynamic(this, &APlant::ReceiveEffectTrigger);
 }
 
@@ -62,11 +65,8 @@ void APlant::OnConstruction(const FTransform& Transform)
 
 	MeshComponent->SetStaticMesh(GetMesh());
 	Health = GetMaxHealth();
-	TimeUntilGrown = GetTimeUntilGrown() + 1;
 	Range = GetRange();
 	Shape.Add(FIntPoint::ZeroValue);
-
-	Grow();
 }
 
 /* /\ Initialization /\ *\

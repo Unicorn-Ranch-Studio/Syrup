@@ -4,6 +4,7 @@
 #include "Tile.h"
 
 #include "Components/InstancedStaticMeshComponent.h"
+#include "Components/ArrowComponent.h"
 #include "DrawDebugHelpers.h"
 
 
@@ -20,7 +21,11 @@
 ATile::ATile()
 {
 	//Create Root
-	RootComponent = CreateDefaultSubobject<USceneComponent>(FName("Root"));
+	UArrowComponent* Arrow = CreateDefaultSubobject<UArrowComponent>(FName("Root"));
+	Arrow->ArrowSize = 0.4;
+	Arrow->ArrowLength = 50;
+	Arrow->ArrowColor = FColor::Black;
+	RootComponent = Arrow;
 	
 	//Get Tile Mesh
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> MeshRef(TEXT("/Game/Tiles/SM_Tile.SM_Tile"));
