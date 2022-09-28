@@ -402,13 +402,15 @@ bool UGridLibrary::OverlapGridLocation(const UObject* WorldContext, const FIntPo
 {
 	FCollisionQueryParams Params = FCollisionQueryParams();
 	Params.AddIgnoredActors(IgnoredTiles);
+	FCollisionObjectQueryParams ObjectParams = FCollisionObjectQueryParams();
+	ObjectParams.AddObjectTypesToQuery(ECollisionChannel::ECC_WorldDynamic);
 
 	FHitResult Hit = FHitResult();
 
 	FVector WorldLocation = GridTransformToWorldTransform(GridLocation).GetTranslation();
-
-	bool ReturnValue = WorldContext->GetWorld()->LineTraceSingleByObjectType(Hit, WorldLocation, WorldLocation - FVector(0, 0, KINDA_SMALL_NUMBER), FCollisionObjectQueryParams::AllDynamicObjects, Params);
+	bool ReturnValue = WorldContext->GetWorld()->LineTraceSingleByObjectType(Hit, WorldLocation, WorldLocation - FVector(0, 0, KINDA_SMALL_NUMBER), ObjectParams, Params);
 	OverlapingTile = Cast<ATile>(Hit.GetActor());
+
 	return IsValid(OverlapingTile);
 }
 

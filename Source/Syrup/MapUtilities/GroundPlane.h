@@ -88,7 +88,7 @@ private:
 	bool AddFieldStrength(const EFieldType FieldType, const int Strength, const TSet<FIntPoint>& Locations);
 
 	//Stores the grid locations of each ground mesh instance
-	UPROPERTY(Transient)
+	UPROPERTY()
 	TMap<FIntPoint, int32> LocationsToInstanceIndices = TMap<FIntPoint, int32>();
 
 	//Stores strengths of all fields.

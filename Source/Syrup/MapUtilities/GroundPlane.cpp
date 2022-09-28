@@ -64,6 +64,7 @@ AGroundPlane::AGroundPlane()
 void AGroundPlane::OnConstruction(const FTransform& Transform)
 {
 	GroundMesh->ClearInstances();
+	GroundMesh->InstancingRandomSeed = FMath::Rand();
 	LocationsToInstanceIndices.Empty();
 	FieldTypeToLocationToStrengths.Empty();
 

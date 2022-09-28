@@ -90,7 +90,7 @@ private:
 	UStaticMesh* TileMesh;
 
 	//The field data for this tile.
-	UPROPERTY(Transient)
+	UPROPERTY()
 	TMap<EFieldType, int> FieldsToStrengths = TMap<EFieldType, int>();
 };
 /* /\ ===== /\ *\

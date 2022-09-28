@@ -81,7 +81,10 @@ void ATile::OnConstruction(const FTransform& Transform)
 			checkCode
 			(
 				ATile* OverlapedTile = nullptr;
-				if (UGridLibrary::OverlapGridLocation(this, RotatedGridLocation + GridTransform.Location, OverlapedTile, TArray<AActor*>()))
+				TArray<AActor*> IgnoredActors = TArray<AActor*>();
+				IgnoredActors.Add(this);
+
+				if (UGridLibrary::OverlapGridLocation(this, RotatedGridLocation + GridTransform.Location, OverlapedTile, IgnoredActors))
 				{
 					UE_LOG(LogLevel, Warning, TEXT("%s is overlapping %s at: %s"), *GetName(), *OverlapedTile->GetName(), *TileWorldLocation.ToString());
 					DrawDebugPoint(GetWorld(), TileWorldTransforms.Last().GetTranslation() + FVector(0, 0, 1), 50, FColor::Red, false, 5);

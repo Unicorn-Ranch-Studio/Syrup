@@ -38,7 +38,6 @@ void UApplyField::Affect(const ETileEffectTriggerType TriggerType, const TSet<FI
 					if (Iterator->ApplyField(FieldType, NewlyEffectedLocations))
 					{
 						EffectedGroundPlanes.Add(*Iterator);
-						break;
 					}
 				}
 			}
@@ -55,8 +54,9 @@ void UApplyField::Affect(const ETileEffectTriggerType TriggerType, const TSet<FI
 		}
 
 		TSet<ATile*> NewlyEffectedTiles;
+		check(NewlyEffectedLocations.Contains(Cast<ATile>(GetOwner())->GetGridTransform().Location))
 		UGridLibrary::OverlapShape(GetWorld(), NewlyEffectedLocations, NewlyEffectedTiles, TArray<AActor*>());
-		for (ATile* EachNewlyEffectedTile : NewlyEffectedTiles)
+		for (ATile* EachNewlyEffectedTile : NewlyEffectedTiles.Difference(EffectedTiles))
 		{
 			EachNewlyEffectedTile->ApplyField(FieldType);
 			EffectedTiles.Add(EachNewlyEffectedTile);
