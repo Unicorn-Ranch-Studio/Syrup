@@ -16,9 +16,7 @@ DECLARE_LOG_CATEGORY_EXTERN(LogPlant, Log, All);
 |  \/ APlant \/  |
 \* \/ ====== \/ */
 /**
- * An object that snaps to the grid.
- *
- * May take up multiple grid locations by adding to the grid locations array.
+ * A plant on the grid that grows, can take damage, and creates a protection radius.
  */
 UCLASS(HideCategories = ("ActorTick", "Tile", "Replication", "Rendering", "Collision", "Actor", "Input", "HLOD", "WorldPartition", "Cooking", "DataLayers"))
 class SYRUP_API APlant : public ATile
