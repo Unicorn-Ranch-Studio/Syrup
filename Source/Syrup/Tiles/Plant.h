@@ -29,19 +29,19 @@ class SYRUP_API APlant : public ATile
 public:
 
 	/**
-	 * Creates the mesh component.
+	 * Creates the plants components.
 	 */
 	APlant();
 
 private:
 
 	/**
-	 * Binds effect triggers.
+	 * Binds effect triggers and initializes size.
 	 */
 	virtual void BeginPlay() override;
 
 	/**
-	 * Initializes Health, Range, and TimeUntilGrown; and sets the appropriate mesh.
+	 * Initializes Health, Range, and Shape; and sets the appropriate mesh.
 	 *
 	 * @param Transform - The new transform of the plant.
 	 */

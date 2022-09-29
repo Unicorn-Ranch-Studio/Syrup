@@ -17,7 +17,7 @@ DEFINE_LOG_CATEGORY(LogPlant);
 \* \/ Initialization \/ */
 
 /**
- * Creates the mesh component.
+ * Creates the plants components.
  */
 APlant::APlant()
 {
@@ -42,7 +42,7 @@ APlant::APlant()
 }
 
 /**
- * Binds effect triggers.
+ * Binds effect triggers and initializes size.
  */
 void APlant::BeginPlay()
 {
@@ -55,7 +55,7 @@ void APlant::BeginPlay()
 }
 
 /**
- * Initializes Health, Range, and TimeUntilGrown; and sets the appropriate mesh.
+ * Initializes Health, Range, and Shape; and sets the appropriate mesh.
  *
  * @param Transform - The new transform of the plant.
  */
