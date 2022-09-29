@@ -166,11 +166,8 @@ void APlant::ReceiveEffectTrigger(const ETileEffectTriggerType TriggerType, cons
 
 	if (IsGrown() || TriggerType == ETileEffectTriggerType::PlantsGrow)
 	{
-		TSet<FIntPoint> EffectedLocations = LocationsToTrigger;
-		if (EffectedLocations.IsEmpty())
-		{
-			EffectedLocations = GetEffectLocations();
-		}
+		TSet<FIntPoint> EffectedLocations = GetEffectLocations();
+		TSet<FIntPoint> TriggeredLocations = LocationsToTrigger.IsEmpty() ? EffectedLocations : LocationsToTrigger.Intersect(EffectedLocations);
 
 		TInlineComponentArray<UActorComponent*> Components = TInlineComponentArray<UActorComponent*>();
 		GetComponents(UTileEffect::StaticClass(), Components);
