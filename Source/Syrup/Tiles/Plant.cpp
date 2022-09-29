@@ -2,7 +2,7 @@
 
 #include "Plant.h"
 
-#include "Syrup/SyrupGameMode.h"
+#include "Syrup/Systems/SyrupGameMode.h"
 #include "Effects/ApplyField.h"
 #include "Effects/PreventTrashSpawn.h"
 #include "Components/InstancedStaticMeshComponent.h"

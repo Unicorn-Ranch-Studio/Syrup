@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "Tiles/Effects/TileEffectTrigger.h"
+#include "Syrup/Tiles/Effects/TileEffectTrigger.h"
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"

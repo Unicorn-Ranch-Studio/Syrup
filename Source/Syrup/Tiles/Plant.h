@@ -16,9 +16,7 @@ DECLARE_LOG_CATEGORY_EXTERN(LogPlant, Log, All);
 |  \/ APlant \/  |
 \* \/ ====== \/ */
 /**
- * An object that snaps to the grid.
- *
- * May take up multiple grid locations by adding to the grid locations array.
+ * A plant on the grid that grows, can take damage, and creates a protection radius.
  */
 UCLASS(HideCategories = ("ActorTick", "Tile", "Replication", "Rendering", "Collision", "Actor", "Input", "HLOD", "WorldPartition", "Cooking", "DataLayers"))
 class SYRUP_API APlant : public ATile
@@ -61,7 +59,7 @@ public:
 	 * 
 	 * @return The static mesh to use for this plant type.
 	 */
-	UFUNCTION(BlueprintPure, Category = "Plant|Shape")
+	UFUNCTION(BlueprintPure, Category = "Shape")
 	FORCEINLINE UStaticMesh* GetMesh() const { return Mesh; };
 
 	/**
@@ -69,7 +67,7 @@ public:
 	 * 
 	 * @return A set containing all of the relative locations of the sub-tiles making up the shape of this plant type.
 	 */
-	UFUNCTION(BlueprintPure, Category = "Plant|Shape")
+	UFUNCTION(BlueprintPure, Category = "Shape")
 	FORCEINLINE TSet<FIntPoint> GetShape() const { return Shape; };
 
 protected:
@@ -81,15 +79,15 @@ protected:
 	virtual TSet<FIntPoint> GetRelativeSubTileLocations() const override;
 
 	//The mesh of this plant.
-	UPROPERTY(VisibleAnywhere, Category = "Plant|Shape")
+	UPROPERTY(VisibleAnywhere, Category = "Shape")
 	UStaticMeshComponent* MeshComponent;
 
 	//The static mesh to use for this plant type.
-	UPROPERTY(EditDefaultsOnly, Category = "Plant|Shape")
+	UPROPERTY(EditDefaultsOnly, Category = "Shape")
 	UStaticMesh* Mesh = nullptr;
 
 	//A set containing all of the relative locations of the sub-tiles making up the shape of this plant type.
-	UPROPERTY(EditDefaultsOnly, Category = "Plant|Shape")
+	UPROPERTY(EditDefaultsOnly, Category = "Shape")
 	TSet<FIntPoint> Shape = TSet<FIntPoint>();
 
 	/* /\ Shape /\ *\
@@ -108,7 +106,7 @@ public:
 	 * 
 	 * @return Whether or not this plant was killed by the damage.
 	 */
-	UFUNCTION(BlueprintCallable, Category = "Plant|Health")
+	UFUNCTION(BlueprintCallable, Category = "Health")
 	bool ReceiveDamage(int Amount, ATile* Cause);
 
 	/**
@@ -116,7 +114,7 @@ public:
 	 * 
 	 * @return The number of damage points this plant can take before dying.
 	 */
-	UFUNCTION(BlueprintPure, Category = "Plant|Health")
+	UFUNCTION(BlueprintPure, Category = "Health")
 	FORCEINLINE int GetHealth() const { return Health; };
 
 	/**
@@ -124,13 +122,13 @@ public:
 	 * 
 	 * @return The number of damage points a plant of this type can take before dying.
 	 */
-	UFUNCTION(BlueprintPure, Category = "Plant|Health")
+	UFUNCTION(BlueprintPure, Category = "Health")
 	FORCEINLINE int GetMaxHealth() const { return Cast<APlant>(GetClass()->GetDefaultObject())->Health; };
 
 protected:
 
 	//The health of this plant.
-	UPROPERTY(EditDefaultsOnly, Category = "Plant|Health", Meta = (ClampMin = "1"))
+	UPROPERTY(EditDefaultsOnly, Category = "Health", Meta = (ClampMin = "1"))
 	int Health = 1;
 
 	/* /\ Health /\ *\
@@ -146,7 +144,7 @@ public:
 	 * 
 	 * @return The number of turns it takes for this plant type's effects to begin taking effect.
 	 */
-	UFUNCTION(BlueprintPure, Category = "Plant|Growth")
+	UFUNCTION(BlueprintPure, Category = "Growth")
 	FORCEINLINE int GetTimeUntilGrown() const { return TimeUntilGrown; };
 
 	/**
@@ -154,7 +152,7 @@ public:
 	 * 
 	 * @return The total number of turns that it takes for this plant type to grow.
 	 */
-	UFUNCTION(BlueprintPure, Category = "Plant|Growth")
+	UFUNCTION(BlueprintPure, Category = "Growth")
 	FORCEINLINE int GetInitialTimeUntilGrown() const { return Cast<APlant>(GetClass()->GetDefaultObject())->TimeUntilGrown; };
 
 	/**
@@ -162,7 +160,7 @@ public:
 	 * 
 	 * @return Whether or not this plant is fully grown.
 	 */
-	UFUNCTION(BlueprintPure, Category = "Plant|Growth")
+	UFUNCTION(BlueprintPure, Category = "Growth")
 	FORCEINLINE bool IsGrown() const { return TimeUntilGrown <= 0; };
 
 	/**
@@ -170,17 +168,17 @@ public:
 	 * 
 	 * @return The amount of energy required to plant a plant of this type.
 	 */
-	UFUNCTION(BlueprintPure, Category = "Plant|Growth")
+	UFUNCTION(BlueprintPure, Category = "Growth")
 	FORCEINLINE int GetPlantingCost() const { return PlantingCost; };
 
 protected:
 
 	//The turns remaining until this plant is fully grown.
-	UPROPERTY(EditDefaultsOnly, Category = "Plant|Growth", Meta = (ClampMin = "1"))
+	UPROPERTY(EditDefaultsOnly, Category = "Growth", Meta = (ClampMin = "1"))
 	int TimeUntilGrown = 1;
 	
 	//The amount of energy required to plant a plant of this type.
-	UPROPERTY(EditDefaultsOnly, Category = "Plant|Growth", Meta = (ClampMin = "0"))
+	UPROPERTY(EditDefaultsOnly, Category = "Growth", Meta = (ClampMin = "0"))
 	int PlantingCost = 1;
 	
 private:
@@ -204,21 +202,21 @@ public:
 	 * 
 	 * @return The scale applied to the shape of this plant type to get all effected locations of this plant type's effects.
 	 */
-	UFUNCTION(BlueprintPure, Category = "Plant|Effect")
+	UFUNCTION(BlueprintPure, Category = "Effect")
 	FORCEINLINE int GetRange() const { return Range; };
 
 protected:
 
 	//Makes the plant grow grass in the effect area.
-	UPROPERTY(VisibleAnywhere, Category = "Plant|Effect")
+	UPROPERTY(VisibleAnywhere, Category = "Effect")
 	UApplyField* GrassComponent;
 
 	//Makes the plant prevent trash from spawning within the effected area.
-	UPROPERTY(VisibleAnywhere, Category = "Plant|Effect")
+	UPROPERTY(VisibleAnywhere, Category = "Effect")
 	UPreventTrashSpawn* PreventTrashComponent;
 
 	//The scale applied to the shape of this plant type to get all effected locations of this plant type's effects.
-	UPROPERTY(EditDefaultsOnly, Category = "Plant|Effect", Meta = (ClampMin = "0"))
+	UPROPERTY(EditDefaultsOnly, Category = "Effect", Meta = (ClampMin = "0"))
 	int Range = 1;
 
 private:
@@ -253,13 +251,13 @@ public:
 	 * 
 	 * @return The text to use when referring to a plant of this type.
 	 */
-	UFUNCTION(BlueprintPure, Category = "Plant|UI")
+	UFUNCTION(BlueprintPure, Category = "UI")
 	FORCEINLINE FText GetDisplayName() const { return DisplayName; };
 
 protected:
 
 	//The text to use when referring to a plant of this type.
-	UPROPERTY(EditDefaultsOnly, Category = "Plant|UI")
+	UPROPERTY(EditDefaultsOnly, Category = "UI")
 	FText DisplayName = FText();
 
 	/* /\ UI /\ *\
