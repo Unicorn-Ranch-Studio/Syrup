@@ -21,7 +21,6 @@ UApplyField::UApplyField()
 /*
  * Causes this effect.
  *
- * @param TriggerType - The type of effects that are currently being triggered.
  * @param Locations - The locations to effect.
  */
 void UApplyField::Affect(const TSet<FIntPoint>& Locations)
@@ -71,9 +70,6 @@ void UApplyField::Affect(const TSet<FIntPoint>& Locations)
 
 /*
  * Undoes this effect.
- *
- * @param TriggerType - The type of effects that are currently being undone.
- * @param Locations - The locations to undo the effect on.
  */
 void UApplyField::Unaffect()
 {
