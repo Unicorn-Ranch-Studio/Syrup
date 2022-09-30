@@ -19,9 +19,10 @@ class SYRUP_API UApplyField : public UTileEffect
 {
 	GENERATED_BODY()
 public:
-	//The type of field to apply
-	UPROPERTY(EditDefaultsOnly, Category = "Effect")
-	EFieldType FieldType = EFieldType::Protection;
+	/**
+	 * Overrides the triggers variable.
+	 */
+	UApplyField();
 
 	/*
 	 * Causes this effect.
@@ -29,7 +30,7 @@ public:
 	 * @param TriggerType - The type of effects that are currently being triggered.
 	 * @param Locations - The locations to effect.
 	 */
-	virtual void Affect(const ETileEffectTriggerType TriggerType, const TSet<FIntPoint>& Locations) override;
+	virtual void Affect(const TSet<FIntPoint>& Locations) override;
 
 	/*
 	 * Undoes this effect.
@@ -37,7 +38,11 @@ public:
 	 * @param TriggerType - The type of effects that are currently being undone.
 	 * @param Locations - The locations to undo the effect on.
 	 */
-	virtual void Unaffect(const ETileEffectTriggerType TriggerType) override;
+	virtual void Unaffect() override;
+
+	//The type of field to apply
+	UPROPERTY(EditDefaultsOnly, Category = "Effect")
+	EFieldType FieldType = EFieldType::Protection;
 
 private:
 	//All the tiles that have been effected.

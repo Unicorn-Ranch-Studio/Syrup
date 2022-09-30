@@ -24,20 +24,17 @@ public:
 	/*
 	 * Causes this effect.
 	 *
-	 * @param TriggerType - The type of effects that are currently being triggered.
 	 * @param Locations - The locations to effect.
 	 */
-	virtual void Affect(const ETileEffectTriggerType TriggerType, const TSet<FIntPoint>& Locations) override;
+	virtual void Affect(const TSet<FIntPoint>& Locations) override;
 
 	/*
 	 * Undoes this effect.
-	 *
-	 * @param TriggerType - The type of effects that are currently being undone.
-	 * @param Locations - The locations to undo the effect on.
 	 */
-	virtual void Unaffect(const ETileEffectTriggerType TriggerType) override;
+	virtual void Unaffect() override;
 
 protected:
+
 	/**
 	 * Applies the effect of this volume when overlap is begun.
 	 * 

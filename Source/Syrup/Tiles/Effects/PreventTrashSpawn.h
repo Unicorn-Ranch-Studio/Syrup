@@ -18,21 +18,10 @@ class SYRUP_API UPreventTrashSpawn : public UVolumetricEffect
 	GENERATED_BODY()
 
 public:
-	/*
-	 * Causes this effect.
-	 *
-	 * @param TriggerType - The type of effects that are currently being triggered.
-	 * @param Locations - The locations to effect.
+	/**
+	 * Adds persistent to triggers.
 	 */
-	virtual void Affect(const ETileEffectTriggerType TriggerType, const TSet<FIntPoint>& Locations) override;
-
-	/*
-	 * Undoes this effect.
-	 *
-	 * @param TriggerType - The type of effects that are currently being undone.
-	 * @param Locations - The locations to undo the effect on.
-	 */
-	virtual void Unaffect(const ETileEffectTriggerType TriggerType) override;
+	UPreventTrashSpawn();
 
 protected:
 

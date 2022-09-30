@@ -13,12 +13,9 @@
 /**
  * Causes this effect.
  *
- * @param EffectedLocations - The locations to effect.
- * @param EffectedTiles - The tiles to effect.
- * @param EffectedNonTileLocations - The locations that are not covered by tiles to effect.
- * @param AffecterTile - The tile doing the affecting.
+ * @param Locations - The locations to effect.
  */
-void UVolumetricEffect::Affect(const ETileEffectTriggerType TriggerType, const TSet<FIntPoint>& Locations)
+void UVolumetricEffect::Affect(const TSet<FIntPoint>& Locations)
 {
 	if (!IsValid(VolumeActor))
 	{
@@ -37,19 +34,14 @@ void UVolumetricEffect::Affect(const ETileEffectTriggerType TriggerType, const T
 	if (IsValid(VolumeActor))
 	{
 		VolumeActor->AddTiles(Locations.Difference(EffectedLocations));
-		Super::Affect(TriggerType, Locations);
+		Super::Affect(Locations);
 	}
 }
 
 /**
  * Undoes the effect of this.
- *
- * @param EffectedLocations - The locations that were effected.
- * @param EffectedTiles - The tiles that were effected.
- * @param EffectedNonTileLocations - The locations that are not covered by tiles to that were effected.
- * @param AffecterTile - The tile doing the affecting.
  */
-void UVolumetricEffect::Unaffect(const ETileEffectTriggerType TriggerType)
+void UVolumetricEffect::Unaffect()
 {
 	if (IsValid(VolumeActor))
 	{
