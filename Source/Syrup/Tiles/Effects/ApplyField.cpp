@@ -94,31 +94,12 @@ void UApplyField::Unaffect()
 		}
 	}
 
-	//If no ground planes are known
-	if (EffectedGroundPlanes.IsEmpty())
+	//Remove field from planes
+	for (AGroundPlane* EachGroundPlane : EffectedGroundPlanes)
 	{
-		//Find ground planes & remove field from.
-		for (TActorIterator<AGroundPlane> Iterator = TActorIterator<AGroundPlane>(GetWorld()); Iterator; ++Iterator)
+		if (IsValid(EachGroundPlane))
 		{
-			if (IsValid(*Iterator))
-			{
-				if (Iterator->RemoveField(FieldType, EffectedLocations))
-				{
-					EffectedGroundPlanes.Add(*Iterator);
-					break;
-				}
-			}
-		}
-	}
-	else
-	{
-		//Remove field from planes
-		for (AGroundPlane* EachGroundPlane : EffectedGroundPlanes)
-		{
-			if (IsValid(EachGroundPlane))
-			{
-				EachGroundPlane->RemoveField(FieldType, EffectedLocations);
-			}
+			EachGroundPlane->RemoveField(FieldType, EffectedLocations);
 		}
 	}
 
