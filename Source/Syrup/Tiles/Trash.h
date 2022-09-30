@@ -140,38 +140,63 @@ public:
 	FORCEINLINE int GetInitialTimeUntilSpread() const { return Cast<ATrash>(GetClass()->GetDefaultObject())->TimeUntilSpread; };
 
 	/**
+	 * Gets how many more times this trash will spread.
+	 * 
+	 * @return The number of energy points required to pickup this trash.
+	 */
+	UFUNCTION(BlueprintPure, Category = "Spreading")
+	FORCEINLINE int GetTimesToSpread() const { return TimesToSpread; };
+
+	/**
 	 * Gets cost to pickup this piece of trash.
 	 * 
 	 * @return The number of energy points required to pickup this trash.
 	 */
 	UFUNCTION(BlueprintPure, Category = "Spreading")
 	FORCEINLINE int GetPickupCost() const { return PickupCost; };
+	
+	/**
+	 * Gets the location this is trying to spread to.
+	 * 
+	 * @return The place where this trash will try to spread to. If unable to spread, it will keep trying until it is able.
+	 */
+	UFUNCTION(BlueprintPure, Category = "Spreading")
+	FORCEINLINE FTransform GetNextSpreadToTransform() const { return NextSpreadToTransform; };
 
-	//The current number of trash within the range of this trash.
-	UPROPERTY(VisibleAnywhere)
-		int NumTrashInRadius = 0;
 protected:
 
 	//The total number of turns it takes for this trash to spread.
 	UPROPERTY(EditDefaultsOnly, Category = "Spreading", Meta = (ClampMin = "1"))
 	int TimeUntilSpread = 1;
 
-	//The maximum number of trash allowed to be within the protection radius of this for it to be able to spread.
+	//The maximum number of trash allowed to spread.
 	UPROPERTY(EditDefaultsOnly, Category = "Spreading", Meta = (ClampMin = "1"))
-	int MaxTrashDensity = 3;
+	int TimesToSpread = 3;
 	
 	//The number of energy points required to pickup this trash.
 	UPROPERTY(EditDefaultsOnly, Category = "Spreading", Meta = (ClampMin = "0"))
 	int PickupCost = 1;
 	
 private:
-
 	/**
 	 * Spawns another trash of the same as this.
 	 */
 	UFUNCTION()
 	void Spread();
+	
+	/**
+	 * Sets NextSpreadToTransform to a new location.
+	 */
+	UFUNCTION()
+	void GenerateNextSpreadToTransform();
 
+	//The place where this trash will try to spread to. If unable to spread, it will keep trying until it is able.
+	UPROPERTY()
+	FTransform NextSpreadToTransform;
+
+	//Whether or not this needs to check its ability to spread.
+	UPROPERTY()
+	bool bCheckSpreadablility = true;
 
 	/* /\ Spreading /\ *\
 	\* --------------- */

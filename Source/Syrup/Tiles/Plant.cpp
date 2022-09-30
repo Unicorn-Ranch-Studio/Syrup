@@ -103,6 +103,7 @@ bool APlant::ReceiveDamage(int Amount, ATile* Cause)
 	Health -= FMath::Max(0, Amount);
 	if (Health <= 0)
 	{
+		ASyrupGameMode::GetTileEffectTriggerDelegate(GetWorld()).Broadcast(ETileEffectTriggerType::PlantKilled, GetSubTileLocations());
 		Destroy();
 	}
 	return Health <= 0;

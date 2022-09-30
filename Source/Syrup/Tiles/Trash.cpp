@@ -46,20 +46,7 @@ void ATrash::BeginPlay()
 {
 	Super::BeginPlay();
 
-	TSet<ATile*> InRangeTiles = TSet<ATile*>();
-	TArray<AActor*> IngnoredActors = TArray<AActor*>();
-	IngnoredActors.Add(this);
-
-	if (UGridLibrary::OverlapShape(GetWorld(), GetEffectLocations(), InRangeTiles, IngnoredActors))
-	{
-		for (ATile* EachInRangeTile : InRangeTiles)
-		{
-			if (IsValid(Cast<ATrash>(EachInRangeTile)))
-			{
-				NumTrashInRadius++;
-			}
-		}
-	}
+	GenerateNextSpreadToTransform();
 
 	ReceiveEffectTrigger(ETileEffectTriggerType::Persistent, TSet<FIntPoint>());
 	ASyrupGameMode::GetTileEffectTriggerDelegate(this).AddDynamic(this, &ATrash::ReceiveEffectTrigger);
@@ -107,43 +94,64 @@ void ATrash::UpdateDamage(int AmountAdded)
  */
 void ATrash::Spread()
 {
-	if (TimeUntilSpread-- <= 1 && NumTrashInRadius < MaxTrashDensity)
+	if (TimeUntilSpread <= 1 && TimesToSpread > 0)
 	{
-		TimeUntilSpread = GetInitialTimeUntilSpread();
-
-		TArray<FIntPoint> EffectLocations = GetEffectLocations().Difference(GetSubTileLocations()).Array();
-
-		FTransform SpawnTransform = UGridLibrary::GridTransformToWorldTransform(FGridTransform(EffectLocations[FMath::RandHelper(EffectLocations.Num())]));
-		SpawnTransform.SetRotation(FQuat(FVector(0, 0, 1), FMath::FRandRange(0, TWO_PI)));
-		FActorSpawnParameters Params = FActorSpawnParameters();
-		Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-
-		ATrash* SpawnedTrash = GetWorld()->SpawnActor<ATrash>(GetClass(), SpawnTransform, Params);
-
-		if (IsValid(SpawnedTrash))
+		DrawDebugDirectionalArrow(GetWorld(), SubtileMesh->GetComponentLocation(), NextSpreadToTransform.GetLocation(), 80, bCheckSpreadablility ? FColor::Purple : FColor::Blue, false, 4, 0U, bCheckSpreadablility ? 10 : 1);
+		
+		if (bCheckSpreadablility)
 		{
-			TSet<FIntPoint> SpawnedLocations = SpawnedTrash->GetSubTileLocations();
-			FCollisionQueryParams TraceParams = FCollisionQueryParams::DefaultQueryParam;
-			TraceParams.AddIgnoredActor(SpawnedTrash);
+			ATrash* SpawnedTrash = GetWorld()->SpawnActorDeferred<ATrash>(GetClass(), NextSpreadToTransform, nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 
-			for (FIntPoint EachSubtileLocation : SpawnedLocations)
+			if (SpawnedTrash)
 			{
-				FHitResult Result;
-				FVector WorldLocation = UGridLibrary::GridTransformToWorldTransform(FGridTransform(EachSubtileLocation)).GetTranslation();
-				if (GetWorld()->LineTraceSingleByChannel(Result, WorldLocation, WorldLocation + FVector(0,0,-0.1), ECollisionChannel::ECC_GameTraceChannel2, TraceParams))
+				TSet<FIntPoint> SpawnedLocations = SpawnedTrash->GetSubTileLocations();
+				FCollisionQueryParams TraceParams = FCollisionQueryParams::DefaultQueryParam;
+				TraceParams.AddIgnoredActor(SpawnedTrash);
+
+				for (FIntPoint EachSubtileLocation : SpawnedLocations)
 				{
-					SpawnedTrash->Destroy();
-					break;
+					FHitResult Result;
+					FVector WorldLocation = UGridLibrary::GridTransformToWorldTransform(FGridTransform(EachSubtileLocation)).GetTranslation();
+					if (GetWorld()->LineTraceSingleByChannel(Result, WorldLocation, WorldLocation + FVector(0, 0, -0.1), ECollisionChannel::ECC_GameTraceChannel2, TraceParams))
+					{
+						DrawDebugPoint(GetWorld(), WorldLocation, 10, FColor::Magenta, false, 4);
+						SpawnedTrash->Destroy();
+						//break;
+					}
+					else
+					{
+						DrawDebugPoint(GetWorld(), WorldLocation, 10, FColor::Green, false, 4);
+					}
+				}
+
+				bCheckSpreadablility = !SpawnedTrash->IsActorBeingDestroyed();
+				if (bCheckSpreadablility)
+				{
+					SpawnedTrash->FinishSpawning(NextSpreadToTransform);
+					GenerateNextSpreadToTransform();
+					TimesToSpread--;
+					TimeUntilSpread = GetInitialTimeUntilSpread();
+
+					ASyrupGameMode::GetTileEffectTriggerDelegate(GetWorld()).Broadcast(ETileEffectTriggerType::TrashSpawned, SpawnedLocations);
 				}
 			}
-
-			if (IsValid(SpawnedTrash))
-			{
-				ASyrupGameMode::GetTileEffectTriggerDelegate(GetWorld()).Broadcast(ETileEffectTriggerType::TrashSpawned, SpawnedLocations);
-			}
 		}
-		DrawDebugDirectionalArrow(GetWorld(), SubtileMesh->GetComponentLocation(), SpawnTransform.GetLocation(), 80, IsValid(SpawnedTrash) ? FColor::Purple : FColor::Blue, false, 4, 0U, IsValid(SpawnedTrash) ? 10 : 1);
+
 	}
+	else
+	{
+		TimeUntilSpread--;
+	}
+}
+
+/**
+ * Sets NextSpreadToTransform to a new location.
+ */
+void ATrash::GenerateNextSpreadToTransform()
+{
+	TArray<FIntPoint> EffectLocations = GetEffectLocations().Difference(GetSubTileLocations()).Array();
+	NextSpreadToTransform = UGridLibrary::GridTransformToWorldTransform(FGridTransform(EffectLocations[FMath::RandHelper(EffectLocations.Num())]));
+	NextSpreadToTransform.SetRotation(FQuat(FVector(0, 0, 1), FMath::FRandRange(0, TWO_PI)));
 }
 
 /* /\ Spreading /\ *\
@@ -168,18 +176,13 @@ void ATrash::ReceiveEffectTrigger(const ETileEffectTriggerType TriggerType, cons
 		FTimerHandle Handle = FTimerHandle();
 		GetWorld()->GetTimerManager().SetTimer(Handle, this, &ATrash::Spread, FMath::FRand(), false);
 	}
-	else if (!TriggeredLocations.IsEmpty())
+	else if (!bCheckSpreadablility && !TriggeredLocations.IsEmpty())
 	{
-		if (TriggerType == ETileEffectTriggerType::TrashSpawned)
+		if (TriggerType == ETileEffectTriggerType::TrashPickedUp || TriggerType == ETileEffectTriggerType::PlantKilled)
 		{
-			NumTrashInRadius++;
-		}
-		else if (TriggerType == ETileEffectTriggerType::TrashPickedUp)
-		{
-			NumTrashInRadius--;
+			bCheckSpreadablility =  true;
 		}
 	}
-
 	TInlineComponentArray<UActorComponent*> Components = TInlineComponentArray<UActorComponent*>();
 	GetComponents(UTileEffect::StaticClass(), Components);
 	for (UActorComponent* EachComponent : Components)

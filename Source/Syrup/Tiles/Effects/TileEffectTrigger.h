@@ -38,6 +38,10 @@ enum class ETileEffectTriggerType : uint8
 
 	// \/ Event Triggers, Called by game object to notify changes in the board state. All of these will pass location info. \/ //
 
+	//This effect will be triggered whenever a plant is planted and will pass the locations of that plant.
+	PlantSpawned	UMETA(DysplayName = "On Plant Spawned"),
+	//This effect will be triggered whenever a plant is by trash and will pass the locations of that plant.
+	PlantKilled		UMETA(DysplayName = "On Plant Killed"),
 	//This effect will be triggered whenever a trash is spawned and will pass the locations of that trash.
 	TrashSpawned	UMETA(DysplayName = "On Trash Spawned"),
 	//This effect will be triggered whenever a trash is picked up by the player and will pass the locations of that trash.
