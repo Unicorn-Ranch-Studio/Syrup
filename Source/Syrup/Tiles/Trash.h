@@ -147,11 +147,18 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Spreading")
 	FORCEINLINE int GetPickupCost() const { return PickupCost; };
 
+	//The current number of trash within the range of this trash.
+	UPROPERTY(VisibleAnywhere)
+		int NumTrashInRadius = 0;
 protected:
 
 	//The total number of turns it takes for this trash to spread.
 	UPROPERTY(EditDefaultsOnly, Category = "Spreading", Meta = (ClampMin = "1"))
 	int TimeUntilSpread = 1;
+
+	//The maximum number of trash allowed to be within the protection radius of this for it to be able to spread.
+	UPROPERTY(EditDefaultsOnly, Category = "Spreading", Meta = (ClampMin = "1"))
+	int MaxTrashDensity = 3;
 	
 	//The number of energy points required to pickup this trash.
 	UPROPERTY(EditDefaultsOnly, Category = "Spreading", Meta = (ClampMin = "0"))
@@ -164,6 +171,7 @@ private:
 	 */
 	UFUNCTION()
 	void Spread();
+
 
 	/* /\ Spreading /\ *\
 	\* --------------- */

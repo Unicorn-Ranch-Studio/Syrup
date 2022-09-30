@@ -408,9 +408,12 @@ bool UGridLibrary::OverlapGridLocation(const UObject* WorldContext, const FIntPo
 	FHitResult Hit = FHitResult();
 
 	FVector WorldLocation = GridTransformToWorldTransform(GridLocation).GetTranslation();
-	bool ReturnValue = WorldContext->GetWorld()->LineTraceSingleByObjectType(Hit, WorldLocation, WorldLocation - FVector(0, 0, KINDA_SMALL_NUMBER), ObjectParams, Params);
-	OverlapingTile = Cast<ATile>(Hit.GetActor());
+	if (!WorldContext->GetWorld()->LineTraceSingleByObjectType(Hit, WorldLocation, WorldLocation - FVector(0, 0, KINDA_SMALL_NUMBER), ObjectParams, Params))
+	{
+		return false;
+	}
 
+	OverlapingTile = Cast<ATile>(Hit.GetActor());
 	return IsValid(OverlapingTile);
 }
 
@@ -427,7 +430,7 @@ bool UGridLibrary::OverlapShape(const UObject* WorldContext, const TSet<FIntPoin
 {
 	for (FIntPoint EachShapeGridLocation : ShapeGridLocations)
 	{
-		ATile* OverlapedTile;
+		ATile* OverlapedTile = nullptr;
 		OverlapGridLocation(WorldContext, EachShapeGridLocation, OverlapedTile, IgnoredTiles);
 		if (IsValid(OverlapedTile))
 		{
