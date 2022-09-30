@@ -4,15 +4,24 @@
 
 #include "CoreMinimal.h"
 #include "TileEffect.h"
-#include "DamagePlant.generated.h"
+#include "DamagePlants.generated.h"
 
+/* \/ ============= \/ *\
+|  \/ UDamagePlants \/  |
+\* \/ ============= \/ */
 /**
  * Causes damage to the plants within the specified area
  */
 UCLASS(ClassGroup = (TileEffects), Meta = (BlueprintSpawnableComponent))
-class SYRUP_API UDamagePlant : public UTileEffect
+class SYRUP_API UDamagePlants : public UTileEffect
 {
 	GENERATED_BODY()
+
+public:
+	/**
+	 * Adds trash damage phase to triggers
+	 */
+	UDamagePlants();
 
 	/**
 	 * Gets the current damage that this effect will cause.
@@ -30,18 +39,19 @@ class SYRUP_API UDamagePlant : public UTileEffect
 	UFUNCTION(BlueprintCallable, Category = "Damage")
 	FORCEINLINE void SetDamage(int NewDamage) { Damage = FMath::Max(0, NewDamage); };
 
+protected:
 
 	/*
 	 * Causes this effect.
 	 *
-	 * @param TriggerType - The type of effects that are currently being triggered.
 	 * @param Locations - The locations to effect.
 	 */
-	virtual void Affect(const ETileEffectTriggerType TriggerType, const TSet<FIntPoint>& Locations) override;
-
-protected:
+	virtual void Affect(const TSet<FIntPoint>& Locations) override;
 
 	//The type of field to apply
 	UPROPERTY(EditDefaultsOnly, Category = "Damage", Meta = (ClampMin = "0"))
 	int Damage = 1;
 };
+/* /\ ============= /\ *\
+|  /\ UDamagePlants /\  |
+\* /\ ============= /\ */

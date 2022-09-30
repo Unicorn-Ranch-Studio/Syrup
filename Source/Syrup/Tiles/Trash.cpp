@@ -5,7 +5,7 @@
 
 #include "Syrup/Systems/SyrupGameMode.h"
 #include "Effects/ApplyField.h"
-//#include "Effects/DamagePlants.h"
+#include "Effects/DamagePlants.h"
 #include "Components/InstancedStaticMeshComponent.h"
 
 /* \/ ====== \/ *\
@@ -20,7 +20,24 @@
  */
 ATrash::ATrash()
 {
+	//Init Mesh
+	MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(FName("Trash Mesh"));
+	MeshComponent->AttachToComponent(SubtileMesh, FAttachmentTransformRules::KeepRelativeTransform);
 
+	//Init Grass
+	GoopComponent = CreateDefaultSubobject<UApplyField>(FName("Goop Zone"));
+	GoopComponent->FieldType = EFieldType::Damage;
+
+	//Init Prevent Trash Spawn
+	DamageComponent = CreateDefaultSubobject<UDamagePlants>(FName("Damage Zone"));
+	UpdateDamage();
+
+	//Get Trash Mat
+	static ConstructorHelpers::FObjectFinder<UMaterialInterface> MatRef(TEXT("/Game/Tiles/Trash/MI_Trash.MI_Trash"));
+	TileMaterial = MatRef.Object;
+	check(TileMaterial != nullptr);
+
+	SubtileMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
 }
 
 /**
@@ -28,7 +45,9 @@ ATrash::ATrash()
  */
 void ATrash::BeginPlay()
 {
-
+	Super::BeginPlay();
+	ReceiveEffectTrigger(ETileEffectTriggerType::Persistent, TSet<FIntPoint>());
+	ASyrupGameMode::GetTileEffectTriggerDelegate(this).AddDynamic(this, &ATrash::ReceiveEffectTrigger);
 }
 
 /**
@@ -38,7 +57,11 @@ void ATrash::BeginPlay()
  */
 void ATrash::OnConstruction(const FTransform& Transform)
 {
+	Super::OnConstruction(Transform);
 
+	MeshComponent->SetStaticMesh(GetMesh());
+	Range = GetRange();
+	Shape.Add(FIntPoint::ZeroValue);
 }
 
 /* /\ Initialization /\ *\
@@ -55,6 +78,7 @@ void ATrash::OnConstruction(const FTransform& Transform)
 void ATrash::UpdateDamage(int AmountAdded)
 {
 	Damage = FMath::Max(0, Damage + AmountAdded);
+	DamageComponent->SetDamage(Damage);
 }
 
 /* /\ Damage /\ *\
@@ -68,7 +92,12 @@ void ATrash::UpdateDamage(int AmountAdded)
  */
 void ATrash::Spread()
 {
-
+	if (TimeUntilSpread-- <= 1)
+	{
+		TimeUntilSpread = GetInitialTimeUntilSpread();
+		TArray<FIntPoint> EffectLocations = GetEffectLocations().Difference(GetSubTileLocations()).Array();
+		DrawDebugDirectionalArrow(GetWorld(), GetActorLocation(), UGridLibrary::GridTransformToWorldTransform(FGridTransform(EffectLocations[FMath::RandHelper(EffectLocations.Num())])).GetTranslation(), 40, FColor::Purple, false, 4, 0U, 10);
+	}
 }
 
 /* /\ Spreading /\ *\
@@ -96,6 +125,7 @@ void ATrash::ReceiveEffectTrigger(const ETileEffectTriggerType TriggerType, cons
 	case ETileEffectTriggerType::TrashActive:
 		break;
 	case ETileEffectTriggerType::TrashSpread:
+		Spread();
 		break;
 	case ETileEffectTriggerType::PlantsGrow:
 		break;
@@ -110,7 +140,7 @@ void ATrash::ReceiveEffectTrigger(const ETileEffectTriggerType TriggerType, cons
 	GetComponents(UTileEffect::StaticClass(), Components);
 	for (UActorComponent* EachComponent : Components)
 	{
-		Cast<UTileEffect>(EachComponent)->Affect(TriggerType, EffectedLocations);
+		Cast<UTileEffect>(EachComponent)->ActivateEffect(TriggerType, EffectedLocations);
 	}
 }
 

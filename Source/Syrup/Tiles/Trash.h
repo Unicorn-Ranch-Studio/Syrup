@@ -15,7 +15,7 @@ class UDamagePlants;
 /**
  * A piece of trash on the grid that can spread, cause damage, and be picked up
  */
-UCLASS()
+UCLASS(HideCategories = ("ActorTick", "Tile", "Replication", "Rendering", "Collision", "Actor", "Input", "HLOD", "WorldPartition", "Cooking", "DataLayers"))
 class SYRUP_API ATrash : public ATile
 {
 	GENERATED_BODY()
@@ -188,8 +188,8 @@ protected:
 	UApplyField* GoopComponent;
 
 	//Makes the trash damage plants within the effected area.
-//	UPROPERTY(VisibleAnywhere, Category = "Effect")
-//	UDamagePlants* DamageComponent;
+	UPROPERTY(VisibleAnywhere, Category = "Effect")
+	UDamagePlants* DamageComponent;
 
 	//The scale applied to the shape of this trash to get all effected locations of this trash's effects.
 	UPROPERTY(EditDefaultsOnly, Category = "Effect", Meta = (ClampMin = "0"))

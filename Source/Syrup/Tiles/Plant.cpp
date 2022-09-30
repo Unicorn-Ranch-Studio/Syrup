@@ -34,8 +34,8 @@ APlant::APlant()
 	PreventTrashComponent = CreateDefaultSubobject<UPreventTrashSpawn>(FName("Protection Zone"));
 
 	//Get Plant Mat
-	static ConstructorHelpers::FObjectFinder<UMaterialInterface> MeshRef(TEXT("/Game/Tiles/Plants/MI_Plant.MI_Plant"));
-	TileMaterial = MeshRef.Object;
+	static ConstructorHelpers::FObjectFinder<UMaterialInterface> MatRef(TEXT("/Game/Tiles/Plants/MI_Plant.MI_Plant"));
+	TileMaterial = MatRef.Object;
 	check(TileMaterial != nullptr);
 
 	SubtileMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);

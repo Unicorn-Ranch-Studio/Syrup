@@ -106,8 +106,13 @@ void UApplyField::Unaffect()
 	//Remove from tiles
 	for (ATile* EachEffectedTile : EffectedTiles)
 	{
-		EachEffectedTile->RemoveField(FieldType);
+		if (IsValid(EachEffectedTile))
+		{
+			EachEffectedTile->RemoveField(FieldType);
+		}
 	}
+	EffectedTiles.Empty();
+	EffectedLocations.Empty();
 }
 /* /\ =========== /\ *\
 |  /\ UTileEffect /\  |
