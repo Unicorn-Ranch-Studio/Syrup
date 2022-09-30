@@ -173,7 +173,7 @@ void APlant::ReceiveEffectTrigger(const ETileEffectTriggerType TriggerType, cons
 		GetComponents(UTileEffect::StaticClass(), Components);
 		for (UActorComponent* EachComponent : Components)
 		{
-			Cast<UTileEffect>(EachComponent)->Affect(TriggerType, EffectedLocations);
+			Cast<UTileEffect>(EachComponent)->ActivateEffect(TriggerType, EffectedLocations);
 		}
 	}
 }
