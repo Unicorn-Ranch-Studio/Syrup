@@ -90,6 +90,8 @@ protected:
 	/* /\ Shape /\ *\
 	\* ----------- */
 
+
+
 	/* ------------ *\
 	\* \/ Damage \/ */
 
@@ -118,88 +120,39 @@ protected:
 	/* /\ Damage /\ *\
 	\* ------------ */
 
-	/* --------------- *\
-	\* \/ Spreading \/ */
 
+
+	/* ------------- *\
+	\* \/ Pick Up \/ */
+	
 public:
-
 	/**
-	 * Gets the turns until this trash will spread.
+	 * Gets cost to pickup this piece of trash. Will fail if energy reserve does not have enough energy to pick this up.
 	 * 
-	 * @return The number of turns until this trash will create a copy of itself.
+	 * @param EnergyReserve - The energy reserve of the thing trying to pick this up. Will have PickupCost subtracted from it.
+	 * @return Whether or not this was picked up,
 	 */
-	UFUNCTION(BlueprintPure, Category = "Spreading")
-	FORCEINLINE int GetTimeUntilSpread() const { return TimeUntilSpread; };
-
-	/**
-	 * Gets the total number of turns it takes for this trash to spread.
-	 * 
-	 * @return The total number of turns it takes for this trash to spread.
-	 */
-	UFUNCTION(BlueprintPure, Category = "Spreading")
-	FORCEINLINE int GetInitialTimeUntilSpread() const { return Cast<ATrash>(GetClass()->GetDefaultObject())->TimeUntilSpread; };
-
-	/**
-	 * Gets how many more times this trash will spread.
-	 * 
-	 * @return The number of energy points required to pickup this trash.
-	 */
-	UFUNCTION(BlueprintPure, Category = "Spreading")
-	FORCEINLINE int GetTimesToSpread() const { return TimesToSpread; };
+	UFUNCTION(BlueprintCallable, Category = "Pick Up")
+	bool PickUp(int& EnergyReserve);
 
 	/**
 	 * Gets cost to pickup this piece of trash.
 	 * 
 	 * @return The number of energy points required to pickup this trash.
 	 */
-	UFUNCTION(BlueprintPure, Category = "Spreading")
-	FORCEINLINE int GetPickupCost() const { return PickupCost; };
-	
-	/**
-	 * Gets the location this is trying to spread to.
-	 * 
-	 * @return The place where this trash will try to spread to. If unable to spread, it will keep trying until it is able.
-	 */
-	UFUNCTION(BlueprintPure, Category = "Spreading")
-	FORCEINLINE FTransform GetNextSpreadToTransform() const { return NextSpreadToTransform; };
+	UFUNCTION(BlueprintPure, Category = "Pick Up")
+	FORCEINLINE int GetPickUpCost() const { return PickUpCost; };
 
 protected:
 
-	//The total number of turns it takes for this trash to spread.
-	UPROPERTY(EditDefaultsOnly, Category = "Spreading", Meta = (ClampMin = "1"))
-	int TimeUntilSpread = 1;
-
-	//The maximum number of trash allowed to spread.
-	UPROPERTY(EditDefaultsOnly, Category = "Spreading", Meta = (ClampMin = "1"))
-	int TimesToSpread = 3;
-	
 	//The number of energy points required to pickup this trash.
-	UPROPERTY(EditDefaultsOnly, Category = "Spreading", Meta = (ClampMin = "0"))
-	int PickupCost = 1;
-	
-private:
-	/**
-	 * Spawns another trash of the same as this.
-	 */
-	UFUNCTION()
-	void Spread();
-	
-	/**
-	 * Sets NextSpreadToTransform to a new location.
-	 */
-	UFUNCTION()
-	void GenerateNextSpreadToTransform();
+	UPROPERTY(EditDefaultsOnly, Category = "Pick Up", Meta = (ClampMin = "0"))
+	int PickUpCost = 1;
 
-	//The place where this trash will try to spread to. If unable to spread, it will keep trying until it is able.
-	UPROPERTY()
-	FTransform NextSpreadToTransform;
+	/* /\ Pick Up /\ *\
+	\* ------------- */
 
-	//Whether or not this needs to check its ability to spread.
-	UPROPERTY()
-	bool bCheckSpreadablility = true;
 
-	/* /\ Spreading /\ *\
-	\* --------------- */
 
 	/* ------------ *\
 	\* \/ Effect \/ */

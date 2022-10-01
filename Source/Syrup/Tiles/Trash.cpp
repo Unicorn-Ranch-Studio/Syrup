@@ -46,8 +46,6 @@ void ATrash::BeginPlay()
 {
 	Super::BeginPlay();
 
-	GenerateNextSpreadToTransform();
-
 	ReceiveEffectTrigger(ETileEffectTriggerType::Persistent, TSet<FIntPoint>());
 	ASyrupGameMode::GetTileEffectTriggerDelegate(this).AddDynamic(this, &ATrash::ReceiveEffectTrigger);
 }
@@ -69,6 +67,8 @@ void ATrash::OnConstruction(const FTransform& Transform)
 /* /\ Initialization /\ *\
 \* -------------------- */
 
+
+
 /* ------------ *\
 \* \/ Damage \/ */
 
@@ -86,76 +86,33 @@ void ATrash::UpdateDamage(int AmountAdded)
 /* /\ Damage /\ *\
 \* ------------ */
 
-/* --------------- *\
-\* \/ Spreading \/ */
+
+
+/* ------------- *\
+\* \/ Pick Up \/ */
 
 /**
- * Spawns another trash of the same as this.
+ * Gets cost to pickup this piece of trash. Will fail if energy reserve does not have enough energy to pick this up.
+ *
+ * @param EnergyReserve - The energy reserve of the thing trying to pick this up. Will have PickupCost subtracted from it.
+ * @return Whether or not this was picked up,
  */
-void ATrash::Spread()
+bool ATrash::PickUp(int& EnergyReserve)
 {
-	if (TimeUntilSpread <= 1 && TimesToSpread > 0)
+	if (EnergyReserve >= PickUpCost)
 	{
-		DrawDebugDirectionalArrow(GetWorld(), SubtileMesh->GetComponentLocation(), NextSpreadToTransform.GetLocation(), 80, bCheckSpreadablility ? FColor::Purple : FColor::Blue, false, 4, 0U, bCheckSpreadablility ? 10 : 1);
-		
-		if (bCheckSpreadablility)
-		{
-			ATrash* SpawnedTrash = GetWorld()->SpawnActorDeferred<ATrash>(GetClass(), NextSpreadToTransform, nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
-
-			if (SpawnedTrash)
-			{
-				TSet<FIntPoint> SpawnedLocations = SpawnedTrash->GetSubTileLocations();
-				FCollisionQueryParams TraceParams = FCollisionQueryParams::DefaultQueryParam;
-				TraceParams.AddIgnoredActor(SpawnedTrash);
-
-				for (FIntPoint EachSubtileLocation : SpawnedLocations)
-				{
-					FHitResult Result;
-					FVector WorldLocation = UGridLibrary::GridTransformToWorldTransform(FGridTransform(EachSubtileLocation)).GetTranslation();
-					if (GetWorld()->LineTraceSingleByChannel(Result, WorldLocation, WorldLocation + FVector(0, 0, -0.1), ECollisionChannel::ECC_GameTraceChannel2, TraceParams))
-					{
-						DrawDebugPoint(GetWorld(), WorldLocation, 10, FColor::Magenta, false, 4);
-						SpawnedTrash->Destroy();
-						//break;
-					}
-					else
-					{
-						DrawDebugPoint(GetWorld(), WorldLocation, 10, FColor::Green, false, 4);
-					}
-				}
-
-				bCheckSpreadablility = !SpawnedTrash->IsActorBeingDestroyed();
-				if (bCheckSpreadablility)
-				{
-					SpawnedTrash->FinishSpawning(NextSpreadToTransform);
-					GenerateNextSpreadToTransform();
-					TimesToSpread--;
-					TimeUntilSpread = GetInitialTimeUntilSpread();
-
-					ASyrupGameMode::GetTileEffectTriggerDelegate(GetWorld()).Broadcast(ETileEffectTriggerType::TrashSpawned, SpawnedLocations);
-				}
-			}
-		}
-
+		EnergyReserve -= PickUpCost;
+		Destroy();
+		return true;
 	}
-	else
-	{
-		TimeUntilSpread--;
-	}
+
+	return false;
 }
 
-/**
- * Sets NextSpreadToTransform to a new location.
- */
-void ATrash::GenerateNextSpreadToTransform()
-{
-	TArray<FIntPoint> EffectLocations = GetEffectLocations().Difference(GetSubTileLocations()).Array();
-	NextSpreadToTransform = UGridLibrary::GridTransformToWorldTransform(FGridTransform(EffectLocations[FMath::RandHelper(EffectLocations.Num())]));
-	NextSpreadToTransform.SetRotation(FQuat(FVector(0, 0, 1), FMath::FRandRange(0, TWO_PI)));
-}
+/* /\ Pick Up /\ *\
+\* ------------- */
 
-/* /\ Spreading /\ *\
-\* --------------- */
+
 
 /* ------------ *\
 \* \/ Effect \/ */
@@ -171,18 +128,6 @@ void ATrash::ReceiveEffectTrigger(const ETileEffectTriggerType TriggerType, cons
 	TSet<FIntPoint> EffectedLocations = GetEffectLocations();
 	TSet<FIntPoint> TriggeredLocations = LocationsToTrigger.IsEmpty() ? EffectedLocations : LocationsToTrigger.Intersect(EffectedLocations);
 
-	if(TriggerType == ETileEffectTriggerType::TrashSpread)
-	{
-		FTimerHandle Handle = FTimerHandle();
-		GetWorld()->GetTimerManager().SetTimer(Handle, this, &ATrash::Spread, FMath::FRand(), false);
-	}
-	else if (!bCheckSpreadablility && !TriggeredLocations.IsEmpty())
-	{
-		if (TriggerType == ETileEffectTriggerType::TrashPickedUp || TriggerType == ETileEffectTriggerType::PlantKilled)
-		{
-			bCheckSpreadablility =  true;
-		}
-	}
 	TInlineComponentArray<UActorComponent*> Components = TInlineComponentArray<UActorComponent*>();
 	GetComponents(UTileEffect::StaticClass(), Components);
 	for (UActorComponent* EachComponent : Components)
