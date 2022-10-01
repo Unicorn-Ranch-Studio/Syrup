@@ -33,7 +33,7 @@ void ASyrupGameMode::TriggerPhaseEvent(const ETileEffectTriggerType TriggerType)
 	(
 		if(TriggerType > LAST_PHASE_TRIGGER)
 		{
-			UE_LOG(LogTemp, Fatal, TEXT("%s is not a Phase Event"), *StaticEnum<ETileEffectTriggerType>()->GetNameStringByValue((int64)TriggerType))
+			UE_LOG(LogTemp, Error, TEXT("%s is not a Phase Event"), *StaticEnum<ETileEffectTriggerType>()->GetNameStringByValue((int64)TriggerType))
 		}
 	)
 
