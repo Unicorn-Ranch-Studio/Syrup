@@ -14,11 +14,6 @@
 UENUM(BlueprintType)
 enum class ETileEffectTriggerType : uint8
 {
-	//This effect will be triggered when affecter is activated and when other tiles are placed near the affecter after its activation.
-	Persistent		UMETA(DysplayName = "Persistent"),
-
-
-
 	// \/ Phase triggers, Called sequentially after the player ends their turn. None of these will pass location info. \/ //
 
 	//This effect will be triggered right after the player ends their turn.
@@ -36,7 +31,18 @@ enum class ETileEffectTriggerType : uint8
 
 
 
-	// \/ Event Triggers, Called by game object to notify changes in the board state. All of these will pass location info. \/ //
+	// \/ Local Triggers, Called by the affecter to notify when its state has changed. \/ //
+	
+	//This effect will be triggered when affecter is activated and will first be able to start causing effects.
+	OnActivated		UMETA(DysplayName = "On Affecter Activated"),
+	//This effect will be triggered when affecter is deactivated and will no longer be able to cause effects.
+	OnDeactivated	UMETA(DysplayName = "On Affecter Deactivated"),
+
+	// /\ Local Triggers, Called by the affecter to notify when its state has changed. /\ //
+
+
+
+	// \/ Global Triggers, Called by game object to notify changes in the board state. All of these will pass location info. \/ //
 
 	//This effect will be triggered whenever a plant is planted and will pass the locations of that plant.
 	PlantSpawned	UMETA(DysplayName = "On Plant Spawned"),
@@ -47,11 +53,14 @@ enum class ETileEffectTriggerType : uint8
 	//This effect will be triggered whenever a trash is picked up by the player and will pass the locations of that trash.
 	TrashPickedUp	UMETA(DysplayName = "On Trash Picked Up")
 
-	// /\ Event Triggers, Called by game object to notify changes in the board state. All of these will pass location info. /\ //
+	// /\ Global Triggers, Called by game object to notify changes in the board state. All of these will pass location info. /\ //
 };
 
 //Creates an iterator for this enum. Make sure the 2nd value == the last enum value.
-ENUM_RANGE_BY_COUNT(ETileEffectTriggerType, ETileEffectTriggerType::PlantsGrow)
+ENUM_RANGE_BY_COUNT(ETileEffectTriggerType, ETileEffectTriggerType::TrashPickedUp)
+
+//The last phase effect trigger.
+#define LAST_PHASE_TRIGGER		ETileEffectTriggerType::PlantsGrow
 /* /\ ================== /\ *\
 |  /\ ETileEffectTrigger /\  |
 \* /\ ================== /\ */

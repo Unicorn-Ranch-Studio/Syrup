@@ -11,7 +11,7 @@
  */
 UPreventTrashSpawn::UPreventTrashSpawn()
 {
-	Triggers.Add(ETileEffectTriggerType::Persistent);
+	Triggers.Add(ETileEffectTriggerType::OnActivated);
 }
 
 /**

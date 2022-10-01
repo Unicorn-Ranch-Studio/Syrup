@@ -46,7 +46,8 @@ void ATrash::BeginPlay()
 {
 	Super::BeginPlay();
 
-	ReceiveEffectTrigger(ETileEffectTriggerType::Persistent, TSet<FIntPoint>());
+	ReceiveEffectTrigger(ETileEffectTriggerType::OnActivated, TSet<FIntPoint>());
+	ASyrupGameMode::GetTileEffectTriggerDelegate(GetWorld()).Broadcast(ETileEffectTriggerType::TrashSpawned, GetSubTileLocations());
 	ASyrupGameMode::GetTileEffectTriggerDelegate(this).AddDynamic(this, &ATrash::ReceiveEffectTrigger);
 }
 
@@ -102,6 +103,8 @@ bool ATrash::PickUp(int& EnergyReserve)
 	if (EnergyReserve >= PickUpCost)
 	{
 		EnergyReserve -= PickUpCost;
+		ASyrupGameMode::GetTileEffectTriggerDelegate(GetWorld()).Broadcast(ETileEffectTriggerType::TrashPickedUp, GetSubTileLocations());
+		ReceiveEffectTrigger(ETileEffectTriggerType::OnDeactivated, TSet<FIntPoint>());
 		Destroy();
 		return true;
 	}

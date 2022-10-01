@@ -51,6 +51,7 @@ void APlant::BeginPlay()
 	TimeUntilGrown = GetTimeUntilGrown() + 1;
 	Grow();
 
+	ASyrupGameMode::GetTileEffectTriggerDelegate(GetWorld()).Broadcast(ETileEffectTriggerType::PlantSpawned, GetSubTileLocations());
 	ASyrupGameMode::GetTileEffectTriggerDelegate(this).AddDynamic(this, &APlant::ReceiveEffectTrigger);
 }
 
@@ -104,6 +105,7 @@ bool APlant::ReceiveDamage(int Amount, ATile* Cause)
 	if (Health <= 0)
 	{
 		ASyrupGameMode::GetTileEffectTriggerDelegate(GetWorld()).Broadcast(ETileEffectTriggerType::PlantKilled, GetSubTileLocations());
+		ReceiveEffectTrigger(ETileEffectTriggerType::OnDeactivated, TSet<FIntPoint>());
 		Destroy();
 	}
 	return Health <= 0;
@@ -127,7 +129,7 @@ void APlant::Grow()
 
 		if (IsGrown())
 		{
-			ReceiveEffectTrigger(ETileEffectTriggerType::Persistent, TSet<FIntPoint>());
+			ReceiveEffectTrigger(ETileEffectTriggerType::OnActivated, TSet<FIntPoint>());
 		}
 	}
 }
@@ -146,23 +148,9 @@ void APlant::Grow()
  */
 void APlant::ReceiveEffectTrigger(const ETileEffectTriggerType TriggerType, const TSet<FIntPoint>& LocationsToTrigger)
 {
-	switch (TriggerType)
+	if(TriggerType == ETileEffectTriggerType::PlantsGrow)
 	{
-	case ETileEffectTriggerType::Persistent:
-		break;
-	case ETileEffectTriggerType::PlantActive:
-		break;
-	case ETileEffectTriggerType::TrashDamage:
-		break;
-	case ETileEffectTriggerType::TrashActive:
-		break;
-	case ETileEffectTriggerType::TrashSpread:
-		break;
-	case ETileEffectTriggerType::PlantsGrow:
 		Grow();
-		break;
-	default:
-		break;
 	}
 
 	if (IsGrown() || TriggerType == ETileEffectTriggerType::PlantsGrow)

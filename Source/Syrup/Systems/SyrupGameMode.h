@@ -31,8 +31,17 @@ public:
 	UFUNCTION()
 	static FTileEffecTrigger& GetTileEffectTriggerDelegate(const UObject* WorldContextObject);
 
-	UPROPERTY(BlueprintAssignable, BlueprintCallable, Meta = (AutoCreateRefTerm = "Locations"))
+	UPROPERTY(BlueprintAssignable, Meta = (AutoCreateRefTerm = "Locations"))
 	FTileEffecTrigger TileEffectTriggerDelegate;
+
+protected:
+	/**
+	 * Triggers a phase event for the world.
+	 * 
+	 * @param TriggerType - The type of trigger to activate. Must be a phase event trigger.
+	 */
+	UFUNCTION(BlueprintCallable)
+	void TriggerPhaseEvent(const ETileEffectTriggerType TriggerType) const;
 };
 /* /\ ============== /\ *\
 |  /\ ASyrupGameMode /\  |

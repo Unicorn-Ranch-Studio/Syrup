@@ -15,7 +15,7 @@
  */
 UApplyField::UApplyField()
 {
-	Triggers.Add(ETileEffectTriggerType::Persistent);
+	Triggers.Add(ETileEffectTriggerType::OnActivated);
 }
 
 /*

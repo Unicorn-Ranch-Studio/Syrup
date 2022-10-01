@@ -8,6 +8,7 @@
 /* \/ ============== \/ *\
 |  \/ ASyrupGameMode \/  |
 \* \/ ============== \/ */
+
 /**
  * Gets the delegate used to bind and trigger tile effects.
  *
@@ -19,6 +20,24 @@ FTileEffecTrigger& ASyrupGameMode::GetTileEffectTriggerDelegate(const UObject* W
 {
 	ASyrupGameMode* GameMode = Cast<ASyrupGameMode>(UGameplayStatics::GetGameMode(WorldContextObject));
 	return GameMode->TileEffectTriggerDelegate;
+}
+
+/**
+ * Triggers a phase event for the world.
+ *
+ * @param TriggerType - The type of trigger to activate. Must be a phase event trigger.
+ */
+void ASyrupGameMode::TriggerPhaseEvent(const ETileEffectTriggerType TriggerType) const
+{
+	checkCode
+	(
+		if(TriggerType > LAST_PHASE_TRIGGER)
+		{
+			UE_LOG(LogTemp, Fatal, TEXT("%s is not a Phase Event"), *StaticEnum<ETileEffectTriggerType>()->GetNameStringByValue((int64)TriggerType))
+		}
+	)
+
+	TileEffectTriggerDelegate.Broadcast(TriggerType, TSet<FIntPoint>());
 }
 /* /\ ============== /\ *\
 |  /\ ASyrupGameMode /\  |
