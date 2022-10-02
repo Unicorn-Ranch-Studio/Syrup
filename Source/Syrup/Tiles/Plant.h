@@ -79,7 +79,7 @@ protected:
 	virtual TSet<FIntPoint> GetRelativeSubTileLocations() const override;
 
 	//The mesh of this plant.
-	UPROPERTY(VisibleAnywhere, Category = "Shape")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Shape")
 	UStaticMeshComponent* MeshComponent;
 
 	//The static mesh to use for this plant type.
@@ -180,14 +180,18 @@ protected:
 	//The amount of energy required to plant a plant of this type.
 	UPROPERTY(EditDefaultsOnly, Category = "Growth", Meta = (ClampMin = "0"))
 	int PlantingCost = 1;
-	
-private:
+
+	/**
+	 * Updates the plants so that it is 1 turn closer to fully grown, and causes the effects of being fully grown if needed.
+	 */
+	UFUNCTION(BlueprintNativeEvent)
+	void Grow();
 
 	/**
 	 * Updates the plants so that it is 1 turn closer to fully grown, and causes the effects of being fully grown if needed.
 	 */
 	UFUNCTION()
-	void Grow();
+	void Grow_Implementation();
 
 	/* /\ Growth /\ *\
 	\* ------------ */

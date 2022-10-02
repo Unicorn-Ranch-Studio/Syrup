@@ -126,12 +126,11 @@ bool APlant::ReceiveDamage(int Amount, ATile* Cause)
 /**
  * Updates the plants so that it is 1 turn closer to fully grown, and causes the effects of being fully grown if needed.
  */
-void APlant::Grow()
+void APlant::Grow_Implementation()
 {
 	if (!IsGrown())
 	{
 		TimeUntilGrown--;
-		MeshComponent->SetRelativeScale3D(FVector((float)(GetInitialTimeUntilGrown() - GetTimeUntilGrown() + 1) / (GetInitialTimeUntilGrown() + 1)));
 
 		if (IsGrown())
 		{
