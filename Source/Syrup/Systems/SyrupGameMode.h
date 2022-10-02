@@ -19,8 +19,39 @@ UCLASS(Blueprintable)
 class SYRUP_API ASyrupGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
-	
+
+
+	/* ----------------- *\
+	\* \/ Player Turn \/ */
+
 public:
+	
+	/**
+	 * Ends the player's turn
+	 * 
+	 * @param WorldContextObject - An object in the same world as the player.
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Player Turn", Meta = (WorldContext = "WorldContextObject"))
+	static void EndPlayerTurn(const UObject* WorldContextObject);
+
+protected:
+
+	/**
+	 * Causes night to fall and non-player objects to take their turns.
+	 */
+	UFUNCTION(BlueprintImplementableEvent, Category = "Player Turn")
+	void BeginNight();
+
+	/* /\ Player Turn /\ *\
+	\* ----------------- */
+
+
+
+	/* --------------------- *\
+	\* \/ Effect Triggers \/ */
+
+public:
+
 	/**
 	 * Gets the delegate used to bind and trigger tile effects.
 	 * 
@@ -31,7 +62,7 @@ public:
 	UFUNCTION()
 	static FTileEffecTrigger& GetTileEffectTriggerDelegate(const UObject* WorldContextObject);
 
-	UPROPERTY(BlueprintAssignable, Meta = (AutoCreateRefTerm = "Locations"))
+	UPROPERTY(BlueprintAssignable)
 	FTileEffecTrigger TileEffectTriggerDelegate;
 
 protected:
@@ -42,7 +73,11 @@ protected:
 	 */
 	UFUNCTION(BlueprintCallable)
 	void TriggerPhaseEvent(const ETileEffectTriggerType TriggerType) const;
+
+	/* /\ Effect Triggers /\ *\
+	\* --------------------- */
 };
+
 /* /\ ============== /\ *\
 |  /\ ASyrupGameMode /\  |
 \* /\ ============== /\ */

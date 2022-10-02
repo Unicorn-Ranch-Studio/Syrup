@@ -9,6 +9,28 @@
 |  \/ ASyrupGameMode \/  |
 \* \/ ============== \/ */
 
+/* ----------------- *\
+\* \/ Player Turn \/ */
+
+/**
+ * Ends the player's turn
+ * 
+ * @param WorldContextObject - An object in the same world as the player.
+ */
+void ASyrupGameMode::EndPlayerTurn(const UObject* WorldContextObject)
+{
+	ASyrupGameMode* GameMode = Cast<ASyrupGameMode>(UGameplayStatics::GetGameMode(WorldContextObject));
+	GameMode->BeginNight();
+}
+
+/* /\ Player Turn /\ *\
+\* ----------------- */
+
+
+
+/* --------------------- *\
+\* \/ Effect Triggers \/ */
+
 /**
  * Gets the delegate used to bind and trigger tile effects.
  *
@@ -39,6 +61,10 @@ void ASyrupGameMode::TriggerPhaseEvent(const ETileEffectTriggerType TriggerType)
 
 	TileEffectTriggerDelegate.Broadcast(TriggerType, TSet<FIntPoint>());
 }
+
+/* /\ Effect Triggers /\ *\
+\* --------------------- */
+
 /* /\ ============== /\ *\
 |  /\ ASyrupGameMode /\  |
 \* /\ ============== /\ */

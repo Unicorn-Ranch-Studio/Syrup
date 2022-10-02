@@ -73,6 +73,8 @@ void APlant::OnConstruction(const FTransform& Transform)
 /* /\ Initialization /\ *\
 \* -------------------- */
 
+
+
 /* ----------- *\
 \* \/ Shape \/ */
 
@@ -88,6 +90,8 @@ TSet<FIntPoint> APlant::GetRelativeSubTileLocations() const
 
 /* /\ Shape /\ *\
 \* ----------- */
+
+
 
 /* ------------ *\
 \* \/ Health \/ */
@@ -114,6 +118,8 @@ bool APlant::ReceiveDamage(int Amount, ATile* Cause)
 /* /\ Health /\ *\
 \* ------------ */
 
+
+
 /* ------------ *\
 \* \/ Growth \/ */
 
@@ -136,6 +142,8 @@ void APlant::Grow()
 
 /* /\ Growth /\ *\
 \* ------------ */
+
+
 
 /* ------------ *\
 \* \/ Effect \/ */
