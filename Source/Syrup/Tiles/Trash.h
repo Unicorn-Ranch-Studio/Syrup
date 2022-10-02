@@ -30,6 +30,14 @@ public:
 	 */
 	ATrash();
 
+protected:
+
+	/**
+	 * Sets up this trash after it has fallen.
+	 */
+	UFUNCTION(BlueprintCallable)
+	void OnFinishedFalling();
+
 private:
 
 	/**
@@ -76,7 +84,7 @@ protected:
 	virtual FORCEINLINE TSet<FIntPoint> GetRelativeSubTileLocations() const override { return GetShape(); };
 
 	//The mesh of this trash.
-	UPROPERTY(VisibleAnywhere, Category = "Shape")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Shape")
 	UStaticMeshComponent* MeshComponent;
 
 	//The static mesh to use for this trash.

@@ -40,13 +40,20 @@ ATrash::ATrash()
 }
 
 /**
+ * Sets up this trash after it has fallen.
+ */
+void ATrash::OnFinishedFalling()
+{ 
+	ReceiveEffectTrigger(ETileEffectTriggerType::OnActivated, TSet<FIntPoint>()); 
+}
+
+/**
  * Binds effect triggers.
  */
 void ATrash::BeginPlay()
 {
 	Super::BeginPlay();
 
-	ReceiveEffectTrigger(ETileEffectTriggerType::OnActivated, TSet<FIntPoint>());
 	ASyrupGameMode::GetTileEffectTriggerDelegate(GetWorld()).Broadcast(ETileEffectTriggerType::TrashSpawned, GetSubTileLocations());
 	ASyrupGameMode::GetTileEffectTriggerDelegate(this).AddDynamic(this, &ATrash::ReceiveEffectTrigger);
 }
