@@ -81,6 +81,35 @@ FGridTransform UGridLibrary::WorldTransformToGridTransform(const FTransform Worl
 }
 
 /*
+ * Transforms the given grid location by the grid transform.
+ *
+ * @param GridLocation - The location to transform.
+ * @param GridTransform - The transformation to apply.
+ * @return The transformed location.
+ */
+FIntPoint UGridLibrary::TransformGridLocation(const FIntPoint GridLocation, const FGridTransform GridTransform)
+{
+	return PointLocationInDirection(GridTransform.Direction, GridLocation) + GridTransform.Location;
+}
+
+/*
+ * Transforms the given shape by the grid transform.
+ *
+ * @param ShapeLocations - The location of each tile in the shape to transform.
+ * @param GridTransform - The transformation to apply.
+ * @return The transformed location of each tile in the shape.
+ */
+TSet<FIntPoint> UGridLibrary::TransformShape(const TSet<FIntPoint> ShapeLocations, const FGridTransform GridTransform)
+{
+	TSet<FIntPoint> ReturnValue = TSet<FIntPoint>();
+	for (FIntPoint EachShapeLocation : ShapeLocations)
+	{
+		ReturnValue.Add(TransformGridLocation(EachShapeLocation, GridTransform));
+	}
+	return ReturnValue;
+}
+
+/*
  * Gets snaps a given transform to the grid.
  *
  * @param Location - The transform in the world to snap.

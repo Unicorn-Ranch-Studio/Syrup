@@ -96,6 +96,26 @@ public:
 	 */
 	UFUNCTION(BlueprintPure, Category="Transformation|Grid")
 	static FGridTransform WorldTransformToGridTransform(const FTransform WorldTransform);
+	
+	/*
+	 * Transforms the given grid location by the grid transform.
+	 * 
+	 * @param GridLocation - The location to transform.
+	 * @param GridTransform - The transformation to apply.
+	 * @return The transformed location.
+	 */
+	UFUNCTION(BlueprintPure, Category="Transformation|Grid")
+	static FIntPoint TransformGridLocation(const FIntPoint GridLocation, const FGridTransform GridTransform);
+
+	/*
+	 * Transforms the given shape by the grid transform.
+	 * 
+	 * @param ShapeLocations - The location of each tile in the shape to transform.
+	 * @param GridTransform - The transformation to apply.
+	 * @return The transformed location of each tile in the shape.
+	 */
+	UFUNCTION(BlueprintPure, Category="Transformation|Grid")
+	static TSet<FIntPoint> TransformShape(const TSet<FIntPoint> ShapeLocations, const FGridTransform GridTransform);
 
 	/*
 	 * Gets snaps a given transform to the grid.

@@ -59,7 +59,7 @@ void ATrash::BeginPlay()
 }
 
 /**
- * Initializes Damage, Range, and TimeUntilSpread; and sets the appropriate mesh.
+ * Initializes Damage, Range, and sets the appropriate mesh.
  *
  * @param Transform - The new transform of the trash.
  */

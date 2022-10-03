@@ -46,7 +46,7 @@ private:
 	virtual void BeginPlay() override;
 
 	/**
-	 * Initializes Damage, Range, and TimeUntilSpread; and sets the appropriate mesh.
+	 * Initializes Damage, Range, and sets the appropriate mesh.
 	 *
 	 * @param Transform - The new transform of the trash.
 	 */
