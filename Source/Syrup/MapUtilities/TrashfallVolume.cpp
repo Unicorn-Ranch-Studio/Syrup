@@ -18,6 +18,7 @@
 ATrashfallVolume::ATrashfallVolume()
 {
 	SpawnArea = CreateDefaultSubobject<UBoxComponent>(FName("Box Component"));
+	SpawnArea->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	RootComponent = SpawnArea;
 }
 /**
@@ -150,9 +151,11 @@ bool ATrashfallVolume::SpawnTrash(bool bAttachTrash)
 			FVector WorldLocation = UGridLibrary::GridTransformToWorldTransform(FGridTransform(EachSpawnLocation)).GetLocation();
 			if (GetWorld()->LineTraceTestByChannel(WorldLocation, WorldLocation + FVector(0, 0, -0.1), ECollisionChannel::ECC_GameTraceChannel2))
 			{
+				DrawDebugPoint(GetWorld(), WorldLocation, 10, FColor::Red, false, 10);
 				BadLocations.Add(EachSpawnLocation);
 				goto endOfLoop;
 			}
+			DrawDebugPoint(GetWorld(), WorldLocation, 10, FColor::Green, false, 10);
 		}
 
 		ATrash* SpawnedTrash = GetWorld()->SpawnActor<ATrash>(TrashType, SpawnWorldTransform);
