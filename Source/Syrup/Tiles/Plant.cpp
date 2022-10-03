@@ -110,8 +110,8 @@ bool APlant::ReceiveDamage(int Amount, ATile* Cause)
 	{
 		ASyrupGameMode::GetTileEffectTriggerDelegate(GetWorld()).Broadcast(ETileEffectTriggerType::PlantKilled, GetSubTileLocations());
 		ReceiveEffectTrigger(ETileEffectTriggerType::OnDeactivated, TSet<FIntPoint>());
-		Destroy();
 	}
+	OnDamageRecived(Amount, Cause);
 	return Health <= 0;
 }
 

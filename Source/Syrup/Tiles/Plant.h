@@ -108,7 +108,9 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Health")
 	bool ReceiveDamage(int Amount, ATile* Cause);
-
+	UFUNCTION(BlueprintNativeEvent , Category = "Health")
+	void OnDamageRecived(int Amount, ATile* Cause);
+	FORCEINLINE void OnDamageRecived_Implementation(int Amount, ATile* Cause) { Destroy(); };
 	/**
 	 * Gets the current health of this plant.
 	 * 
