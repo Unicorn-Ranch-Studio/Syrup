@@ -77,7 +77,7 @@ void ATrashfallVolume::OnConstruction(const FTransform& Transform)
 	TArray<AActor*> AttachedTrashPieces;
 	GetAttachedActors(AttachedTrashPieces);
 
-	if (!AttachedTrashPieces.IsEmpty() && AttachedTrashPieces[0]->GetClass() != TrashType.Get())
+	if (!bStartWithTrash || (!AttachedTrashPieces.IsEmpty() && AttachedTrashPieces[0]->GetClass() != TrashType.Get()))
 	{
 		for (AActor* EachAttachedTrashPiece : AttachedTrashPieces)
 		{
@@ -93,7 +93,7 @@ void ATrashfallVolume::OnConstruction(const FTransform& Transform)
 		AttachedTrashPieces.RemoveAt(AttachedTrashPieces.Num() - 1);
 	}
 
-	if (IsValid(TrashType))
+	if (bStartWithTrash && IsValid(TrashType))
 	{
 		while (NumTrash < NumToMaintain)
 		{
@@ -128,19 +128,21 @@ void ATrashfallVolume::ReceiveEffectTrigger(const ETileEffectTriggerType Trigger
  */
 bool ATrashfallVolume::SpawnTrash(bool bAttachTrash)
 {
-	while (BadLocations.Num() < NumTiles)
+	TSet<FIntPoint> RelativeTileLocations = TrashType.GetDefaultObject()->GetShape();
+	int Count = 0;
+	while (Count++ < 50)
 	{
 		//Gets a random transform in spawn area and converts it to a grid transform.
-		FTransform SpawnWorldTransform = FTransform(FQuat(FVector::UpVector, FMath::FRandRange(0.f, /*TWO_PI*/ 0.f)), GetActorTransform().TransformPosition(FMath::RandPointInBox(FBox(-SpawnArea->GetUnscaledBoxExtent(), SpawnArea->GetUnscaledBoxExtent()))));
+		FTransform SpawnWorldTransform = FTransform(FQuat(FVector::UpVector, FMath::FRandRange(0.f, TWO_PI)), GetActorTransform().TransformPosition(FMath::RandPointInBox(FBox(-SpawnArea->GetUnscaledBoxExtent(), SpawnArea->GetUnscaledBoxExtent()))));
 
-		FGridTransform SpawnTransform = UGridLibrary::WorldTransformToGridTransform(SpawnWorldTransform).Location;
+		FGridTransform SpawnTransform = UGridLibrary::WorldTransformToGridTransform(SpawnWorldTransform);
 
 		if (BadLocations.Contains(SpawnTransform.Location))
 		{
 			continue;
 		}
 
-		TSet<FIntPoint> SpawnLocations = UGridLibrary::TransformShape(TrashType.GetDefaultObject()->GetShape(), SpawnTransform);
+		TSet<FIntPoint> SpawnLocations = UGridLibrary::TransformShape(RelativeTileLocations, SpawnTransform);
 		if (SpawnLocations.Difference(BadLocations).Num() != SpawnLocations.Num())
 		{
 			continue;
@@ -149,13 +151,11 @@ bool ATrashfallVolume::SpawnTrash(bool bAttachTrash)
 		for (FIntPoint EachSpawnLocation : SpawnLocations)
 		{
 			FVector WorldLocation = UGridLibrary::GridTransformToWorldTransform(FGridTransform(EachSpawnLocation)).GetLocation();
-			if (GetWorld()->LineTraceTestByChannel(WorldLocation, WorldLocation + FVector(0, 0, -0.1), ECollisionChannel::ECC_GameTraceChannel2))
+			if (GetWorld()->LineTraceTestByChannel(WorldLocation + FVector(0, 0, 1), WorldLocation + FVector(0, 0, -0.5), ECollisionChannel::ECC_GameTraceChannel2))
 			{
-				DrawDebugPoint(GetWorld(), WorldLocation, 10, FColor::Red, false, 10);
 				BadLocations.Add(EachSpawnLocation);
 				goto endOfLoop;
 			}
-			DrawDebugPoint(GetWorld(), WorldLocation, 10, FColor::Green, false, 10);
 		}
 
 		ATrash* SpawnedTrash = GetWorld()->SpawnActor<ATrash>(TrashType, SpawnWorldTransform);

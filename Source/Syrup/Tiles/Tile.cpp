@@ -61,7 +61,7 @@ void ATile::OnConstruction(const FTransform& Transform)
 
 		//Reset Mesh
 		SubtileMesh->ClearInstances();
-		SubtileMesh->InstancingRandomSeed = FMath::Rand();
+		SubtileMesh->InstancingRandomSeed = FMath::Rand() + 1;
 		SubtileMesh->SetWorldTransform(UGridLibrary::GridTransformToWorldTransform(GridTransform));
 
 		//Ensure tile has valid origin
@@ -69,31 +69,25 @@ void ATile::OnConstruction(const FTransform& Transform)
 		TileLocations.Add(FIntPoint::ZeroValue);
 
 		//Get sub-tile transforms
-		TArray<FTransform> TileWorldTransforms = TArray<FTransform>();
+		TArray<FTransform> TileLocalTransforms = TArray<FTransform>();
 		for (FIntPoint EachTileLocation : TileLocations)
 		{
-			FIntPoint RotatedGridLocation = UGridLibrary::PointLocationInDirection(GridTransform.Direction, EachTileLocation);
-			FTransform TileWorldTransform = UGridLibrary::GridTransformToWorldTransform(FGridTransform(RotatedGridLocation + GridTransform.Location));
-			TileWorldTransforms.Add(TileWorldTransform);
-
-			FVector TileWorldLocation = TileWorldTransform.GetTranslation();
-			FHitResult HitResult = FHitResult();
-
+			TileLocalTransforms.Add(UGridLibrary::GridTransformToWorldTransform(FGridTransform(EachTileLocation)) * FTransform(FVector(UGridLibrary::GetGridHeight() * -0.333333333333333,0,0)));
 			checkCode
 			(
 				ATile* OverlapedTile = nullptr;
 				TArray<AActor*> IgnoredActors = TArray<AActor*>();
 				IgnoredActors.Add(this);
 
-				if (UGridLibrary::OverlapGridLocation(this, RotatedGridLocation + GridTransform.Location, OverlapedTile, IgnoredActors))
+				if (UGridLibrary::OverlapGridLocation(this, UGridLibrary::TransformGridLocation(EachTileLocation, GridTransform), OverlapedTile, IgnoredActors))
 				{
-					UE_LOG(LogLevel, Warning, TEXT("%s is overlapping %s at: %s"), *GetName(), *OverlapedTile->GetName(), *TileWorldLocation.ToString());
-					DrawDebugPoint(GetWorld(), TileWorldTransforms.Last().GetTranslation() + FVector(0, 0, 1), 50, FColor::Red, false, 5);
+					UE_LOG(LogLevel, Warning, TEXT("%s is overlapping %s at: %s"), *GetName(), *OverlapedTile->GetName(), *GridTransform.Location.ToString());
+					DrawDebugPoint(GetWorld(), (TileLocalTransforms.Last() * SubtileMesh->GetComponentTransform()).GetLocation() + FVector(0, 0, 50), 50, FColor::Red, false, 5);
 				}
 			);
 		}
 
-		SubtileMesh->AddInstances(TileWorldTransforms, false, true);
+		SubtileMesh->AddInstances(TileLocalTransforms, false, false);
 	}
 }
 
