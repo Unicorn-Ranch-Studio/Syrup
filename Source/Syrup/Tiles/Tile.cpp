@@ -21,13 +21,13 @@
 ATile::ATile()
 {
 	//Create Root
-	UArrowComponent* Arrow = CreateDefaultSubobject<UArrowComponent>(FName("Root"));
+	UArrowComponent* Arrow = CreateDefaultSubobject<UArrowComponent>(FName("World Location"));
 	Arrow->ArrowSize = 0.4;
 	Arrow->ArrowLength = 50;
 	Arrow->ArrowColor = FColor::Black;
 	Arrow->SetHiddenInGame(true);
 	RootComponent = Arrow;
-	
+
 	//Get Tile Mesh
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> MeshRef(TEXT("/Game/Tiles/SM_Tile.SM_Tile"));
 	TileMesh = MeshRef.Object;

@@ -58,15 +58,6 @@ private:
 	/* ----------- *\
 	\* \/ Shape \/ */
 
-public:
-	/**
-	 * Gets the mesh of this trash.
-	 * 
-	 * @return The static mesh to use for this trash.
-	 */
-	UFUNCTION(BlueprintPure, Category = "Shape")
-	FORCEINLINE UStaticMesh* GetMesh() const { return Mesh; };
-
 	/**
 	 * Gets the shape of this trash.
 	 * 
@@ -82,14 +73,6 @@ protected:
 	 * @return The relative locations of all of the sub-tiles of this trash.
 	 */
 	virtual FORCEINLINE TSet<FIntPoint> GetRelativeSubTileLocations() const override { return GetShape(); };
-
-	//The mesh of this trash.
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Shape")
-	UStaticMeshComponent* MeshComponent;
-
-	//The static mesh to use for this trash.
-	UPROPERTY(EditDefaultsOnly, Category = "Shape")
-	UStaticMesh* Mesh = nullptr;
 
 	//A set containing all of the relative locations of the sub-tiles making up the shape of this trash.
 	UPROPERTY(EditDefaultsOnly, Category = "Shape")
