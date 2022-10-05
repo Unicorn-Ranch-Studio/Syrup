@@ -54,13 +54,6 @@ private:
 	\* \/ Shape \/ */
 
 public:
-	/**
-	 * Gets the mesh of this plant type.
-	 * 
-	 * @return The static mesh to use for this plant type.
-	 */
-	UFUNCTION(BlueprintPure, Category = "Shape")
-	FORCEINLINE UStaticMesh* GetMesh() const { return Mesh; };
 
 	/**
 	 * Gets the shape of this plant type.
@@ -77,14 +70,6 @@ protected:
 	 * @return The relative locations of all of the sub-tiles of this plant.
 	 */
 	virtual TSet<FIntPoint> GetRelativeSubTileLocations() const override;
-
-	//The mesh of this plant.
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Shape")
-	UStaticMeshComponent* MeshComponent;
-
-	//The static mesh to use for this plant type.
-	UPROPERTY(EditDefaultsOnly, Category = "Shape")
-	UStaticMesh* Mesh = nullptr;
 
 	//A set containing all of the relative locations of the sub-tiles making up the shape of this plant type.
 	UPROPERTY(EditDefaultsOnly, Category = "Shape")

@@ -21,24 +21,12 @@ DEFINE_LOG_CATEGORY(LogPlant);
  */
 APlant::APlant()
 {
-	//Init Mesh
-	MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(FName("Plant Mesh"));
-	MeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	MeshComponent->AttachToComponent(SubtileMesh, FAttachmentTransformRules::KeepRelativeTransform);
-
 	//Init Grass
 	GrassComponent = CreateDefaultSubobject<UApplyField>(FName("Grass Zone"));
 	GrassComponent->FieldType = EFieldType::Protection;
 
 	//Init Prevent Trash Spawn
 	PreventTrashComponent = CreateDefaultSubobject<UPreventTrashSpawn>(FName("Protection Zone"));
-
-	//Get Plant Mat
-	static ConstructorHelpers::FObjectFinder<UMaterialInterface> MatRef(TEXT("/Game/Tiles/Plants/MI_Plant.MI_Plant"));
-	TileMaterial = MatRef.Object;
-	check(TileMaterial != nullptr);
-
-	SubtileMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
 }
 
 /**
@@ -64,7 +52,6 @@ void APlant::OnConstruction(const FTransform& Transform)
 {
 	Super::OnConstruction(Transform);
 
-	MeshComponent->SetStaticMesh(GetMesh());
 	Health = GetMaxHealth();
 	Range = GetRange();
 	Shape.Add(FIntPoint::ZeroValue);

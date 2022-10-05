@@ -62,11 +62,6 @@ public:
 	void RemoveField(EFieldType Type);
 
 protected:
-	UPROPERTY(EditDefaultsOnly)
-	UMaterialInterface* TileMaterial;
-
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
-	UInstancedStaticMeshComponent* SubtileMesh;
 
 	/*
 	 * The relative locations of all of the sub-tiles of this tile.
@@ -83,11 +78,19 @@ protected:
 	 */
 	UFUNCTION(BlueprintPure)
 	TSet<FIntPoint> GetSubTileLocations() const;
+	
+	//The material of the tile
+	UPROPERTY(EditDefaultsOnly)
+	UMaterialInterface* TileMaterial;
 
 private:
 	//The mesh used for each tile as the ground.
 	UPROPERTY()
 	UStaticMesh* TileMesh;
+
+	//The mesh used to representing the tile's collision and the ground underneath the tile.
+	UPROPERTY()
+	UInstancedStaticMeshComponent* SubtileMesh;
 
 	//The field data for this tile.
 	UPROPERTY()

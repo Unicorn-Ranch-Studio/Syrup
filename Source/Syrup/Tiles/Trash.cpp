@@ -20,11 +20,6 @@
  */
 ATrash::ATrash()
 {
-	//Init Mesh
-	MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(FName("Trash Mesh"));
-	MeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	MeshComponent->AttachToComponent(SubtileMesh, FAttachmentTransformRules::KeepRelativeTransform);
-
 	//Init Grass
 	GoopComponent = CreateDefaultSubobject<UApplyField>(FName("Goop Zone"));
 	GoopComponent->FieldType = EFieldType::Damage;
@@ -32,11 +27,6 @@ ATrash::ATrash()
 	//Init Prevent Trash Spawn
 	DamageComponent = CreateDefaultSubobject<UDamagePlants>(FName("Damage Zone"));
 	UpdateDamage();
-
-	//Get Trash Mat
-	static ConstructorHelpers::FObjectFinder<UMaterialInterface> MatRef(TEXT("/Game/Tiles/Trash/MI_Trash.MI_Trash"));
-	TileMaterial = MatRef.Object;
-	check(TileMaterial != nullptr);
 }
 
 /**
@@ -60,7 +50,6 @@ void ATrash::OnConstruction(const FTransform& Transform)
 {
 	Super::OnConstruction(Transform);
 
-	MeshComponent->SetStaticMesh(GetMesh());
 	Range = GetRange();
 	Shape.Add(FIntPoint::ZeroValue);
 }
