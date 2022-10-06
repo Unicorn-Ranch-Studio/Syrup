@@ -82,6 +82,7 @@ TSet<FIntPoint> APlant::GetRelativeSubTileLocations() const
 
 /* ------------ *\
 \* \/ Health \/ */
+
 /**
  * Causes this plant to take damage.
  *
@@ -93,13 +94,14 @@ TSet<FIntPoint> APlant::GetRelativeSubTileLocations() const
 bool APlant::ReceiveDamage(int Amount, ATile* Cause)
 {
 	Health -= FMath::Max(0, Amount);
-	if (Health <= 0)
+	bool bDead = Health <= 0;
+	if (bDead)
 	{
 		ASyrupGameMode::GetTileEffectTriggerDelegate(GetWorld()).Broadcast(ETileEffectTriggerType::PlantKilled, GetSubTileLocations());
 		ReceiveEffectTrigger(ETileEffectTriggerType::OnDeactivated, TSet<FIntPoint>());
 	}
-	OnDamageRecived(Amount, Cause);
-	return Health <= 0;
+	OnDamageRecived(Amount, Cause, bDead);
+	return bDead;
 }
 
 /* /\ Health /\ *\

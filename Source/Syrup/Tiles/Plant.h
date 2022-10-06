@@ -93,9 +93,18 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Health")
 	bool ReceiveDamage(int Amount, ATile* Cause);
+
+	/**
+	 * Causes the visual effects of this plant taking damage
+	 * 
+	 * @param Amount - The number of damage points to that were caused to this plant.
+	 * @param Cause - The tile that caused this damage.
+	 * @param bShouldDestroy - Whether or not the plant should be destroyed once the VFX has finished.
+	 */
 	UFUNCTION(BlueprintNativeEvent , Category = "Health")
-	void OnDamageRecived(int Amount, ATile* Cause);
-	FORCEINLINE void OnDamageRecived_Implementation(int Amount, ATile* Cause) { Destroy(); };
+	void OnDamageRecived(int Amount, ATile* Cause, bool bShouldDestroy);
+	FORCEINLINE void OnDamageRecived_Implementation(int Amount, ATile* Cause, bool bShouldDestroy) { if (bShouldDestroy) { Destroy(); } };
+
 	/**
 	 * Gets the current health of this plant.
 	 * 
