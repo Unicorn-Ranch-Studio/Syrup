@@ -84,13 +84,14 @@ protected:
 	\* \/ UI \/ */
 	
 public:
+
 	/**
 	 * Makes all the tile labels relating to the given area activate. Also deactivates he previously active labels.
 	 * 
 	 * @param Location - A location relating to the tile labels to activate.
 	 */
 	UFUNCTION(BlueprintCallable, Category = "UI")
-	void ActivateLabels(FIntPoint Location);
+	static void ActivateLabels(const FIntPoint Location);
 
 	/**
 	 * Makes all the tile labels relating to the given area deactivate.
@@ -98,7 +99,7 @@ public:
 	 * @param Location - A location relating to the tile labels to deactivate.
 	 */
 	UFUNCTION(BlueprintCallable, Category = "UI")
-	void DeactivateLabels(FIntPoint Location);
+	static void DeactivateLabels(const FIntPoint Location);
 
 	/**
 	 * Registers a tile label at the given location so that it may be rendered when the appropriate locations are selected.
@@ -109,7 +110,7 @@ public:
 	 * @param LabelPayload - The value the label should try to render.
 	 */
 	UFUNCTION(BlueprintCallable, Category = "UI")
-	void RegisterTileLabel(FIntPoint SourceLocation, FIntPoint LabelLocation, TSubclassOf<UTileLabel> LabelType, int LabelPayload = 0);
+	static void RegisterTileLabel(const FIntPoint SourceLocation, const FIntPoint LabelLocation, const TSubclassOf<UTileLabel> LabelType, const int LabelPayload = 0);
 
 	/**
 	 * Unregisters a tile label at the given location so that it is no longer able to be rendered.
@@ -120,7 +121,7 @@ public:
 	 * @param LabelPayload - The payload of the label to unregister.
 	 */
 	UFUNCTION(BlueprintCallable, Category = "UI")
-	void UnregisterTileLabel(FIntPoint SourceLocation, FIntPoint LabelLocation, TSubclassOf<UTileLabel> LabelType, int LabelPayload = 0);
+	static void UnregisterTileLabel(const FIntPoint SourceLocation, const FIntPoint LabelLocation, const TSubclassOf<UTileLabel> LabelType, const int LabelPayload = 0);
 	
 	/* /\ UI /\ *\
 	\* -------- */
