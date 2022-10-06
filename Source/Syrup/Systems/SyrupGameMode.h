@@ -8,6 +8,7 @@
 #include "GameFramework/GameModeBase.h"
 #include "SyrupGameMode.generated.h"
 
+class UTileLabel;
 
 /* \/ ============== \/ *\
 |  \/ ASyrupGameMode \/  |
@@ -76,6 +77,53 @@ protected:
 
 	/* /\ Effect Triggers /\ *\
 	\* --------------------- */
+
+
+
+	/* -------- *\
+	\* \/ UI \/ */
+	
+public:
+	/**
+	 * Makes all the tile labels relating to the given area activate. Also deactivates he previously active labels.
+	 * 
+	 * @param Location - A location relating to the tile labels to activate.
+	 */
+	UFUNCTION(BlueprintCallable, Category = "UI")
+	void ActivateLabels(FIntPoint Location);
+
+	/**
+	 * Makes all the tile labels relating to the given area deactivate.
+	 *
+	 * @param Location - A location relating to the tile labels to deactivate.
+	 */
+	UFUNCTION(BlueprintCallable, Category = "UI")
+	void DeactivateLabels(FIntPoint Location);
+
+	/**
+	 * Registers a tile label at the given location so that it may be rendered when the appropriate locations are selected.
+	 *
+	 * @param SourceLocation - The location of the thing creating the label.
+	 * @param LabelLocation - The location being labeled.
+	 * @param LabelType - The type of label to render.
+	 * @param LabelPayload - The value the label should try to render.
+	 */
+	UFUNCTION(BlueprintCallable, Category = "UI")
+	void RegisterTileLabel(FIntPoint SourceLocation, FIntPoint LabelLocation, TSubclassOf<UTileLabel> LabelType, int LabelPayload = 0);
+
+	/**
+	 * Unregisters a tile label at the given location so that it is no longer able to be rendered.
+	 *
+	 * @param SourceLocation - The location of the thing unregistering the label.
+	 * @param LabelLocation - The location to remove the label from labeled.
+	 * @param LabelType - The type of label to unregister.
+	 * @param LabelPayload - The payload of the label to unregister.
+	 */
+	UFUNCTION(BlueprintCallable, Category = "UI")
+	void UnregisterTileLabel(FIntPoint SourceLocation, FIntPoint LabelLocation, TSubclassOf<UTileLabel> LabelType, int LabelPayload = 0);
+	
+	/* /\ UI /\ *\
+	\* -------- */
 };
 
 /* /\ ============== /\ *\
