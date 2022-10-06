@@ -80,7 +80,7 @@ protected:
 	TSet<FIntPoint> GetSubTileLocations() const;
 	
 	//The material of the tile
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, Category = "Visuals")
 	UMaterialInterface* TileMaterial;
 
 private:

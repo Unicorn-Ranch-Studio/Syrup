@@ -36,7 +36,7 @@ public:
 	void ResetTrashLocations();
 
 	//The type of trash that will fall in this volume.
-	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = "Trashfall")
+	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = "Trashfall", Meta=(AllowAbstract = "false"))
 	TSubclassOf<ATrash> TrashType;
 
 	//The number of trash that this trashfall volume will attempt to maintain.

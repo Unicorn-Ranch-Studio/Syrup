@@ -15,7 +15,7 @@ class UDamagePlants;
 /**
  * A piece of trash on the grid that can spread, cause damage, and be picked up
  */
-UCLASS(HideCategories = ("ActorTick", "Tile", "Replication", "Rendering", "Collision", "Actor", "Input", "HLOD", "WorldPartition", "Cooking", "DataLayers"))
+UCLASS(Abstract, HideCategories = ("ActorTick", "Tile", "Replication", "Rendering", "Collision", "Actor", "Input", "HLOD", "WorldPartition", "Cooking", "DataLayers"))
 class SYRUP_API ATrash : public ATile
 {
 	GENERATED_BODY()
@@ -57,6 +57,8 @@ private:
 
 	/* ----------- *\
 	\* \/ Shape \/ */
+
+public:
 
 	/**
 	 * Gets the shape of this trash.
@@ -147,7 +149,7 @@ protected:
 
 	/* ------------ *\
 	\* \/ Effect \/ */
-
+		
 public:
 	
 	/**
@@ -157,6 +159,14 @@ public:
 	 */
 	UFUNCTION(BlueprintPure, Category = "Effect")
 	FORCEINLINE int GetRange() const { return Range; };
+
+	/**
+	 * Gets the locations where the effects of this plant will apply.
+	 * 
+	 * @return A set of all locations where the effects of this plant will apply.
+	 */
+	UFUNCTION(BlueprintPure, Category = "Effect")
+	TSet<FIntPoint> GetEffectLocations() const;
 
 protected:
 
@@ -182,14 +192,6 @@ private:
 	 */
 	UFUNCTION()
 	void ReceiveEffectTrigger(const ETileEffectTriggerType TriggerType, const TSet<FIntPoint>& LocationsToTrigger);
-
-	/**
-	 * Gets the locations where the effects of this plant will apply.
-	 * 
-	 * @return A set of all locations where the effects of this plant will apply.
-	 */
-	UFUNCTION()
-	TSet<FIntPoint> GetEffectLocations() const;
 
 	/* /\ Effect /\ *\
 	\* ------------ */

@@ -18,7 +18,7 @@ DECLARE_LOG_CATEGORY_EXTERN(LogPlant, Log, All);
 /**
  * A plant on the grid that grows, can take damage, and creates a protection radius.
  */
-UCLASS(HideCategories = ("ActorTick", "Tile", "Replication", "Rendering", "Collision", "Actor", "Input", "HLOD", "WorldPartition", "Cooking", "DataLayers"))
+UCLASS(Abstract, HideCategories = ("ActorTick", "Tile", "Replication", "Rendering", "Collision", "Actor", "Input", "HLOD", "WorldPartition", "Cooking", "DataLayers"))
 class SYRUP_API APlant : public ATile
 {
 	GENERATED_BODY()
