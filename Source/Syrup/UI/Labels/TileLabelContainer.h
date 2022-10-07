@@ -39,6 +39,13 @@ public:
 	UFUNCTION()
 	void UnregisterLabel(const TSubclassOf<UTileLabel> LabelType, const UTileLabelPayload* LabelPayload);
 
+protected:
+	/**
+	 * Sets up a label so it can be rendered.
+	 */
+	UFUNCTION(BlueprintImplementableEvent)
+	void LabelCreated(UTileLabel* NewLabel);
+
 	//The labels that need to be rendered.
 	UPROPERTY(BlueprintReadOnly)
 	TArray<UTileLabel*> Labels;

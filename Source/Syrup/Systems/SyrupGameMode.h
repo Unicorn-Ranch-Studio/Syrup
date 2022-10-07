@@ -10,7 +10,6 @@
 
 class UTileLabel;
 class UTileLabelContainer;
-class UTileLabelPayload;
 
 UDELEGATE()
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FTileLabelActivityUpdate, bool, bNowActive, FIntPoint, NewLocation);
@@ -120,20 +119,20 @@ public:
 	/**
 	 * Registers a tile label at the given location so that it may be rendered when the appropriate locations are selected.
 	 *
-	 * @param LabelType - The type of label to render.
-	 * @param LabelPayload - The value the label should try to render.
+	 * @param Label - The label to render.
+	 * @param Location - The location being labeled.
 	 */
 	UFUNCTION(BlueprintCallable, Category = "UI")
-	static void RegisterTileLabel(const TSubclassOf<UTileLabel> LabelType, const UTileLabelPayload* LabelPayload = nullptr);
+	static void RegisterTileLabel(const UTileLabel* Label, const FIntPoint Location);
 
 	/**
 	 * Unregisters a tile label at the given location so that it is no longer able to be rendered.
 	 *
-	 * @param LabelType - The type of label to unregister.
-	 * @param LabelPayload - The payload of the label to unregister.
+	 * @param Label - The label to unregister.
+	 * @param Location - The location being unlabeled.
 	 */
 	UFUNCTION(BlueprintCallable, Category = "UI")
-	static void UnregisterTileLabel(const TSubclassOf<UTileLabel> LabelType, const UTileLabelPayload* LabelPayload = nullptr);
+	static void UnregisterTileLabel(const UTileLabel* Label, const FIntPoint Location);
 	
 private:
 	//Stores the tile label container at each location.
