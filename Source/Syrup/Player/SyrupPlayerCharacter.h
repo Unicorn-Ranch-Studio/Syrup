@@ -4,12 +4,17 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
-#include "Camera/CameraComponent.h"
 #include "SyrupPlayerCharacter.generated.h"
+
+class UCameraComponent;
 
 /* \/ ===================== \/ *\
 |  \/ ASyrupPlayerCharacter \/  |
 \* \/ ===================== \/ */
+/**
+ * The Player Character that can use energy, 
+ * pick up trash, move arround, plant, and end the players turn.
+ */
 UCLASS()
 class SYRUP_API ASyrupPlayerCharacter : public ACharacter
 {
@@ -19,9 +24,11 @@ class SYRUP_API ASyrupPlayerCharacter : public ACharacter
 	\* \/ Components \/ */
 
 private:
+	//Camera of the player character.
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	UCameraComponent* Camera;
 
+	//Scene component of the player character.
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	USceneComponent* CameraRoot;
 	
@@ -30,42 +37,41 @@ private:
 
 
 public:
-	// Sets default AxisValues for this character's properties
+	/**
+	 * Sets up camera and movement components.
+	 */
 	ASyrupPlayerCharacter();
 
-	/* --------------- *\
-	\* \/ Variables \/ */
-private:
-	//Stores most recent X and Y input values from MoveForward() and MoveRight()
-	float recentInputX = 0.f, recentInputY = 0.f;
-
-	/* /\ Variables /\ *\
-	\* --------------- */
-
-
-	/* --------------- *\
-	\* \/ Functions \/ */
+	/* ----------- *\
+	\* \/ Input \/ */
 public:	
-	// Called to bind functionality to input
 	/**
-	 * Sets up movement axis and inputs
+	 * Sets up movement axis and inputs.
 	 *
-	 * @param UInputComponent*
+	 * @param PlayerInputComponent - The input component to set up.
 	 */
+	UFUNCTION()
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 private:
 	/**
 	 * Moves ASyrupPlayerCharacter by the movement speed multiplied the input axis values.
 	 *
-	 * @param AxisValue - Takes input axis value of "MoveForward" and "MoveRight".
+	 * @param AxisValue - A value between 1 and -1 that determines what direction and percent of maximum speed this character will move in the next frame.
 	 */
+	UFUNCTION()
 	void MoveForward(float AxisValue);
-
+	
+	/**
+	* Moves ASyrupPlayerCharacter by the movement speed multiplied the input axis values.
+	*
+	* @param AxisValue - A value between 1 and -1 that determines what direction and percent of maximum speed this character will move in the next frame.
+	*/
+	UFUNCTION()
 	void MoveRight(float AxisValue);
 
-	/* /\ Functions /\ *\
-	\* --------------- */
+	/* /\ Input /\ *\
+	\* ----------- */
 };
 /* /\ ===================== /\ *\
 |  /\ ASyrupPlayerCharacter /\  |

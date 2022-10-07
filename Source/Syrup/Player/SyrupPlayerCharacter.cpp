@@ -11,11 +11,11 @@
 \* \/ ===================== \/ */
 
 /**
- * Creates Camera (with defaults) and its root so it doesn't rotate when changing direction
+ * Sets up camera and movement components.
  */
 ASyrupPlayerCharacter::ASyrupPlayerCharacter()
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+ 	//Set this character to call Tick() every frame. You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	//Create Camera Root
@@ -40,14 +40,15 @@ ASyrupPlayerCharacter::ASyrupPlayerCharacter()
 }
 
 /**
- *  Called to bind functionality to input
+ * Sets up movement axis and inputs.
+ *
+ * @param PlayerInputComponent - The input component to set up.
  */
 void ASyrupPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 	PlayerInputComponent->BindAxis(TEXT("MoveForward"), this, &ASyrupPlayerCharacter::MoveForward);
 	PlayerInputComponent->BindAxis(TEXT("MoveRight"), this, &ASyrupPlayerCharacter::MoveRight);
-
 }
 
 /**
@@ -58,18 +59,16 @@ void ASyrupPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInp
 void ASyrupPlayerCharacter::MoveForward(float AxisValue)
 {
 	GetCharacterMovement()->AddInputVector(FVector(AxisValue, 0.f, 0.f));
-	recentInputX = AxisValue;
 }
 
 /**
- *  Adds movement in the Y Directions
- *
- * @param Takes axis values from "MoveRight"
- */
+* Moves ASyrupPlayerCharacter by the movement speed multiplied the input axis values.
+*
+* @param AxisValue - A value between 1 and -1 that determines what direction and percent of maximum speed this character will move in the next frame.
+*/
 void ASyrupPlayerCharacter::MoveRight(float AxisValue)
 {
 	GetCharacterMovement()->AddInputVector(FVector(0.f, AxisValue, 0.f));
-	recentInputY = AxisValue;
 }
 
 /* /\ ===================== /\ *\
