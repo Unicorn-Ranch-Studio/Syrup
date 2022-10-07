@@ -38,7 +38,7 @@ void ASyrupGameMode::EndPlayerTurn(const UObject* WorldContextObject)
  *
  * @return The delegate used to bind and trigger tile effects.
  */
-FTileEffecTrigger& ASyrupGameMode::GetTileEffectTriggerDelegate(const UObject* WorldContextObject)
+FTileEffectTrigger& ASyrupGameMode::GetTileEffectTriggerDelegate(const UObject* WorldContextObject)
 {
 	ASyrupGameMode* GameMode = Cast<ASyrupGameMode>(UGameplayStatics::GetGameMode(WorldContextObject));
 	return GameMode->TileEffectTriggerDelegate;

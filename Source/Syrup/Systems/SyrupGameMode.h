@@ -9,6 +9,11 @@
 #include "SyrupGameMode.generated.h"
 
 class UTileLabel;
+class UTileLabelContainer;
+class UTileLabelPayload;
+
+UDELEGATE()
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FTileLabelActivityUpdate, bool, bNowActive, FIntPoint, NewLocation);
 
 /* \/ ============== \/ *\
 |  \/ ASyrupGameMode \/  |
@@ -61,10 +66,10 @@ public:
 	 * @return The delegate used to bind and trigger tile effects.
 	 */
 	UFUNCTION()
-	static FTileEffecTrigger& GetTileEffectTriggerDelegate(const UObject* WorldContextObject);
+	static FTileEffectTrigger& GetTileEffectTriggerDelegate(const UObject* WorldContextObject);
 
 	UPROPERTY(BlueprintAssignable)
-	FTileEffecTrigger TileEffectTriggerDelegate;
+	FTileEffectTrigger TileEffectTriggerDelegate;
 
 protected:
 	/**
@@ -102,27 +107,39 @@ public:
 	static void DeactivateLabels(const FIntPoint Location);
 
 	/**
+	 * Makes all the tile labels relating to the given area activate. Also deactivates he previously active labels.
+	 * 
+	 * @param Location - A location relating to the tile labels to activate.
+	 */
+	UFUNCTION(BlueprintCallable, Category = "UI")
+	static FIntPoint GetActiveLabelLocation();
+	
+	UPROPERTY(BlueprintAssignable)
+	FTileLabelActivityUpdate OnActiveLabelChanged;
+
+	/**
 	 * Registers a tile label at the given location so that it may be rendered when the appropriate locations are selected.
 	 *
-	 * @param SourceLocation - The location of the thing creating the label.
-	 * @param LabelLocation - The location being labeled.
 	 * @param LabelType - The type of label to render.
 	 * @param LabelPayload - The value the label should try to render.
 	 */
 	UFUNCTION(BlueprintCallable, Category = "UI")
-	static void RegisterTileLabel(const FIntPoint SourceLocation, const FIntPoint LabelLocation, const TSubclassOf<UTileLabel> LabelType, const int LabelPayload = 0);
+	static void RegisterTileLabel(const TSubclassOf<UTileLabel> LabelType, const UTileLabelPayload* LabelPayload = nullptr);
 
 	/**
 	 * Unregisters a tile label at the given location so that it is no longer able to be rendered.
 	 *
-	 * @param SourceLocation - The location of the thing unregistering the label.
-	 * @param LabelLocation - The location to remove the label from labeled.
 	 * @param LabelType - The type of label to unregister.
 	 * @param LabelPayload - The payload of the label to unregister.
 	 */
 	UFUNCTION(BlueprintCallable, Category = "UI")
-	static void UnregisterTileLabel(const FIntPoint SourceLocation, const FIntPoint LabelLocation, const TSubclassOf<UTileLabel> LabelType, const int LabelPayload = 0);
+	static void UnregisterTileLabel(const TSubclassOf<UTileLabel> LabelType, const UTileLabelPayload* LabelPayload = nullptr);
 	
+private:
+	//Stores the tile label container at each location.
+	UPROPERTY()
+	TMap<FIntPoint, UTileLabelContainer*> LocationsToLabelConatiners = TMap<FIntPoint, UTileLabelContainer*>();
+
 	/* /\ UI /\ *\
 	\* -------- */
 };
