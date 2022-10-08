@@ -9,8 +9,12 @@
 class UTileLabel;
 class UTileLabelPayload;
 
+/* \/ =================== \/ *\
+|  \/ UTileLabelContainer \/  |
+\* \/ =================== \/ */
+
 /**
- * 
+ * Handles the rendering of multiple tile labels all for the same tile.
  */
 UCLASS()
 class SYRUP_API UTileLabelContainer : public UUserWidget
@@ -24,7 +28,6 @@ public:
 	 * to the current label's payload.
 	 * 
 	 * @param Label - The label to render.
-	 * @
 	 */
 	UFUNCTION()
 	void RegisterLabel(const UTileLabel* Label);
@@ -52,5 +55,9 @@ protected:
 
 	//The labels that need to be rendered.
 	UPROPERTY(BlueprintReadOnly)
-	TArray<UTileLabel*> Labels;
+	TArray<UTileLabel*> Labels = TArray<UTileLabel*>();
 };
+
+/* /\ =================== /\ *\
+|  /\ UTileLabelContainer /\  |
+\* /\ =================== /\ */

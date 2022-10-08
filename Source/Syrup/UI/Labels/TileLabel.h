@@ -23,8 +23,8 @@ public:
 	 * @return The copy that was created.
 	 */
 	UFUNCTION(BlueprintNativeEvent)
-	UTileLabel* Copy(const FIntPoint CopyLocation) const;
-	UTileLabel* Copy_Implementation(const FIntPoint CopyLocation) const;
+	UTileLabel* CreateCopy(const FIntPoint CopyLocation) const;
+	UTileLabel* CreateCopy_Implementation(const FIntPoint CopyLocation) const;
 
 	/**
 	 * Adds the attributes of this to another label.
@@ -32,8 +32,8 @@ public:
 	 * @param Other - The label to add the attributes of this to.
 	 */
 	UFUNCTION(BlueprintNativeEvent)
-	void Merge(const UTileLabel* Other) const;
-	void Merge_Implementation(const UTileLabel* Other) const;
+	void MergeInto(const UTileLabel* Other) const;
+	void MergeInto_Implementation(const UTileLabel* Other) const;
 
 	/**
 	 * Removes the attributes of this from another label.
@@ -41,8 +41,8 @@ public:
 	 * @param Other - The label to remove the attributes of this from.
 	 */
 	UFUNCTION(BlueprintNativeEvent)
-	void Split(const UTileLabel* Other) const;
-	void Split_Implementation(const UTileLabel* Other) const;
+	void SplitFrom(const UTileLabel* Other) const;
+	void SplitFrom_Implementation(const UTileLabel* Other) const;
 
 protected:
 	//The locations of all the things creating this label.
