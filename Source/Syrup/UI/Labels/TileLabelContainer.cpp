@@ -19,13 +19,13 @@ void UTileLabelContainer::RegisterLabel(const UTileLabel* Label)
 	UTileLabel* ExistingLabel = *Labels.FindByPredicate([Label](UTileLabel* EachLabel) { return EachLabel->GetClass() == Label->GetClass(); });
 	if (!IsValid(ExistingLabel))
 	{
-		ExistingLabel = Label->CreateCopy(Location);
+		ExistingLabel = Label->CreateCopy(GetWorld(), Location);
 		Labels.Add(ExistingLabel);
 		SetUpLabel(ExistingLabel);
 	}
 	else
 	{
-		Label->MergeInto(ExistingLabel);
+		ExistingLabel->MergeFrom(Label);
 	}
 }
 
@@ -40,7 +40,7 @@ void UTileLabelContainer::UnregisterLabel(const UTileLabel* Label)
 	UTileLabel* ExistingLabel = *Labels.FindByPredicate([Label](UTileLabel* EachLabel) { return EachLabel->GetClass() == Label->GetClass(); });
 	if (IsValid(ExistingLabel))
 	{
-		Label->SplitFrom(ExistingLabel);
+		ExistingLabel->SplitFrom(Label);
 	}
 }
 

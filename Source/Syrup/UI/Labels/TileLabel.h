@@ -6,6 +6,9 @@
 #include "Blueprint/UserWidget.h"
 #include "TileLabel.generated.h"
 
+/* \/ ========== \/ *\
+|  \/ UTileLabel \/  |
+\* \/ ========== \/ */
 /**
  * A widget that labels some tile with some information.
  */
@@ -18,31 +21,32 @@ public:
 	/**
 	 * Creates a copy of this label at the given location.
 	 * 
+	 * @param WorldContextObject - An object in the same world as the one that copy should be made in.
 	 * @param CopyLocation - The location of the new tile.
 	 * 
 	 * @return The copy that was created.
 	 */
-	UFUNCTION(BlueprintNativeEvent)
-	UTileLabel* CreateCopy(const FIntPoint CopyLocation) const;
-	UTileLabel* CreateCopy_Implementation(const FIntPoint CopyLocation) const;
+	UFUNCTION(BlueprintNativeEvent, Meta = (WorldContext = "WorldContextObject"))
+	UTileLabel* CreateCopy(const UObject* WorldContextObject, const FIntPoint CopyLocation) const;
+	UTileLabel* CreateCopy_Implementation(const UObject* WorldContextObject, const FIntPoint CopyLocation) const;
 
 	/**
-	 * Adds the attributes of this to another label.
-	 * 
-	 * @param Other - The label to add the attributes of this to.
+	 * Adds the attributes of another label to this.
+	 *
+	 * @param Other - The label who's attributes will be added to this.
 	 */
 	UFUNCTION(BlueprintNativeEvent)
-	void MergeInto(const UTileLabel* Other) const;
-	void MergeInto_Implementation(const UTileLabel* Other) const;
+	void MergeFrom(const UTileLabel* Other);
+	void MergeFrom_Implementation(const UTileLabel* Other);
 
 	/**
-	 * Removes the attributes of this from another label.
+	 * Removes the attributes of another label from this.
 	 * 
-	 * @param Other - The label to remove the attributes of this from.
+	 * @param Other - The label to remove the attributes of.
 	 */
 	UFUNCTION(BlueprintNativeEvent)
-	void SplitFrom(const UTileLabel* Other) const;
-	void SplitFrom_Implementation(const UTileLabel* Other) const;
+	void SplitFrom(const UTileLabel* Other);
+	void SplitFrom_Implementation(const UTileLabel* Other);
 
 protected:
 	//The locations of all the things creating this label.
@@ -52,4 +56,12 @@ protected:
 	//The location being labeled.
 	UPROPERTY(BlueprintReadOnly)
 	FIntPoint Location = FIntPoint::ZeroValue;
+
+private:
+	//The of labels merged into this with each source location.
+	UPROPERTY()
+	TMap<FIntPoint, int> SourceLocationsToCounts = TMap<FIntPoint, int>();
 };
+/* /\ ========== /\ *\
+|  /\ UTileLabel /\  |
+\* /\ ========== /\ */
