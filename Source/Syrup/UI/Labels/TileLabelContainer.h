@@ -24,6 +24,7 @@ public:
 	 * to the current label's payload.
 	 * 
 	 * @param Label - The label to render.
+	 * @
 	 */
 	UFUNCTION()
 	void RegisterLabel(const UTileLabel* Label);
@@ -36,7 +37,10 @@ public:
 	 */
 	UFUNCTION()
 	void UnregisterLabel(const UTileLabel* Label);
-
+	
+	//The location of this container.
+	UPROPERTY(BlueprintReadOnly)
+	FIntPoint Location = FIntPoint::ZeroValue;
 protected:
 	/**
 	 * Sets up a label so it can be rendered.

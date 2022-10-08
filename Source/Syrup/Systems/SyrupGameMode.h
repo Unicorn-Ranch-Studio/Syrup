@@ -92,44 +92,47 @@ public:
 	/**
 	 * Makes all the tile labels relating to the given area activate. Also deactivates he previously active labels.
 	 * 
+	 * @param WorldContextObject - An object in the same world as the label.
 	 * @param Location - A location relating to the tile labels to activate.
 	 */
-	UFUNCTION(BlueprintCallable, Category = "UI")
-	static void ActivateLabels(const FIntPoint Location);
+	UFUNCTION(BlueprintCallable, Category = "UI", Meta = (WorldContext = "WorldContextObject"))
+	static void ActivateLabels(const UObject* WorldContextObject, const FIntPoint Location);
 
 	/**
 	 * Makes all the tile labels relating to the given area deactivate.
 	 *
-	 * @param Location - A location relating to the tile labels to deactivate.
+	 * @param WorldContextObject - An object in the same world as the label.
 	 */
-	UFUNCTION(BlueprintCallable, Category = "UI")
-	static void DeactivateLabels(const FIntPoint Location);
+	UFUNCTION(BlueprintCallable, Category = "UI", Meta = (WorldContext = "WorldContextObject"))
+	static void DeactivateLabels(const UObject* WorldContextObject);
 
 	/**
 	 * Makes all the tile labels relating to the given area activate. Also deactivates he previously active labels.
 	 * 
-	 * @param Location - A location relating to the tile labels to activate.
+	 * @param WorldContextObject - An object in the same world as the label.
 	 */
-	UFUNCTION(BlueprintCallable, Category = "UI")
-	static FIntPoint GetActiveLabelLocation();
+	UFUNCTION(BlueprintCallable, Category = "UI", Meta = (WorldContext = "WorldContextObject"))
+	static FIntPoint GetActiveLabelLocation(const UObject* WorldContextObject);
 
 	/**
 	 * Registers a tile label at the given location so that it may be rendered when the appropriate locations are selected.
 	 *
+	 * @param WorldContextObject - An object in the same world as the label.
 	 * @param Label - The label to render.
 	 * @param Location - The location being labeled.
 	 */
-	UFUNCTION(BlueprintCallable, Category = "UI")
-	static void RegisterTileLabel(const UTileLabel* Label, const FIntPoint Location);
+	UFUNCTION(BlueprintCallable, Category = "UI", Meta = (WorldContext = "WorldContextObject"))
+	static void RegisterTileLabel(const UObject* WorldContextObject, UTileLabel* Label, const FIntPoint Location);
 
 	/**
 	 * Unregisters a tile label at the given location so that it is no longer able to be rendered.
 	 *
+	 * @param WorldContextObject - An object in the same world as the label.
 	 * @param Label - The label to unregister.
 	 * @param Location - The location being unlabeled.
 	 */
-	UFUNCTION(BlueprintCallable, Category = "UI")
-	static void UnregisterTileLabel(const UTileLabel* Label, const FIntPoint Location);
+	UFUNCTION(BlueprintCallable, Category = "UI", Meta = (WorldContext = "WorldContextObject"))
+	static void UnregisterTileLabel(const UObject* WorldContextObject, const UTileLabel* Label, const FIntPoint Location);
 	
 	//Called when a label is either activated or deactivated.
 	UPROPERTY(BlueprintAssignable)
@@ -138,6 +141,14 @@ private:
 	//Stores the tile label container at each location.
 	UPROPERTY()
 	TMap<FIntPoint, UTileLabelContainer*> LocationsToLabelConatiners = TMap<FIntPoint, UTileLabelContainer*>();
+
+	//Whether or not a label is curenly active.
+	UPROPERTY()
+	bool bLabelActive = false;
+
+	//The currently active label's location.
+	UPROPERTY()
+	FIntPoint ActiveLabelLocation = FIntPoint::ZeroValue;
 
 	/* /\ UI /\ *\
 	\* -------- */

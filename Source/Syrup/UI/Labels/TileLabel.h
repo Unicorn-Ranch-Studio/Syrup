@@ -18,13 +18,13 @@ public:
 	/**
 	 * Creates a copy of this label at the given location.
 	 * 
-	 * @param Location - The location of the new tile.
+	 * @param CopyLocation - The location of the new tile.
 	 * 
 	 * @return The copy that was created.
 	 */
 	UFUNCTION(BlueprintNativeEvent)
-	UTileLabel* Copy(const FIntPoint Location) const;
-	UTileLabel* Copy_Implementation(const FIntPoint Location) const;
+	UTileLabel* Copy(const FIntPoint CopyLocation) const;
+	UTileLabel* Copy_Implementation(const FIntPoint CopyLocation) const;
 
 	/**
 	 * Adds the attributes of this to another label.
