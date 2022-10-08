@@ -23,28 +23,28 @@ public:
 	 * Registers a label with the given payload so that it can be rendered by this. If label already exist the given payload will be added
 	 * to the current label's payload.
 	 * 
-	 * @param LabelType - The type of label to register.
-	 * @param LabelPayload - The payload of the label.
+	 * @param Label - The label to render.
 	 */
 	UFUNCTION()
-	void RegisterLabel(const TSubclassOf<UTileLabel> LabelType, const UTileLabelPayload* LabelPayload);
+	void RegisterLabel(const UTileLabel* Label);
 
 	/**
 	 * Unregisters the label with the given payload so that it is no longer rendered by this. If this type of label has been registered 
 	 * multiple times, then the given payload will be removed from the current label's payload.
 	 * 
-	 * @param LabelType - The type of label to unregister.
-	 * @param LabelPayload - The payload of the label.
+	 * @param Label - The label to unregister.
 	 */
 	UFUNCTION()
-	void UnregisterLabel(const TSubclassOf<UTileLabel> LabelType, const UTileLabelPayload* LabelPayload);
+	void UnregisterLabel(const UTileLabel* Label);
 
 protected:
 	/**
 	 * Sets up a label so it can be rendered.
+	 * 
+	 * @param NewLabel - The label that needs setting up
 	 */
 	UFUNCTION(BlueprintImplementableEvent)
-	void LabelCreated(UTileLabel* NewLabel);
+	void SetUpLabel(UTileLabel* NewLabel);
 
 	//The labels that need to be rendered.
 	UPROPERTY(BlueprintReadOnly)

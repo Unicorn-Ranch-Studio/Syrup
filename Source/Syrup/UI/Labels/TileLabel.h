@@ -45,9 +45,9 @@ public:
 	void Split_Implementation(const UTileLabel* Other) const;
 
 protected:
-	//The location of the thing creating the label.
+	//The locations of all the things creating this label.
 	UPROPERTY(BlueprintReadOnly)
-	FIntPoint SourceLocation = FIntPoint::ZeroValue;
+	TSet<FIntPoint> SourceLocations = TSet<FIntPoint>();
 
 	//The location being labeled.
 	UPROPERTY(BlueprintReadOnly)

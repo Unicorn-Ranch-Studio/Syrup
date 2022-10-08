@@ -112,9 +112,6 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category = "UI")
 	static FIntPoint GetActiveLabelLocation();
-	
-	UPROPERTY(BlueprintAssignable)
-	FTileLabelActivityUpdate OnActiveLabelChanged;
 
 	/**
 	 * Registers a tile label at the given location so that it may be rendered when the appropriate locations are selected.
@@ -134,6 +131,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "UI")
 	static void UnregisterTileLabel(const UTileLabel* Label, const FIntPoint Location);
 	
+	//Called when a label is either activated or deactivated.
+	UPROPERTY(BlueprintAssignable)
+	FTileLabelActivityUpdate OnActiveLabelChanged;
 private:
 	//Stores the tile label container at each location.
 	UPROPERTY()
