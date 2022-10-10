@@ -3,6 +3,8 @@
 
 #include "TileLabel.h"
 
+DEFINE_LOG_CATEGORY(LogLabel);
+
 /* \/ ========== \/ *\
 |  \/ UTileLabel \/  |
 \* \/ ========== \/ */

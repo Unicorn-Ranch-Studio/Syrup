@@ -133,26 +133,34 @@ FIntPoint ASyrupGameMode::GetActiveLabelLocation(const UObject* WorldContextObje
  */
 void ASyrupGameMode::RegisterTileLabel(const UObject* WorldContextObject, UTileLabel* Label, const FIntPoint Location)
 {
-	ASyrupGameMode* GameMode = Cast<ASyrupGameMode>(UGameplayStatics::GetGameMode(WorldContextObject));
-	UTileLabelContainer* LabelContainer = GameMode->LocationsToLabelConatiners.FindRef(Location);
-	if (!IsValid(LabelContainer))
+	if (IsValid(Label))
 	{
-		AActor* SpawnedActor = WorldContextObject->GetWorld()->SpawnActor<AActor>(AActor::StaticClass(), FTransform());
-		UWidgetComponent* WidgetComponent = Cast<UWidgetComponent>(SpawnedActor->AddComponentByClass(UWidgetComponent::StaticClass(), false, FTransform(), false));
-		SpawnedActor->SetRootComponent(WidgetComponent);
-		SpawnedActor->SetActorLocation(UGridLibrary::GridLocationToWorldLocation(Location));
+		ASyrupGameMode* GameMode = Cast<ASyrupGameMode>(UGameplayStatics::GetGameMode(WorldContextObject));
+		UTileLabelContainer* LabelContainer = GameMode->LocationsToLabelConatiners.FindRef(Location);
+		if (!IsValid(LabelContainer))
+		{
+			AActor* SpawnedActor = WorldContextObject->GetWorld()->SpawnActor<AActor>(AActor::StaticClass(), FTransform());
+			SpawnedActor->SetActorLabel("Tile Label " + Location.ToString());
+			UWidgetComponent* WidgetComponent = Cast<UWidgetComponent>(SpawnedActor->AddComponentByClass(UWidgetComponent::StaticClass(), false, FTransform(), false));
+			SpawnedActor->SetRootComponent(WidgetComponent);
+			SpawnedActor->SetActorLocation(UGridLibrary::GridLocationToWorldLocation(Location));
 
-		LabelContainer = CreateWidget<UTileLabelContainer>(WorldContextObject->GetWorld(), GameMode->TileLabelContainerClass);
-		LabelContainer->Location = Location;
+			LabelContainer = CreateWidget<UTileLabelContainer>(WorldContextObject->GetWorld(), GameMode->TileLabelContainerClass);
+			LabelContainer->Location = Location;
 
-		WidgetComponent->SetWidget(LabelContainer);
-		WidgetComponent->SetDrawAtDesiredSize(true);
-		WidgetComponent->SetWidgetSpace(EWidgetSpace::Screen);
+			WidgetComponent->SetWidget(LabelContainer);
+			WidgetComponent->SetDrawAtDesiredSize(true);
+			WidgetComponent->SetWidgetSpace(EWidgetSpace::Screen);
 
-		GameMode->LocationsToLabelConatiners.Add(Location, LabelContainer);
+			GameMode->LocationsToLabelConatiners.Add(Location, LabelContainer);
+		}
+
+		LabelContainer->RegisterLabel(Label);
 	}
-
-	LabelContainer->RegisterLabel(Label);
+	else
+	{
+		UE_LOG(LogLabel, Error, TEXT("Can't registered label. Label is null."))
+	}
 }
 
 /**
@@ -164,11 +172,18 @@ void ASyrupGameMode::RegisterTileLabel(const UObject* WorldContextObject, UTileL
  */
 void ASyrupGameMode::UnregisterTileLabel(const UObject* WorldContextObject, const UTileLabel* Label, const FIntPoint Location)
 {
-	ASyrupGameMode* GameMode = Cast<ASyrupGameMode>(UGameplayStatics::GetGameMode(WorldContextObject));
-	UTileLabelContainer* LabelContainer = GameMode->LocationsToLabelConatiners.FindRef(Location);
-	if (IsValid(LabelContainer))
+	if (IsValid(Label))
 	{
-		LabelContainer->UnregisterLabel(Label);
+		ASyrupGameMode* GameMode = Cast<ASyrupGameMode>(UGameplayStatics::GetGameMode(WorldContextObject));
+		UTileLabelContainer* LabelContainer = GameMode->LocationsToLabelConatiners.FindRef(Location);
+		if (IsValid(LabelContainer))
+		{
+			LabelContainer->UnregisterLabel(Label);
+		}
+	}
+	else
+	{
+		UE_LOG(LogLabel, Error, TEXT("Can't unregistered label. Label is null."))
 	}
 }
 

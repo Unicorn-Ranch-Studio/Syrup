@@ -6,6 +6,8 @@
 #include "Blueprint/UserWidget.h"
 #include "TileLabel.generated.h"
 
+DECLARE_LOG_CATEGORY_EXTERN(LogLabel, Log, All);
+
 /* \/ ========== \/ *\
 |  \/ UTileLabel \/  |
 \* \/ ========== \/ */
