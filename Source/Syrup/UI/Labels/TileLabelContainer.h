@@ -30,7 +30,7 @@ public:
 	 * @param Label - The label to render.
 	 */
 	UFUNCTION()
-	void RegisterLabel(const UTileLabel* Label);
+	void RegisterLabel(UTileLabel* Label);
 
 	/**
 	 * Unregisters the label with the given payload so that it is no longer rendered by this. If this type of label has been registered 

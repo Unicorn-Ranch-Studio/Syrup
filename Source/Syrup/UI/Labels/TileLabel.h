@@ -29,8 +29,8 @@ public:
 	 * @return The copy that was created.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Meta = (WorldContext = "WorldContextObject"))
-	UTileLabel* CreateCopy(const UObject* WorldContextObject, const FIntPoint CopyLocation) const;
-	UTileLabel* CreateCopy_Implementation(const UObject* WorldContextObject, const FIntPoint CopyLocation) const;
+	UTileLabel* CreateCopy(const UObject* WorldContextObject, const FIntPoint CopyLocation);
+	UTileLabel* CreateCopy_Implementation(const UObject* WorldContextObject, const FIntPoint CopyLocation);
 
 	/**
 	 * Adds the attributes of another label to this.

@@ -93,6 +93,50 @@ FGridTransform UGridLibrary::WorldTransformToGridTransform(const FTransform Worl
 }
 
 /*
+ * Gets the grid location of a world location.
+ *
+ * @param WorldLocation - The transform in the world to get the grid location of.
+ * @return The grid location of the world location.
+ */
+FIntPoint UGridLibrary::WorldLocationToGridLocation(const FVector WorldLocation)
+{
+	//Scale to grid
+	FVector2D GridLocation = FVector2D(WorldLocation) / FVector2D(GetGridHeight(), GetGridSideLength() * 0.5);
+	GridLocation.Y += 0.5;
+
+	//Get the distance from the appropriate edge.
+	FVector2D RelativeLocation = FVector2D(FMath::Fractional(GridLocation.X), FMath::Fractional(GridLocation.Y));
+	if (RelativeLocation.X < 0)
+	{
+		RelativeLocation.X = 1 + RelativeLocation.X;
+	}
+	if (RelativeLocation.Y < 0)
+	{
+		RelativeLocation.Y = 1 + RelativeLocation.Y;
+	}
+
+	//Floor to grid location
+	FIntPoint ApproximateLocation = FIntPoint(FMath::Floor(GridLocation.X), FMath::Floor(GridLocation.Y));
+	bool bIsFlipped = IsGridLocationFlipped(ApproximateLocation);
+
+	//Adjust for points
+	if (RelativeLocation.X < 0.5 == bIsFlipped)
+	{
+		if (bIsFlipped)
+		{
+			RelativeLocation.X = 1 - RelativeLocation.X;
+		}
+
+		if (RelativeLocation.Y < RelativeLocation.X - 0.5 || 1 - RelativeLocation.Y < RelativeLocation.X - 0.5)
+		{
+			ApproximateLocation = ApproximateLocation + (RelativeLocation.Y > 0.5 ? FIntPoint(0, 1) : FIntPoint(0, -1));
+		}
+	}
+
+	return ApproximateLocation;
+}
+
+/*
  * Transforms the given grid location by the grid transform.
  *
  * @param GridLocation - The location to transform.

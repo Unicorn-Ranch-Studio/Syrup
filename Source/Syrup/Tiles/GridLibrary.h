@@ -107,6 +107,15 @@ public:
 	static FGridTransform WorldTransformToGridTransform(const FTransform WorldTransform);
 	
 	/*
+	 * Gets the grid location of a world location.
+	 *
+	 * @param WorldLocation - The transform in the world to get the grid location of.
+	 * @return The grid location of the world location.
+	 */
+	UFUNCTION(BlueprintPure, Category="Transformation|Grid")
+	static FIntPoint WorldLocationToGridLocation(const FVector WorldLocation);
+
+	/*
 	 * Transforms the given grid location by the grid transform.
 	 * 
 	 * @param GridLocation - The location to transform.

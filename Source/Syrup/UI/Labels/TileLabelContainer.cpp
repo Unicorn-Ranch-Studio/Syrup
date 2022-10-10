@@ -14,7 +14,7 @@
  *
  * @param Label - The label to render.
  */
-void UTileLabelContainer::RegisterLabel(const UTileLabel* Label)
+void UTileLabelContainer::RegisterLabel(UTileLabel* Label)
 {
 	UTileLabel* ExistingLabel = nullptr;
 	if (!Labels.IsEmpty())
@@ -46,6 +46,10 @@ void UTileLabelContainer::UnregisterLabel(const UTileLabel* Label)
 	if (IsValid(ExistingLabel))
 	{
 		ExistingLabel->SplitFrom(Label);
+		if (!Label->IsInViewport())
+		{
+			Labels.Remove(ExistingLabel);
+		}
 	}
 }
 

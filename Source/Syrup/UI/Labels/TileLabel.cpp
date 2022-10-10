@@ -17,7 +17,7 @@ DEFINE_LOG_CATEGORY(LogLabel);
  *
  * @return The copy that was created.
  */
-UTileLabel* UTileLabel::CreateCopy_Implementation(const UObject* WorldContextObject, const FIntPoint CopyLocation) const
+UTileLabel* UTileLabel::CreateCopy_Implementation(const UObject* WorldContextObject, const FIntPoint CopyLocation)
 {
 	UTileLabel* Copy = CreateWidget<UTileLabel>(WorldContextObject->GetWorld(), GetClass());
 	Copy->SourceLocations = SourceLocations;
