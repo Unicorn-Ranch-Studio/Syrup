@@ -13,6 +13,12 @@
 |  \/ ASyrupGameMode \/  |
 \* \/ ============== \/ */
 
+ASyrupGameMode::ASyrupGameMode()
+{
+	static ConstructorHelpers::FClassFinder<UTileLabelContainer> MyWidgetClass(TEXT("/Game/UI/TileLabels/WBP_TileLabelContianer"));
+	TileLabelContainerClass = MyWidgetClass.Class;
+}
+
 /* ----------------- *\
 \* \/ Player Turn \/ */
 
@@ -131,13 +137,17 @@ void ASyrupGameMode::RegisterTileLabel(const UObject* WorldContextObject, UTileL
 	UTileLabelContainer* LabelContainer = GameMode->LocationsToLabelConatiners.FindRef(Location);
 	if (!IsValid(LabelContainer))
 	{
-		AActor* SpawnedActor = WorldContextObject->GetWorld()->SpawnActor<AActor>(AActor::StaticClass(), FTransform(UGridLibrary::GridLocationToWorldLocation(Location)));
+		AActor* SpawnedActor = WorldContextObject->GetWorld()->SpawnActor<AActor>(AActor::StaticClass(), FTransform());
 		UWidgetComponent* WidgetComponent = Cast<UWidgetComponent>(SpawnedActor->AddComponentByClass(UWidgetComponent::StaticClass(), false, FTransform(), false));
+		SpawnedActor->SetRootComponent(WidgetComponent);
+		SpawnedActor->SetActorLocation(UGridLibrary::GridLocationToWorldLocation(Location));
 
-		LabelContainer = CreateWidget<UTileLabelContainer>(WorldContextObject->GetWorld());
+		LabelContainer = CreateWidget<UTileLabelContainer>(WorldContextObject->GetWorld(), GameMode->TileLabelContainerClass);
 		LabelContainer->Location = Location;
+
 		WidgetComponent->SetWidget(LabelContainer);
 		WidgetComponent->SetDrawAtDesiredSize(true);
+		WidgetComponent->SetWidgetSpace(EWidgetSpace::Screen);
 
 		GameMode->LocationsToLabelConatiners.Add(Location, LabelContainer);
 	}

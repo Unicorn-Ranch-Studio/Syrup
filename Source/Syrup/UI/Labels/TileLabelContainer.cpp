@@ -16,7 +16,12 @@
  */
 void UTileLabelContainer::RegisterLabel(const UTileLabel* Label)
 {
-	UTileLabel* ExistingLabel = *Labels.FindByPredicate([Label](UTileLabel* EachLabel) { return EachLabel->GetClass() == Label->GetClass(); });
+	UTileLabel* ExistingLabel = nullptr;
+	if (!Labels.IsEmpty())
+	{
+		ExistingLabel = *Labels.FindByPredicate([Label](UTileLabel* EachLabel) { return EachLabel->GetClass() == Label->GetClass(); });
+	}
+
 	if (!IsValid(ExistingLabel))
 	{
 		ExistingLabel = Label->CreateCopy(GetWorld(), Location);

@@ -25,6 +25,7 @@ class SYRUP_API ASyrupGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
 
+	ASyrupGameMode();
 
 	/* ----------------- *\
 	\* \/ Player Turn \/ */
@@ -149,6 +150,10 @@ private:
 	//The currently active label's location.
 	UPROPERTY()
 	FIntPoint ActiveLabelLocation = FIntPoint::ZeroValue;
+
+	//The blueprint TileLabelContainer class.
+	UPROPERTY()
+	UClass* TileLabelContainerClass;
 
 	/* /\ UI /\ *\
 	\* -------- */
