@@ -58,6 +58,10 @@ protected:
 	FIntPoint Location = FIntPoint::ZeroValue;
 
 private:
+	//The total number of labels that have been merged into this.
+	UPROPERTY()
+	int MergeCount = 0;
+
 	//The of labels merged into this with each source location.
 	UPROPERTY()
 	TMap<FIntPoint, int> SourceLocationsToCounts = TMap<FIntPoint, int>();

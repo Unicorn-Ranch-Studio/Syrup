@@ -30,6 +30,7 @@ UTileLabel* UTileLabel::CreateCopy_Implementation(const UObject* WorldContextObj
  */
 void UTileLabel::MergeFrom_Implementation(const UTileLabel* Other)
 {
+	MergeCount++;
 	for (FIntPoint EachSourceLocation : Other->SourceLocations)
 	{
 		if (SourceLocations.Contains(EachSourceLocation))
@@ -51,17 +52,24 @@ void UTileLabel::MergeFrom_Implementation(const UTileLabel* Other)
  */
 void UTileLabel::SplitFrom_Implementation(const UTileLabel* Other)
 {
-	for (FIntPoint EachSourceLocation : Other->SourceLocations)
+	if (--MergeCount > 0)
 	{
-		if (SourceLocationsToCounts.FindRef(EachSourceLocation) <= 1)
+		for (FIntPoint EachSourceLocation : Other->SourceLocations)
 		{
-			SourceLocations.Remove(EachSourceLocation);
-			SourceLocationsToCounts.Remove(EachSourceLocation);
+			if (SourceLocationsToCounts.FindRef(EachSourceLocation) <= 1)
+			{
+				SourceLocations.Remove(EachSourceLocation);
+				SourceLocationsToCounts.Remove(EachSourceLocation);
+			}
+			else
+			{
+				SourceLocationsToCounts.Add(EachSourceLocation, SourceLocationsToCounts.FindRef(EachSourceLocation) - 1);
+			}
 		}
-		else
-		{
-			SourceLocationsToCounts.Add(EachSourceLocation, SourceLocationsToCounts.FindRef(EachSourceLocation) - 1);
-		}
+	}
+	else
+	{
+		RemoveFromParent();
 	}
 }
 
