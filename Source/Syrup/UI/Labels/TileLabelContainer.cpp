@@ -46,7 +46,7 @@ void UTileLabelContainer::UnregisterLabel(const UTileLabel* Label)
 	if (IsValid(ExistingLabel))
 	{
 		ExistingLabel->SplitFrom(Label);
-		if (!Label->IsInViewport())
+		if (!ExistingLabel->GetParent())
 		{
 			Labels.Remove(ExistingLabel);
 		}
