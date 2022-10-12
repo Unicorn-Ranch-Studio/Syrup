@@ -27,7 +27,7 @@ public:
 
 	//The label to register.
 	UPROPERTY(Instanced, EditAnywhere, BlueprintReadOnly)
-	UTileLabel* Label = nullptr;
+	TObjectPtr<UTileLabel> Label = nullptr;
 
 protected:
 	/**

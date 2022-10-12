@@ -14,7 +14,7 @@ DECLARE_LOG_CATEGORY_EXTERN(LogLabel, Log, All);
 /**
  * A widget that labels some tile with some information.
  */
-UCLASS(Abstract, EditInlineNew)
+UCLASS(DefaultToInstanced, Abstract, EditInlineNew)
 class SYRUP_API UTileLabel : public UUserWidget
 {
 	GENERATED_BODY()
