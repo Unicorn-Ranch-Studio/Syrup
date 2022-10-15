@@ -24,7 +24,7 @@ public:
 	 * Creates a copy of this label at the given location.
 	 * 
 	 * @param WorldContextObject - An object in the same world as the one that copy should be made in.
-	 * @param CopyLocation - The location of the new tile.
+	 * @param CopyLocation - The location of the new tile label.
 	 * 
 	 * @return The copy that was created.
 	 */
@@ -50,11 +50,11 @@ public:
 	void SplitFrom(const UTileLabel* Other);
 	void SplitFrom_Implementation(const UTileLabel* Other);
 
-protected:
 	//The locations of all the things creating this label.
 	UPROPERTY(BlueprintReadOnly)
 	TSet<FIntPoint> SourceLocations = TSet<FIntPoint>();
 
+protected:
 	//The location being labeled.
 	UPROPERTY(BlueprintReadOnly)
 	FIntPoint Location = FIntPoint::ZeroValue;

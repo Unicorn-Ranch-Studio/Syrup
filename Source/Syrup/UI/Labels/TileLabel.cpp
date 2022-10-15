@@ -13,7 +13,7 @@ DEFINE_LOG_CATEGORY(LogLabel);
  * Creates a copy of this label at the given location.
  *
  * @param WorldContextObject - An object in the same world as the one that copy should be made in.
- * @param CopyLocation - The location of the new tile.
+ * @param CopyLocation - The location of the new tile label.
  *
  * @return The copy that was created.
  */

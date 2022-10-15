@@ -175,10 +175,13 @@ void ASyrupGameMode::UnregisterTileLabel(const UObject* WorldContextObject, cons
 	if (IsValid(Label))
 	{
 		ASyrupGameMode* GameMode = Cast<ASyrupGameMode>(UGameplayStatics::GetGameMode(WorldContextObject));
-		UTileLabelContainer* LabelContainer = GameMode->LocationsToLabelConatiners.FindRef(Location);
-		if (IsValid(LabelContainer))
+		if (IsValid(GameMode))
 		{
-			LabelContainer->UnregisterLabel(Label);
+			UTileLabelContainer* LabelContainer = GameMode->LocationsToLabelConatiners.FindRef(Location);
+			if (IsValid(LabelContainer))
+			{
+				LabelContainer->UnregisterLabel(Label);
+			}
 		}
 	}
 	else

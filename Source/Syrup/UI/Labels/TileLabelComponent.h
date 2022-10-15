@@ -34,6 +34,16 @@ protected:
 	 * Registers a tile label at its location.
 	 */
 	virtual void BeginPlay() override;
+
+	/**
+	 * Handles the unregistration of the tile label.
+	 */
+	virtual void OnComponentDestroyed(bool bDestroyingHierarchy) override;
+
+private:
+	//The location being labeled.
+	UPROPERTY()
+	FIntPoint Location = FIntPoint::ZeroValue;
 };
 /* /\ =================== /\ *\
 |  /\ UTileLabelComponent /\  |
