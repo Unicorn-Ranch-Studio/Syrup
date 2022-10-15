@@ -3,6 +3,8 @@
 
 #include "TileLabel.h"
 
+#include "Syrup/Systems/SyrupGameMode.h"
+
 DEFINE_LOG_CATEGORY(LogLabel);
 
 /* \/ ========== \/ *\
@@ -72,6 +74,38 @@ void UTileLabel::SplitFrom_Implementation(const UTileLabel* Other)
 	else
 	{
 		RemoveFromParent();
+	}
+}
+
+/**
+ * Binds the appropriate visibility events
+ */
+void UTileLabel::NativeConstruct()
+{
+	if (LabelVisisbility != ETileLabelVisibility::Never || LabelVisisbility != ETileLabelVisibility::Always)
+	{
+		ASyrupGameMode::GetOnActiveLabelChangedDelegate(this).AddDynamic(this, &UTileLabel::OnTileLabelActivityChanged);
+	}
+}
+
+/**
+ * Sets the appropriate visibility of this given the new activation state.
+ */
+void UTileLabel::OnTileLabelActivityChanged(bool bNowActive, FIntPoint NewLocation)
+{
+	if (NewLocation == Location)
+	{
+		if (LabelVisisbility == ETileLabelVisibility::LocationOrSource || LabelVisisbility == ETileLabelVisibility::Location)
+		{
+			SetVisibility(bNowActive ? ESlateVisibility::HitTestInvisible : ESlateVisibility::Hidden);
+		}
+	} 
+	else if (SourceLocations.Contains(NewLocation))
+	{
+		if (LabelVisisbility == ETileLabelVisibility::LocationOrSource || LabelVisisbility == ETileLabelVisibility::Source)
+		{
+			SetVisibility(bNowActive ? ESlateVisibility::HitTestInvisible : ESlateVisibility::Hidden);
+		}
 	}
 }
 

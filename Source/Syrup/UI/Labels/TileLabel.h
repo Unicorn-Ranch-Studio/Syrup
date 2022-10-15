@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "TileLabelVisibility.h"
+
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "TileLabel.generated.h"
@@ -55,11 +57,26 @@ public:
 	TSet<FIntPoint> SourceLocations = TSet<FIntPoint>();
 
 protected:
+	//When this label will be visible.
+	UPROPERTY(EditDefaultsOnly)
+	ETileLabelVisibility LabelVisisbility;
+
 	//The location being labeled.
 	UPROPERTY(BlueprintReadOnly)
 	FIntPoint Location = FIntPoint::ZeroValue;
 
 private:
+	/**
+	 * Binds the appropriate visibility events
+	 */
+	virtual void NativeConstruct() override;
+
+	/**
+	 * Sets the appropriate visibility of this given the new activation state.
+	 */
+	UFUNCTION()
+	void OnTileLabelActivityChanged(bool bNowActive, FIntPoint NewLocation);
+
 	//The total number of labels that have been merged into this.
 	UPROPERTY()
 	int MergeCount = 0;

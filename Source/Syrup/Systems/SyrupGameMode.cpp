@@ -190,6 +190,19 @@ void ASyrupGameMode::UnregisterTileLabel(const UObject* WorldContextObject, cons
 	}
 }
 
+/**
+ * Gets the delegate used to bind and trigger tile label activation change effects.
+ *
+ * @param WorldContextObject - An object in the same world as the delegate.
+ *
+ * @return The delegate used to bind and trigger tile label activation change effects.
+ */
+FTileLabelActivityUpdate& ASyrupGameMode::GetOnActiveLabelChangedDelegate(const UObject* WorldContextObject)
+{
+	ASyrupGameMode* GameMode = Cast<ASyrupGameMode>(UGameplayStatics::GetGameMode(WorldContextObject));
+	return GameMode->OnActiveLabelChanged;
+}
+
 /* /\ UI /\ *\
 \* -------- */
 

@@ -134,7 +134,17 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category = "UI", Meta = (WorldContext = "WorldContextObject"))
 	static void UnregisterTileLabel(const UObject* WorldContextObject, const UTileLabel* Label, const FIntPoint Location);
-	
+
+	/**
+	 * Gets the delegate used to bind and trigger tile label activation change effects.
+	 * 
+	 * @param WorldContextObject - An object in the same world as the delegate.
+	 * 
+	 * @return The delegate used to bind and trigger tile label activation change effects.
+	 */
+	UFUNCTION()
+	static FTileLabelActivityUpdate& GetOnActiveLabelChangedDelegate(const UObject* WorldContextObject);
+
 	//Called when a label is either activated or deactivated.
 	UPROPERTY(BlueprintAssignable)
 	FTileLabelActivityUpdate OnActiveLabelChanged;
