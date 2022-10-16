@@ -83,14 +83,14 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Visuals")
 	UMaterialInterface* TileMaterial;
 
+	//The mesh used to representing the tile's collision and the ground underneath the tile.
+	UPROPERTY()
+	UInstancedStaticMeshComponent* SubtileMesh;
+
 private:
 	//The mesh used for each tile as the ground.
 	UPROPERTY()
 	UStaticMesh* TileMesh;
-
-	//The mesh used to representing the tile's collision and the ground underneath the tile.
-	UPROPERTY()
-	UInstancedStaticMeshComponent* SubtileMesh;
 
 	//The field data for this tile.
 	UPROPERTY()

@@ -79,7 +79,7 @@ private:
 
 	//The total number of labels that have been merged into this.
 	UPROPERTY()
-	int MergeCount = 0;
+	int MergeCount = 1;
 
 	//The of labels merged into this with each source location.
 	UPROPERTY()

@@ -17,24 +17,13 @@ DEFINE_LOG_CATEGORY(LogPlant);
 \* \/ Initialization \/ */
 
 /**
- * Creates the plants components.
- */
-APlant::APlant()
-{
-	//Init Grass
-	GrassComponent = CreateDefaultSubobject<UApplyField>(FName("Grass Zone"));
-	GrassComponent->FieldType = EFieldType::Protection;
-
-	//Init Prevent Trash Spawn
-	PreventTrashComponent = CreateDefaultSubobject<UPreventTrashSpawn>(FName("Protection Zone"));
-}
-
-/**
  * Binds effect triggers and initializes size.
  */
 void APlant::BeginPlay()
 {
 	Super::BeginPlay();
+
+	SubtileMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	TimeUntilGrown = GetTimeUntilGrown() + 1;
 	Grow();

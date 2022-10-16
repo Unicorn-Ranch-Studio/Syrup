@@ -48,6 +48,13 @@ protected:
 	 */
 	virtual void Affect(const TSet<FIntPoint>& Locations) override;
 
+	/**
+	 * Gets the subset of the given locations that will be labeled.
+	 *
+	 * @param Locations - The locations that will be effected by this component
+	 */
+	virtual TSet<FIntPoint> GetLabelLocations(const TSet<FIntPoint>& Locations) const override;
+
 	//The type of field to apply
 	UPROPERTY(EditDefaultsOnly, Category = "Effect", Meta = (ClampMin = "0"))
 	int Damage = 1;

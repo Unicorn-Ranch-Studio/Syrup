@@ -22,16 +22,20 @@ class SYRUP_API UTileEffect : public UActorComponent
 public:
 
 	/**
-	 * Unregisters this effects labels.
+	 * Registers this effects labels.
+	 * 
+	 * @param Locations - The locations to register labels at.
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Effect")
-	void UnregisterLabels();
+	void RegisterLabels(const TSet<FIntPoint>& Locations);
 
 	/**
-	 * Registers this effects labels.
+	 * Unregisters this effects labels.
+	 * 
+	 * @param Locations - The locations to unregister labels at.
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Effect")
-	void RegisterLabels();
+	void UnregisterLabels(const TSet<FIntPoint>& Locations);
 
 	/**
 	 * Tries to activate the effect
@@ -43,12 +47,12 @@ public:
 	void ActivateEffect(const ETileEffectTriggerType TriggerType, const TSet<FIntPoint>& Locations);
 	
 	//The label that will be added to the location of the owner of this.
-	UPROPERTY(Instanced, EditAnywhere, Category = "Effect", Meta = (AllowAbstract = "false"))
-	TObjectPtr<UTileLabel> SourceLabel = nullptr;
+	UPROPERTY(Instanced, EditAnywhere/*, Category = "Effect", Meta = (AllowAbstract = "false")*/)
+	UTileLabel* SourceLabel = nullptr;
 
 	//The label that will be added to each of the effected locations.
-	UPROPERTY(Instanced, EditAnywhere, Category = "Effect", Meta = (AllowAbstract = "false"))
-	TObjectPtr<UTileLabel> EffectedLocationLabel = nullptr;
+	UPROPERTY(Instanced, EditAnywhere/*, Category = "Effect", Meta = (AllowAbstract = "false")*/)
+	UTileLabel* EffectedLocationLabel = nullptr;
 
 protected:
 
@@ -66,11 +70,13 @@ protected:
 	UFUNCTION()
 	virtual FORCEINLINE void Unaffect() {};
 
+
 	/**
-	 * Gets the subset of effected locations that will be labeled.
+	 * Gets the subset of the given locations that will be labeled.
+	 *
+	 * @param Locations - The locations that will be effected by this component
 	 */
-	UFUNCTION()
-	virtual FORCEINLINE TSet<FIntPoint> GetLabelLocations() const { return EffectedLocations; };
+	virtual FORCEINLINE TSet<FIntPoint> GetLabelLocations(const TSet<FIntPoint>& Locations) const { return EffectedLocations; };
 
 
 	//The triggers that will activate this effect.

@@ -14,8 +14,10 @@
 
 /**
  * Registers this effects labels.
+ * 
+ * @param Locations - The locations to register labels at.
  */
-void UTileEffect::RegisterLabels()
+void UTileEffect::RegisterLabels(const TSet<FIntPoint>& Locations)
 {
 	FIntPoint GridLocation = UGridLibrary::WorldLocationToGridLocation(GetOwner()->GetActorLocation());
 
@@ -27,7 +29,7 @@ void UTileEffect::RegisterLabels()
 
 	if (IsValid(EffectedLocationLabel))
 	{
-		for (FIntPoint EachLabelLocation : GetLabelLocations())
+		for (FIntPoint EachLabelLocation : GetLabelLocations(Locations))
 		{
 			EffectedLocationLabel->SourceLocations.Add(GridLocation);
 			ASyrupGameMode::RegisterTileLabel(this, EffectedLocationLabel, EachLabelLocation);
@@ -37,8 +39,10 @@ void UTileEffect::RegisterLabels()
 
 /**
  * Unregisters this effects labels.
+ * 
+ * @param Locations - The locations to unregister labels at.
  */
-void UTileEffect::UnregisterLabels()
+void UTileEffect::UnregisterLabels(const TSet<FIntPoint>& Locations)
 {
 	FIntPoint GridLocation = UGridLibrary::WorldLocationToGridLocation(GetOwner()->GetActorLocation());
 
@@ -50,7 +54,7 @@ void UTileEffect::UnregisterLabels()
 
 	if (IsValid(EffectedLocationLabel))
 	{
-		for (FIntPoint EachLabelLocation : GetLabelLocations())
+		for (FIntPoint EachLabelLocation : GetLabelLocations(Locations))
 		{
 			EffectedLocationLabel->SourceLocations.Add(GridLocation);
 			ASyrupGameMode::UnregisterTileLabel(this, EffectedLocationLabel, EachLabelLocation);
@@ -75,11 +79,11 @@ void UTileEffect::ActivateEffect(const ETileEffectTriggerType TriggerType, const
 	{
 		if (TriggerType == ETileEffectTriggerType::OnActivated)
 		{
-			RegisterLabels();
+			RegisterLabels(Locations);
 		}
 		else if (TriggerType == ETileEffectTriggerType::OnDeactivated)
 		{
-			UnregisterLabels();
+			UnregisterLabels(Locations);
 		}
 	}
 }
