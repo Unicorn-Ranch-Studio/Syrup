@@ -23,7 +23,7 @@ void APlant::BeginPlay()
 {
 	Super::BeginPlay();
 
-	SubtileMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	SubtileMesh->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
 
 	TimeUntilGrown = GetTimeUntilGrown() + 1;
 	Grow();
