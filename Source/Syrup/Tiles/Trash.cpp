@@ -30,8 +30,6 @@ void ATrash::BeginPlay()
 {
 	Super::BeginPlay();
 
-	SubtileMesh->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
-
 	ASyrupGameMode::GetTileEffectTriggerDelegate(GetWorld()).Broadcast(ETileEffectTriggerType::TrashSpawned, GetSubTileLocations());
 	ASyrupGameMode::GetTileEffectTriggerDelegate(this).AddDynamic(this, &ATrash::ReceiveEffectTrigger);
 }

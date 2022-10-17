@@ -84,7 +84,7 @@ protected:
 	UMaterialInterface* TileMaterial;
 
 	//The mesh used to representing the tile's collision and the ground underneath the tile.
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere)
 	UInstancedStaticMeshComponent* SubtileMesh;
 
 private:
