@@ -12,7 +12,7 @@
 /*
  * Gets the world transform of a grid transform.
  *
- * @param Location - The transform on the grid to get the tranform of.
+ * @param Location - The transform on the grid to get the transform of.
  * @return The world transform of the grid transform.
  */
 FTransform UGridLibrary::GridTransformToWorldTransform(const FGridTransform GridTransform)
@@ -21,7 +21,10 @@ FTransform UGridLibrary::GridTransformToWorldTransform(const FGridTransform Grid
 	bool bIsFlipped = IsGridLocationFlipped(Location);
 	double XLocation = GetGridHeight() * Location.X + (!bIsFlipped ? GetGridHeight() *.333333333333 : GetGridHeight() * .666666666666);
 	double YLocation = GetGridSideLength() * Location.Y * 0.5;
-	FRotator Rotation = FRotator(0, (bIsFlipped ? -60 : -120) + (bIsFlipped ? 120 : -120) * (uint8)GridTransform.Direction, 0);
+	int Offset = (bIsFlipped ? 180 : 120);
+	int Direction = (bIsFlipped ? 120 : -120);
+	int Multiplier = (int)GridTransform.Direction;
+	FRotator Rotation = FRotator(0, Offset + Direction * Multiplier, 0);
 
 	return FTransform(Rotation, FVector(XLocation, YLocation, 0));
 }
@@ -38,7 +41,7 @@ FGridTransform UGridLibrary::WorldTransformToGridTransform(const FTransform Worl
 	FVector2D GridLocation = FVector2D(WorldTransform.GetLocation()) / FVector2D(GetGridHeight(), GetGridSideLength() * 0.5);
 	GridLocation.Y += 0.5;
 
-	//Get the distance from the aproapreate edge.
+	//Get the distance from the appropriate edge.
 	FVector2D RelativeLocation = FVector2D(FMath::Fractional(GridLocation.X), FMath::Fractional(GridLocation.Y));
 	if (RelativeLocation.X < 0)
 	{
@@ -78,6 +81,35 @@ FGridTransform UGridLibrary::WorldTransformToGridTransform(const FTransform Worl
 }
 
 /*
+ * Transforms the given grid location by the grid transform.
+ *
+ * @param GridLocation - The location to transform.
+ * @param GridTransform - The transformation to apply.
+ * @return The transformed location.
+ */
+FIntPoint UGridLibrary::TransformGridLocation(const FIntPoint GridLocation, const FGridTransform GridTransform)
+{
+	return PointLocationInDirection(GridTransform.Direction, GridLocation) + GridTransform.Location;
+}
+
+/*
+ * Transforms the given shape by the grid transform.
+ *
+ * @param ShapeLocations - The location of each tile in the shape to transform.
+ * @param GridTransform - The transformation to apply.
+ * @return The transformed location of each tile in the shape.
+ */
+TSet<FIntPoint> UGridLibrary::TransformShape(const TSet<FIntPoint> ShapeLocations, const FGridTransform GridTransform)
+{
+	TSet<FIntPoint> ReturnValue = TSet<FIntPoint>();
+	for (FIntPoint EachShapeLocation : ShapeLocations)
+	{
+		ReturnValue.Add(TransformGridLocation(EachShapeLocation, GridTransform));
+	}
+	return ReturnValue;
+}
+
+/*
  * Gets snaps a given transform to the grid.
  *
  * @param Location - The transform in the world to snap.
@@ -109,10 +141,10 @@ double UGridLibrary::GetGridSideLength()
 }
 
 /*
- * Gets whether or not a tile at a given grid location will be fliped.
+ * Gets whether or not a tile at a given grid location will be flipped.
  *
  * @param Location - The location of the tile.
- * @return Whether or not a tile at a given grid location will be fliped.
+ * @return Whether or not a tile at a given grid location will be flipped.
  */
 bool UGridLibrary::IsGridLocationFlipped(const FIntPoint Location)
 {
@@ -156,7 +188,7 @@ bool UGridLibrary::IsDirectionValidAtLocation(const EGridDirection Direction, co
 }
 
 /*
- * Gets where the a given relative location of a tile would be if its root was pointed in a given direction. Intial direction assumed to be up.
+ * Gets where the a given relative location of a tile would be if its root was pointed in a given direction. Initial direction assumed to be up.
  *
  * @param Direction - The given direction.
  * @param Location - The given location.
@@ -173,7 +205,7 @@ FIntPoint UGridLibrary::PointLocationInDirection(const EGridDirection Direction,
 	// Translates that back to grid space
 	ReturnValue = WorldTransformToGridTransform(FTransform(WorldLocation + FVector(GetGridHeight() * 0.33333333333333, 0, 0))).Location;
 
-	// Flip if Nessesary
+	// Flip if Necessary
 	if (IsDirectionValidAtLocation(Direction, FIntPoint::ZeroValue))
 	{
 		ReturnValue.X = -ReturnValue.X;
@@ -183,7 +215,7 @@ FIntPoint UGridLibrary::PointLocationInDirection(const EGridDirection Direction,
 }
 
 /*
- * Gets where the a given set of relative locations of a shape would be if its root was pointed in a given direction. Intial direction assumed to be up.
+ * Gets where the a given set of relative locations of a shape would be if its root was pointed in a given direction. Initial direction assumed to be up.
  *
  * @param Direction - The given direction.
  * @param Location - The given set of  locations.
@@ -255,28 +287,30 @@ TSet<FIntPoint> UGridLibrary::GetGridLocationsInRadius(const FIntPoint Location,
  * @param Size -  The number of layers to add to the shape.
  * @return All the grid locations of a given shape when scaled up.
  */
-TSet<FIntPoint> UGridLibrary::ScaleShapeUp(const TSet<FIntPoint> ShapeLocations, const int Size, const bool bChopPoints)
+TSet<FIntPoint> UGridLibrary::ScaleShapeUp(const TSet<FIntPoint>& ShapeLocations, const int Size, const bool bChopPoints)
 {
+	TSet<FIntPoint> ShapeLocationsRehashed = TSet<FIntPoint>(ShapeLocations.Array());
+
 	// End if invalid size
 	if (Size < 1)
 	{
-		return ShapeLocations;
+		return ShapeLocationsRehashed;
 	}
 
 	// Get the details of the layers that need to be added
 	TSet<TTuple<FIntPoint, EGridDirection, bool>> LayerDetails = TSet<TTuple<FIntPoint, EGridDirection, bool>>();
-	for (FIntPoint EachShapeLocation : ShapeLocations)
+	for (FIntPoint EachShapeLocation : ShapeLocationsRehashed)
 	{
 		// Get the adjacent locations of the shape and check to see if they are not contained in the shape
 		TMap<EGridDirection, FIntPoint> AdjacentLocations = GetAdjacentGridLocations(EachShapeLocation);
 		for (EGridDirection DirectionIndex = (EGridDirection)IsGridLocationFlipped(EachShapeLocation); (uint8)DirectionIndex < 6; DirectionIndex = (EGridDirection)((uint8)DirectionIndex + 2))
 		{
-			bool bShouldLayerBeAdded = !ShapeLocations.Contains(AdjacentLocations.FindRef(DirectionIndex));
+			bool bShouldLayerBeAdded = !ShapeLocationsRehashed.Contains(AdjacentLocations.FindRef(DirectionIndex));
 			if (bShouldLayerBeAdded)
 			{
 				// If next adjacent location is also outside the shape then add cap
-				bool bShouldCapBeAdded = bShouldLayerBeAdded && !ShapeLocations.Contains(AdjacentLocations.FindRef(GetNextDirection(DirectionIndex)));
-
+				bool bShouldCapBeAdded = !ShapeLocationsRehashed.Contains(AdjacentLocations.FindRef(GetNextDirection(DirectionIndex)));
+				
 				LayerDetails.Add(TTuple<FIntPoint, EGridDirection, bool>(AdjacentLocations.FindRef(DirectionIndex), DirectionIndex, bShouldCapBeAdded));
 			}
 		}
@@ -284,16 +318,16 @@ TSet<FIntPoint> UGridLibrary::ScaleShapeUp(const TSet<FIntPoint> ShapeLocations,
 
 
 	// Create Layers
-	TSet<FIntPoint> ReturnValue = TSet<FIntPoint>(ShapeLocations);
+	TSet<FIntPoint> ReturnValue = TSet<FIntPoint>(ShapeLocationsRehashed);
 	
-	// For each layer details get the locations of a trapziod with one corner on the layer location.
+	// For each layer details get the locations of a trapezoid with one corner on the layer location.
 	for (TTuple<FIntPoint, EGridDirection, bool> EachLayerDetail : LayerDetails)
 	{
 		TArray<FIntPoint> StartLocations = (GetLocationsInLine(EachLayerDetail.Get<FIntPoint>(), GetNextDirection(EachLayerDetail.Get<EGridDirection>(), true), 2 * Size)).Array();
 		
 		for (int LayerIndex = 0; LayerIndex < Size; LayerIndex++)
 		{
-			// Adjust trapizode size if a cap is needed.
+			// Adjust trapezoid size if a cap is needed.
 			int Length = 2 + 2 * LayerIndex;
 			if (EachLayerDetail.Get<bool>())
 			{
@@ -397,12 +431,17 @@ bool UGridLibrary::OverlapGridLocation(const UObject* WorldContext, const FIntPo
 {
 	FCollisionQueryParams Params = FCollisionQueryParams();
 	Params.AddIgnoredActors(IgnoredTiles);
+	FCollisionObjectQueryParams ObjectParams = FCollisionObjectQueryParams();
+	ObjectParams.AddObjectTypesToQuery(ECollisionChannel::ECC_WorldDynamic);
 
 	FHitResult Hit = FHitResult();
 
 	FVector WorldLocation = GridTransformToWorldTransform(GridLocation).GetTranslation();
+	if (!WorldContext->GetWorld()->LineTraceSingleByObjectType(Hit, WorldLocation, WorldLocation - FVector(0, 0, KINDA_SMALL_NUMBER), ObjectParams, Params))
+	{
+		return false;
+	}
 
-	bool ReturnValue = WorldContext->GetWorld()->LineTraceSingleByObjectType(Hit, WorldLocation, WorldLocation - FVector(0, 0, KINDA_SMALL_NUMBER), FCollisionObjectQueryParams::AllDynamicObjects, Params);
 	OverlapingTile = Cast<ATile>(Hit.GetActor());
 	return IsValid(OverlapingTile);
 }
@@ -414,13 +453,13 @@ bool UGridLibrary::OverlapGridLocation(const UObject* WorldContext, const FIntPo
  * @param ShapeGridLocations - The given shape's grid locations to check.
  * @param OverlapingTiles - Will be set to the tile at the given location if there is one, otherwise is nullptr.
  * @param IgnoredTiles - The tiles to ignore when querying.
- * @return Whether or not a tile was at overlaping the given shape.
+ * @return Whether or not a tile was at overlapping the given shape.
  */
 bool UGridLibrary::OverlapShape(const UObject* WorldContext, const TSet<FIntPoint>& ShapeGridLocations, TSet<ATile*>& OverlapingTiles, const TArray<AActor*>& IgnoredTiles)
 {
 	for (FIntPoint EachShapeGridLocation : ShapeGridLocations)
 	{
-		ATile* OverlapedTile;
+		ATile* OverlapedTile = nullptr;
 		OverlapGridLocation(WorldContext, EachShapeGridLocation, OverlapedTile, IgnoredTiles);
 		if (IsValid(OverlapedTile))
 		{

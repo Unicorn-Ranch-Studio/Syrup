@@ -13,7 +13,7 @@ class ATile;
 |  \/ EGridDirection \/  |
 \* \/ ============== \/ */
 /**
- * Repersents the valid directions that a tile could face.
+ * Represents the valid directions that a tile could face.
  * Note: To flip the direction just add 1 and to get the next clockwise direction add 2.
  */
 UENUM(BlueprintType)
@@ -36,7 +36,7 @@ enum class EGridDirection : uint8
 |  \/ FGridTransform \/  |
 \* \/ ============== \/ */
 /**
- * Rerpsesnts the position of a tile or shape on the grid.
+ * Represents the position of a tile or shape on the grid.
  */
 USTRUCT(BlueprintType)
 struct SYRUP_API FGridTransform
@@ -68,7 +68,7 @@ struct SYRUP_API FGridTransform
 /**
  * A library for functions related to the in game grid.
  * 
- * Includes things like translateing between grid and world space, handeling 
+ * Includes things like translating between grid and world space, handling 
  * direction operations, transforming shapes in the grid, and querying the grid 
  * for collisions.
  */
@@ -82,7 +82,7 @@ public:
 	/*
 	 * Gets the world transform of a grid transform.
 	 * 
-	 * @param Location - The transform on the grid to get the tranform of.
+	 * @param Location - The transform on the grid to get the transform of.
 	 * @return The world transform of the grid transform.
 	 */
 	UFUNCTION(BlueprintPure, Category="Transformation|Grid")
@@ -96,12 +96,32 @@ public:
 	 */
 	UFUNCTION(BlueprintPure, Category="Transformation|Grid")
 	static FGridTransform WorldTransformToGridTransform(const FTransform WorldTransform);
+	
+	/*
+	 * Transforms the given grid location by the grid transform.
+	 * 
+	 * @param GridLocation - The location to transform.
+	 * @param GridTransform - The transformation to apply.
+	 * @return The transformed location.
+	 */
+	UFUNCTION(BlueprintPure, Category="Transformation|Grid")
+	static FIntPoint TransformGridLocation(const FIntPoint GridLocation, const FGridTransform GridTransform);
+
+	/*
+	 * Transforms the given shape by the grid transform.
+	 * 
+	 * @param ShapeLocations - The location of each tile in the shape to transform.
+	 * @param GridTransform - The transformation to apply.
+	 * @return The transformed location of each tile in the shape.
+	 */
+	UFUNCTION(BlueprintPure, Category="Transformation|Grid")
+	static TSet<FIntPoint> TransformShape(const TSet<FIntPoint> ShapeLocations, const FGridTransform GridTransform);
 
 	/*
 	 * Gets snaps a given transform to the grid.
 	 * 
 	 * @param Location - The transform in the world to snap.
-	 * @return The snaped transform.
+	 * @return The snapped transform.
 	 */
 	UFUNCTION(BlueprintPure, Category="Transformation|Grid")
 	static FTransform SnapWorldTransformToGrid(const FTransform Transform);
@@ -123,10 +143,10 @@ public:
 	static double GetGridSideLength();
 
 	/*
-	 * Gets whether or not a tile at a given grid location will be fliped.
+	 * Gets whether or not a tile at a given grid location will be flipped.
 	 *
 	 * @param Location - The location of the tile.
-	 * @return Whether or not a tile at a given grid location will be fliped.
+	 * @return Whether or not a tile at a given grid location will be flipped.
 	 */
 	UFUNCTION(BlueprintPure, Category = "Transformation|Grid")
 	static bool IsGridLocationFlipped(const FIntPoint Location);
@@ -210,7 +230,7 @@ public:
 	 * @return All the grid locations of a given shape when scaled up.
 	 */
 	UFUNCTION(BlueprintPure, Category = "Transformation|Grid|Adjacency")
-	static TSet<FIntPoint> ScaleShapeUp(const TSet<FIntPoint> Shape, const int Size, const bool bChopPoints = false);
+	static TSet<FIntPoint> ScaleShapeUp(const TSet<FIntPoint>& ShapeLocations, const int Size, const bool bChopPoints = false);
 
 	/*
 	 * Gets all the grid locations of a line.
