@@ -126,7 +126,7 @@ public:
 	 * @return Whether or not this was picked up,
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Pick Up")
-	bool PickUp(int& EnergyReserve);
+	bool PickUp(UPARAM(Ref) int& EnergyReserve);
 
 	/**
 	 * Gets cost to pickup this piece of trash.

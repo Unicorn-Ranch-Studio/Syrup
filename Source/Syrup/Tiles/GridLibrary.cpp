@@ -457,6 +457,7 @@ bool UGridLibrary::OverlapGridLocation(const UObject* WorldContext, const FIntPo
  */
 bool UGridLibrary::OverlapShape(const UObject* WorldContext, const TSet<FIntPoint>& ShapeGridLocations, TSet<ATile*>& OverlapingTiles, const TArray<AActor*>& IgnoredTiles)
 {
+	OverlapingTiles = TSet<ATile*>();
 	for (FIntPoint EachShapeGridLocation : ShapeGridLocations)
 	{
 		ATile* OverlapedTile = nullptr;

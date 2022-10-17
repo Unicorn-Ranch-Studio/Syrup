@@ -72,7 +72,7 @@ protected:
 	virtual TSet<FIntPoint> GetRelativeSubTileLocations() const override;
 
 	//A set containing all of the relative locations of the sub-tiles making up the shape of this plant type.
-	UPROPERTY(EditDefaultsOnly, Category = "Shape")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Shape")
 	TSet<FIntPoint> Shape = TSet<FIntPoint>();
 
 	/* /\ Shape /\ *\
@@ -174,7 +174,7 @@ protected:
 	int TimeUntilGrown = 1;
 	
 	//The amount of energy required to plant a plant of this type.
-	UPROPERTY(EditDefaultsOnly, Category = "Growth", Meta = (ClampMin = "0"))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Growth", Meta = (ClampMin = "0"))
 	int PlantingCost = 1;
 
 	/**
