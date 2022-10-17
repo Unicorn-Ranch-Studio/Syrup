@@ -5,9 +5,9 @@
 
 #include "Syrup/UI/Labels/TileLabelContainer.h"
 #include "Syrup/UI/Labels/TileLabel.h"
+#include "Syrup/UI/Labels/TileLabelActor.h"
 #include "Components/WidgetComponent.h"
 #include "Kismet/GameplayStatics.h"
-#include "Syrup/Tiles/GridLibrary.h"
 
 /* \/ ============== \/ *\
 |  \/ ASyrupGameMode \/  |
@@ -139,18 +139,7 @@ void ASyrupGameMode::RegisterTileLabel(const UObject* WorldContextObject, UTileL
 		UTileLabelContainer* LabelContainer = GameMode->LocationsToLabelConatiners.FindRef(Location);
 		if (!IsValid(LabelContainer))
 		{
-			AActor* SpawnedActor = WorldContextObject->GetWorld()->SpawnActor<AActor>(AActor::StaticClass(), FTransform());
-			SpawnedActor->SetActorLabel("Tile Label " + Location.ToString());
-			UWidgetComponent* WidgetComponent = Cast<UWidgetComponent>(SpawnedActor->AddComponentByClass(UWidgetComponent::StaticClass(), false, FTransform(), false));
-			SpawnedActor->SetRootComponent(WidgetComponent);
-			SpawnedActor->SetActorLocation(UGridLibrary::GridLocationToWorldLocation(Location));
-
-			LabelContainer = CreateWidget<UTileLabelContainer>(WorldContextObject->GetWorld(), GameMode->TileLabelContainerClass);
-			LabelContainer->Location = Location;
-
-			WidgetComponent->SetWidget(LabelContainer);
-			WidgetComponent->SetDrawAtDesiredSize(true);
-			WidgetComponent->SetWidgetSpace(EWidgetSpace::Screen);
+			LabelContainer = ATileLabelActor::Create(WorldContextObject, GameMode->TileLabelContainerClass, Location);
 
 			GameMode->LocationsToLabelConatiners.Add(Location, LabelContainer);
 		}

@@ -61,6 +61,10 @@ public:
 	UFUNCTION()
 	void RemoveField(EFieldType Type);
 
+	//The root for any tile labels labeling this tile.
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	USceneComponent* LabelRoot;
+
 protected:
 
 	/*

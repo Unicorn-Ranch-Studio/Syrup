@@ -49,6 +49,10 @@ void UTileLabelContainer::UnregisterLabel(const UTileLabel* Label)
 		if (!ExistingLabel->GetParent())
 		{
 			Labels.Remove(ExistingLabel);
+			if (Labels.IsEmpty())
+			{
+				OnContainerEmptied.Broadcast();
+			}
 		}
 	}
 }

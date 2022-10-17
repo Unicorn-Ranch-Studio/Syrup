@@ -9,10 +9,12 @@
 class UTileLabel;
 class UTileLabelPayload;
 
+//UDELEGATE()
+DECLARE_MULTICAST_DELEGATE(FEmptyedDelegate);
+
 /* \/ =================== \/ *\
 |  \/ UTileLabelContainer \/  |
 \* \/ =================== \/ */
-
 /**
  * Handles the rendering of multiple tile labels all for the same tile.
  */
@@ -44,6 +46,10 @@ public:
 	//The location of this container.
 	UPROPERTY(BlueprintReadOnly)
 	FIntPoint Location = FIntPoint::ZeroValue;
+
+	//Called when this container is emptied.
+	FEmptyedDelegate OnContainerEmptied;
+
 protected:
 	/**
 	 * Sets up a label so it can be rendered.
