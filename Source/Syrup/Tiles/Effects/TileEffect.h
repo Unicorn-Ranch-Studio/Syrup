@@ -38,7 +38,6 @@ public:
 	 * Tries to undo this effect.
 	 *
 	 * @param TriggerType - The type of effects that are currently being undone.
-	 * @param Locations - The locations to undo the effect on.
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Effect")
 	FORCEINLINE void UndoEffect(const ETileEffectTriggerType TriggerType) 
