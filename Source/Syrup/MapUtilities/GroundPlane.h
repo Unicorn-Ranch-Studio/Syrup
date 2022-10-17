@@ -68,7 +68,11 @@ public:
 protected:
 	//The plane used to render the fields
 	UPROPERTY()
-	UInstancedStaticMeshComponent* GroundMesh;
+	UInstancedStaticMeshComponent* GroundMeshComponent;
+	
+	//The mesh spawned at each grid location.
+	UPROPERTY(EditAnywhere)
+	UStaticMesh* GroundMesh;
 
 	//The material to be applied to the ground
 	UPROPERTY(EditAnywhere)
