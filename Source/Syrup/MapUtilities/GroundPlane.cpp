@@ -40,19 +40,14 @@ AGroundPlane::AGroundPlane()
 {
 	RootComponent = CreateDefaultSubobject<USceneComponent>(FName("Root"));
 
-	//Get Tile Mesh
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> MeshRef(TEXT("/Game/LevelUtilities/SM_GroundPlane.SM_GroundPlane"));
-	UStaticMesh* TileMesh = MeshRef.Object;
-	check(TileMesh != nullptr);
-
 	//Create ground plane
-	GroundMesh = CreateDefaultSubobject<UInstancedStaticMeshComponent>(FName("GroundPlane"));
-	GroundMesh->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
-	GroundMesh->SetAbsolute(true, true, true);
-	GroundMesh->SetStaticMesh(TileMesh);
-	GroundMesh->SetMaterial(0, Material);
-	GroundMesh->CastShadow = false;
-	GroundMesh->NumCustomDataFloats = 2;
+	GroundMeshComponent = CreateDefaultSubobject<UInstancedStaticMeshComponent>(FName("GroundPlane"));
+	GroundMeshComponent->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
+	GroundMeshComponent->SetAbsolute(true, true, true);
+	GroundMeshComponent->SetStaticMesh(GroundMesh);
+	GroundMeshComponent->SetMaterial(0, Material);
+	GroundMeshComponent->CastShadow = false;
+	GroundMeshComponent->NumCustomDataFloats = 2;
 }
 
 
@@ -63,8 +58,8 @@ AGroundPlane::AGroundPlane()
  */
 void AGroundPlane::OnConstruction(const FTransform& Transform)
 {
-	GroundMesh->ClearInstances();
-	GroundMesh->InstancingRandomSeed = FMath::Rand();
+	GroundMeshComponent->ClearInstances();
+	GroundMeshComponent->InstancingRandomSeed = FMath::Rand();
 	LocationsToInstanceIndices.Empty();
 	FieldTypeToLocationToStrengths.Empty();
 
@@ -73,7 +68,7 @@ void AGroundPlane::OnConstruction(const FTransform& Transform)
 		for (int IndexY = -(PlaneSize.Y / 2); IndexY < PlaneSize.Y / 2 + PlaneSize.Y % 2; IndexY++)
 		{
 			FIntPoint GridLocation = FIntPoint(IndexX, IndexY) + Offset;
-			LocationsToInstanceIndices.Add(GridLocation, GroundMesh->AddInstance(UGridLibrary::GridTransformToWorldTransform(FGridTransform(GridLocation)) * FTransform(FVector(0, 0, -1)), true));
+			LocationsToInstanceIndices.Add(GridLocation, GroundMeshComponent->AddInstance(UGridLibrary::GridTransformToWorldTransform(FGridTransform(GridLocation)) * FTransform(FVector(0, 0, -1)), true));
 		}
 	}
 }
@@ -116,7 +111,7 @@ bool AGroundPlane::AddFieldStrength(const EFieldType FieldType, const int Streng
 			if (Strength > 0)
 			{
 				FieldTypeToLocationToStrengths.Find(FieldType)->Add(EachLocation, Strength);
-				GroundMesh->SetCustomDataValue(LocationsToInstanceIndices.FindRef(EachLocation), (uint8)FieldType, 1, true);
+				GroundMeshComponent->SetCustomDataValue(LocationsToInstanceIndices.FindRef(EachLocation), (uint8)FieldType, 1, true);
 			}
 		}
 		else
@@ -128,7 +123,7 @@ bool AGroundPlane::AddFieldStrength(const EFieldType FieldType, const int Streng
 			{
 				//Eliminate value at location if field is too weak.
 				FieldTypeToLocationToStrengths.Find(FieldType)->Remove(EachLocation);
-				GroundMesh->SetCustomDataValue(LocationsToInstanceIndices.FindRef(EachLocation), (uint8)FieldType, 0, true);
+				GroundMeshComponent->SetCustomDataValue(LocationsToInstanceIndices.FindRef(EachLocation), (uint8)FieldType, 0, true);
 			}
 			else
 			{
