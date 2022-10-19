@@ -70,7 +70,7 @@ void AGroundPlane::OnConstruction(const FTransform& Transform)
 		for (int IndexY = -(PlaneSize.Y / 2); IndexY < PlaneSize.Y / 2 + PlaneSize.Y % 2; IndexY++)
 		{
 			FIntPoint GridLocation = FIntPoint(IndexX, IndexY) + Offset;
-			LocationsToInstanceIndices.Add(GridLocation, GroundMeshComponent->AddInstance(UGridLibrary::GridTransformToWorldTransform(FGridTransform(GridLocation)) * FTransform(FVector(0, 0, -0.1)), true));
+			LocationsToInstanceIndices.Add(GridLocation, GroundMeshComponent->AddInstance(UGridLibrary::GridTransformToWorldTransform(FGridTransform(GridLocation)) * FTransform(FVector(0, 0, -0.01)), true));
 		}
 	}
 }
