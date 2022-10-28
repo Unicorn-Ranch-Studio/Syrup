@@ -44,12 +44,6 @@ AGroundPlane::AGroundPlane()
 	GroundMeshComponent = CreateDefaultSubobject<UInstancedStaticMeshComponent>(FName("GroundPlane"));
 	GroundMeshComponent->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
 	GroundMeshComponent->SetAbsolute(true, true, true);
-	GroundMeshComponent->SetStaticMesh(GroundMesh);
-	GroundMeshComponent->SetMaterial(0, Material);
-	GroundMeshComponent->CastShadow = false;
-	GroundMeshComponent->NumCustomDataFloats = 2;
-	GroundMeshComponent->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
-	GroundMeshComponent->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
 }
 
 
@@ -60,6 +54,13 @@ AGroundPlane::AGroundPlane()
  */
 void AGroundPlane::OnConstruction(const FTransform& Transform)
 {
+	GroundMeshComponent->SetStaticMesh(GroundMesh);
+	GroundMeshComponent->SetMaterial(0, Material);
+	GroundMeshComponent->CastShadow = false;
+	GroundMeshComponent->NumCustomDataFloats = 2;
+	GroundMeshComponent->SetCollisionObjectType(ECollisionChannel::ECC_WorldStatic);
+	GroundMeshComponent->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+	GroundMeshComponent->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Block);
 	GroundMeshComponent->ClearInstances();
 	GroundMeshComponent->InstancingRandomSeed = FMath::Rand();
 	LocationsToInstanceIndices.Empty();
@@ -70,7 +71,7 @@ void AGroundPlane::OnConstruction(const FTransform& Transform)
 		for (int IndexY = -(PlaneSize.Y / 2); IndexY < PlaneSize.Y / 2 + PlaneSize.Y % 2; IndexY++)
 		{
 			FIntPoint GridLocation = FIntPoint(IndexX, IndexY) + Offset;
-			LocationsToInstanceIndices.Add(GridLocation, GroundMeshComponent->AddInstance(UGridLibrary::GridTransformToWorldTransform(FGridTransform(GridLocation)) * FTransform(FVector(0, 0, -0.01)), true));
+			LocationsToInstanceIndices.Add(GridLocation, GroundMeshComponent->AddInstance(UGridLibrary::GridTransformToWorldTransform(FGridTransform(GridLocation)) * FTransform(FVector(0, 0, -0.1)), true));
 		}
 	}
 }
