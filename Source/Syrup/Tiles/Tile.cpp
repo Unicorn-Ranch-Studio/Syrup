@@ -114,6 +114,7 @@ void ATile::ApplyField(EFieldType Type)
 		return;
 	}
 	FieldsToStrengths.Add(Type,  1);
+	UpdateField(Type, true);
 	for (int InstanceIndex = 0; InstanceIndex < SubtileMesh->PerInstanceSMCustomData.Num(); InstanceIndex++)
 	{
 		SubtileMesh->SetCustomDataValue(InstanceIndex, (uint8)Type, 1, true);
@@ -137,6 +138,7 @@ void ATile::RemoveField(EFieldType Type)
 		else
 		{
 			FieldsToStrengths.Remove(Type);
+			UpdateField(Type, false);
 			for (int InstanceIndex = 0; InstanceIndex < SubtileMesh->PerInstanceSMCustomData.Num(); InstanceIndex++)
 			{
 				SubtileMesh->SetCustomDataValue(InstanceIndex, (uint8)Type, 0, true);
