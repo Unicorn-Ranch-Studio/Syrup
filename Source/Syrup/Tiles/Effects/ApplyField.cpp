@@ -16,6 +16,8 @@
 UApplyField::UApplyField()
 {
 	Triggers.Add(ETileEffectTriggerType::OnActivated);
+	Triggers.Add(ETileEffectTriggerType::PlantSpawned);
+	Triggers.Add(ETileEffectTriggerType::TrashSpawned);
 }
 
 /*
@@ -25,14 +27,14 @@ UApplyField::UApplyField()
  */
 void UApplyField::Affect(const TSet<FIntPoint>& Locations)
 {
-	//Remove invalid planes
-	for (TSet<AGroundPlane*>::TIterator Itterator = EffectedGroundPlanes.CreateIterator(); Itterator; ++Itterator)
-	{
-		if (!IsValid(*Itterator))
-		{
-			Itterator.RemoveCurrent();
-		}
-	}
+	////Remove invalid planes
+	//for (TSet<AGroundPlane*>::TIterator Itterator = EffectedGroundPlanes.CreateIterator(); Itterator; ++Itterator)
+	//{
+	//	if (!IsValid(*Itterator))
+	//	{
+	//		Itterator.RemoveCurrent();
+	//	}
+	//}
 
 	TSet<FIntPoint> NewlyEffectedLocations = Locations.Difference(EffectedLocations);
 
@@ -66,7 +68,7 @@ void UApplyField::Affect(const TSet<FIntPoint>& Locations)
 
 	//Affect tiles
 	TSet<ATile*> NewlyEffectedTiles;
-	UGridLibrary::OverlapShape(GetWorld(), NewlyEffectedLocations, NewlyEffectedTiles, TArray<AActor*>());
+	UGridLibrary::OverlapShape(GetWorld(), Locations, NewlyEffectedTiles, TArray<AActor*>());
 	for (ATile* EachNewlyEffectedTile : NewlyEffectedTiles.Difference(EffectedTiles))
 	{
 		EachNewlyEffectedTile->ApplyField(FieldType);

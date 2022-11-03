@@ -28,6 +28,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Effect", Meta = (AutoCreateRefTerm = "Locations"))
 	FORCEINLINE void ActivateEffect(const ETileEffectTriggerType TriggerType, const TSet<FIntPoint>& Locations) 
 	{ 
+		UE_LOG(LogTemp, Warning, TEXT("Type triggered: %s  |  On: %s  |  Pass: %s"), *StaticEnum<ETileEffectTriggerType>()->GetNameStringByValue((int64)TriggerType), *GetName(), *(Triggers.Contains(TriggerType) ? FString("Yes") : FString("No")))
 		if (Triggers.Contains(TriggerType))
 		{
 			Affect(Locations);
