@@ -23,13 +23,6 @@ class SYRUP_API ATrash : public ATile
 	/* -------------------- *\
 	\* \/ Initialization \/ */
 
-public:
-
-	/**
-	 * Creates the mesh and effect components.
-	 */
-	ATrash();
-
 protected:
 
 	/**
@@ -82,36 +75,6 @@ protected:
 
 	/* /\ Shape /\ *\
 	\* ----------- */
-
-
-
-	/* ------------ *\
-	\* \/ Damage \/ */
-
-	/**
-	 * Gets the current damage that this trash will cause.
-	 * 
-	 * @return The number of damage points this trash will cause each turn to plants within its range.
-	 */
-	UFUNCTION(BlueprintPure, Category = "Damage")
-	FORCEINLINE int GetDamage() const { return Damage; };
-
-	/**
-	 * Updates the damage that this trash will deal.
-	 * 
-	 * @param AmountAdded - The number of damage points to add to the current damage of this trash. May be a negative number
-	 */
-	UFUNCTION(BlueprintCallable, Category = "Damage")
-	void UpdateDamage(int AmountAdded = 0);
-
-protected:
-
-	//The number of damage points this trash will cause each turn to plants within its range.
-	UPROPERTY(EditDefaultsOnly, Category = "Damage", Meta = (ClampMin = "0"))
-	int Damage = 1;
-
-	/* /\ Damage /\ *\
-	\* ------------ */
 
 
 
@@ -169,15 +132,6 @@ public:
 	TSet<FIntPoint> GetEffectLocations() const;
 
 protected:
-
-	//Makes the trash spread goop within the effect area.
-	UPROPERTY(VisibleAnywhere, Category = "Effect")
-	UApplyField* GoopComponent;
-
-	//Makes the trash damage plants within the effected area.
-	UPROPERTY(VisibleAnywhere, Category = "Effect")
-	UDamagePlants* DamageComponent;
-
 	//The scale applied to the shape of this trash to get all effected locations of this trash's effects.
 	UPROPERTY(EditDefaultsOnly, Category = "Effect", Meta = (ClampMin = "0"))
 	int Range = 1;

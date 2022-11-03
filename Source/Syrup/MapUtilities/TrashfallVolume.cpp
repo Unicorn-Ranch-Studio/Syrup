@@ -150,7 +150,7 @@ bool ATrashfallVolume::SpawnTrash(bool bAttachTrash)
 
 		for (FIntPoint EachSpawnLocation : SpawnLocations)
 		{
-			FVector WorldLocation = UGridLibrary::GridTransformToWorldTransform(FGridTransform(EachSpawnLocation)).GetLocation();
+			FVector WorldLocation = UGridLibrary::GridLocationToWorldLocation(EachSpawnLocation);
 			if (GetWorld()->LineTraceTestByChannel(WorldLocation + FVector(0, 0, 1), WorldLocation + FVector(0, 0, -0.5), ECollisionChannel::ECC_GameTraceChannel2))
 			{
 				BadLocations.Add(EachSpawnLocation);

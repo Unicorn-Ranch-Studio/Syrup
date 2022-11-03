@@ -12,21 +12,33 @@
 /*
  * Gets the world transform of a grid transform.
  *
- * @param Location - The transform on the grid to get the transform of.
+ * @param GridTransform - The transform on the grid to get the transform of.
  * @return The world transform of the grid transform.
  */
 FTransform UGridLibrary::GridTransformToWorldTransform(const FGridTransform GridTransform)
 {
 	FIntPoint Location = GridTransform.Location;
 	bool bIsFlipped = IsGridLocationFlipped(Location);
-	double XLocation = GetGridHeight() * Location.X + (!bIsFlipped ? GetGridHeight() *.333333333333 : GetGridHeight() * .666666666666);
-	double YLocation = GetGridSideLength() * Location.Y * 0.5;
 	int Offset = (bIsFlipped ? 180 : 120);
 	int Direction = (bIsFlipped ? 120 : -120);
 	int Multiplier = (int)GridTransform.Direction;
 	FRotator Rotation = FRotator(0, Offset + Direction * Multiplier, 0);
 
-	return FTransform(Rotation, FVector(XLocation, YLocation, 0));
+	return FTransform(Rotation, GridLocationToWorldLocation(Location));
+}
+
+/*
+ * Gets the world location of a grid location.
+ *
+ * @param Location - The transform on the grid to get the transform of.
+ * @return The world transform of the grid transform.
+ */
+FVector UGridLibrary::GridLocationToWorldLocation(const FIntPoint GridLocation)
+{
+	double XLocation = GetGridHeight() * GridLocation.X + (!IsGridLocationFlipped(GridLocation) ? GetGridHeight() * .333333333333 : GetGridHeight() * .666666666666);
+	double YLocation = GetGridSideLength() * GridLocation.Y * 0.5;
+
+	return FVector(XLocation, YLocation, 0);
 }
 
 /*
@@ -78,6 +90,50 @@ FGridTransform UGridLibrary::WorldTransformToGridTransform(const FTransform Worl
 	EGridDirection Direction = (EGridDirection)(((int)(Yaw / 120) * 2) + (bIsFlipped ? 0 : 1));
 
 	return FGridTransform(ApproximateLocation, Direction);
+}
+
+/*
+ * Gets the grid location of a world location.
+ *
+ * @param WorldLocation - The transform in the world to get the grid location of.
+ * @return The grid location of the world location.
+ */
+FIntPoint UGridLibrary::WorldLocationToGridLocation(const FVector WorldLocation)
+{
+	//Scale to grid
+	FVector2D GridLocation = FVector2D(WorldLocation) / FVector2D(GetGridHeight(), GetGridSideLength() * 0.5);
+	GridLocation.Y += 0.5;
+
+	//Get the distance from the appropriate edge.
+	FVector2D RelativeLocation = FVector2D(FMath::Fractional(GridLocation.X), FMath::Fractional(GridLocation.Y));
+	if (RelativeLocation.X < 0)
+	{
+		RelativeLocation.X = 1 + RelativeLocation.X;
+	}
+	if (RelativeLocation.Y < 0)
+	{
+		RelativeLocation.Y = 1 + RelativeLocation.Y;
+	}
+
+	//Floor to grid location
+	FIntPoint ApproximateLocation = FIntPoint(FMath::Floor(GridLocation.X), FMath::Floor(GridLocation.Y));
+	bool bIsFlipped = IsGridLocationFlipped(ApproximateLocation);
+
+	//Adjust for points
+	if (RelativeLocation.X < 0.5 == bIsFlipped)
+	{
+		if (bIsFlipped)
+		{
+			RelativeLocation.X = 1 - RelativeLocation.X;
+		}
+
+		if (RelativeLocation.Y < RelativeLocation.X - 0.5 || 1 - RelativeLocation.Y < RelativeLocation.X - 0.5)
+		{
+			ApproximateLocation = ApproximateLocation + (RelativeLocation.Y > 0.5 ? FIntPoint(0, 1) : FIntPoint(0, -1));
+		}
+	}
+
+	return ApproximateLocation;
 }
 
 /*

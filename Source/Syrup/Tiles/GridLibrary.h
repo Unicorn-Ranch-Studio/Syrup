@@ -82,11 +82,20 @@ public:
 	/*
 	 * Gets the world transform of a grid transform.
 	 * 
-	 * @param Location - The transform on the grid to get the transform of.
+	 * @param GridTransform - The transform on the grid to get the transform of.
 	 * @return The world transform of the grid transform.
 	 */
 	UFUNCTION(BlueprintPure, Category="Transformation|Grid")
 	static FTransform GridTransformToWorldTransform(const FGridTransform GridTransform);
+
+	/*
+	 * Gets the world location of a grid location.
+	 *
+	 * @param Location - The transform on the grid to get the transform of.
+	 * @return The world transform of the grid transform.
+	 */
+	UFUNCTION(BlueprintPure, Category = "Transformation|Grid")
+	static FVector GridLocationToWorldLocation(const FIntPoint GridLocation);
 
 	/*
 	 * Gets the grid transform of a world transform.
@@ -97,6 +106,15 @@ public:
 	UFUNCTION(BlueprintPure, Category="Transformation|Grid")
 	static FGridTransform WorldTransformToGridTransform(const FTransform WorldTransform);
 	
+	/*
+	 * Gets the grid location of a world location.
+	 *
+	 * @param WorldLocation - The transform in the world to get the grid location of.
+	 * @return The grid location of the world location.
+	 */
+	UFUNCTION(BlueprintPure, Category="Transformation|Grid")
+	static FIntPoint WorldLocationToGridLocation(const FVector WorldLocation);
+
 	/*
 	 * Transforms the given grid location by the grid transform.
 	 * 
