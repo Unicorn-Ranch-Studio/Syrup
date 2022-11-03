@@ -41,6 +41,10 @@ ATile::ATile()
 	SubtileMesh->SetMaterial(0, TileMaterial);
 	SubtileMesh->NumCustomDataFloats = 2;
 	SubtileMesh->CastShadow = false;
+
+	//Create Label Root
+	LabelRoot = CreateDefaultSubobject<USceneComponent>(FName("Label Root"));
+	LabelRoot->AttachToComponent(SubtileMesh, FAttachmentTransformRules::KeepRelativeTransform);
 }
 
 /**
@@ -114,6 +118,7 @@ void ATile::ApplyField(EFieldType Type)
 		return;
 	}
 	FieldsToStrengths.Add(Type,  1);
+	UpdateField(Type, true);
 	for (int InstanceIndex = 0; InstanceIndex < SubtileMesh->PerInstanceSMCustomData.Num(); InstanceIndex++)
 	{
 		SubtileMesh->SetCustomDataValue(InstanceIndex, (uint8)Type, 1, true);
@@ -137,6 +142,7 @@ void ATile::RemoveField(EFieldType Type)
 		else
 		{
 			FieldsToStrengths.Remove(Type);
+			UpdateField(Type, false);
 			for (int InstanceIndex = 0; InstanceIndex < SubtileMesh->PerInstanceSMCustomData.Num(); InstanceIndex++)
 			{
 				SubtileMesh->SetCustomDataValue(InstanceIndex, (uint8)Type, 0, true);

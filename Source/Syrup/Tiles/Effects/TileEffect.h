@@ -7,6 +7,7 @@
 #include "TileEffect.generated.h"
 
 class ATile;
+class UTileLabel;
 
 /* \/ =========== \/ *\
 |  \/ UTileEffect \/  |
@@ -19,6 +20,23 @@ class SYRUP_API UTileEffect : public UActorComponent
 {
 	GENERATED_BODY()
 public:
+
+	/**
+	 * Registers this effects labels.
+	 * 
+	 * @param Locations - The locations to register labels at.
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Effect")
+	void RegisterLabels(const TSet<FIntPoint>& Locations);
+
+	/**
+	 * Unregisters this effects labels.
+	 * 
+	 * @param Locations - The locations to unregister labels at.
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Effect")
+	void UnregisterLabels(const TSet<FIntPoint>& Locations);
+
 	/**
 	 * Tries to activate the effect
 	 *
@@ -26,28 +44,15 @@ public:
 	 * @param Locations - The locations to effect.
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Effect", Meta = (AutoCreateRefTerm = "Locations"))
-	FORCEINLINE void ActivateEffect(const ETileEffectTriggerType TriggerType, const TSet<FIntPoint>& Locations) 
-	{ 
-		UE_LOG(LogTemp, Warning, TEXT("Type triggered: %s  |  On: %s  |  Pass: %s"), *StaticEnum<ETileEffectTriggerType>()->GetNameStringByValue((int64)TriggerType), *GetName(), *(Triggers.Contains(TriggerType) ? FString("Yes") : FString("No")))
-		if (Triggers.Contains(TriggerType))
-		{
-			Affect(Locations);
-		}
-	};
+	void ActivateEffect(const ETileEffectTriggerType TriggerType, const TSet<FIntPoint>& Locations);
+	
+	//The label that will be added to the location of the owner of this.
+	UPROPERTY(Instanced, EditAnywhere/*, Category = "Effect", Meta = (AllowAbstract = "false")*/)
+	UTileLabel* SourceLabel = nullptr;
 
-	/**
-	 * Tries to undo this effect.
-	 *
-	 * @param TriggerType - The type of effects that are currently being undone.
-	 */
-	UFUNCTION(BlueprintCallable, Category = "Effect")
-	FORCEINLINE void UndoEffect(const ETileEffectTriggerType TriggerType) 
-	{
-		if (Triggers.Contains(TriggerType))
-		{
-			Unaffect();
-		}
-	};
+	//The label that will be added to each of the effected locations.
+	UPROPERTY(Instanced, EditAnywhere/*, Category = "Effect", Meta = (AllowAbstract = "false")*/)
+	UTileLabel* EffectedLocationLabel = nullptr;
 
 protected:
 
@@ -59,12 +64,19 @@ protected:
 	UFUNCTION()
 	virtual FORCEINLINE void Affect(const TSet<FIntPoint>& Locations) { EffectedLocations = EffectedLocations.Union(Locations); };
 
-
 	/**
 	 * Undoes the effects of this.
 	 */
 	UFUNCTION()
 	virtual FORCEINLINE void Unaffect() {};
+
+
+	/**
+	 * Gets the subset of the given locations that will be labeled.
+	 *
+	 * @param Locations - The locations that will be effected by this component
+	 */
+	virtual FORCEINLINE TSet<FIntPoint> GetLabelLocations(const TSet<FIntPoint>& Locations) const { return EffectedLocations; };
 
 
 	//The triggers that will activate this effect.
@@ -76,14 +88,13 @@ protected:
 	TSet<FIntPoint> EffectedLocations = TSet<FIntPoint>();
 
 private:
+
 	/**
 	 * Called when a component is destroyed, and undoes this effect.
 	 *
 	 * @param	bDestroyingHierarchy  - True if the entire component hierarchy is being torn down, allows avoiding expensive operations
 	 */
-	virtual FORCEINLINE void OnComponentDestroyed(bool bDestroyingHierarchy) override { 
-		Unaffect();
-	};
+	virtual FORCEINLINE void OnComponentDestroyed(bool bDestroyingHierarchy) override { Unaffect(); };
 };
 /* /\ =========== /\ *\
 |  /\ UTileEffect /\  |

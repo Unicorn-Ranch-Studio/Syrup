@@ -50,7 +50,6 @@ public:
 	 *
 	 * @param Type - The type of field to apply.
 	 */
-	UFUNCTION()
 	void ApplyField(EFieldType Type);
 
 	/**
@@ -60,6 +59,19 @@ public:
 	 */
 	UFUNCTION()
 	void RemoveField(EFieldType Type);
+
+	/**
+	 * Applies visual changes based off of the change of field status.
+	 * 
+	 * @param Type - The type of field that was updated.
+	 * @param bNowPresent - Whether or not this is now in the given field type.
+	 */
+	UFUNCTION(BlueprintImplementableEvent)
+	void UpdateField(EFieldType Type, bool bNowPresent);
+
+	//The root for any tile labels labeling this tile.
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	USceneComponent* LabelRoot;
 
 protected:
 
