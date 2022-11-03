@@ -52,6 +52,7 @@ void APlant::OnConstruction(const FTransform& Transform)
 {
 	Super::OnConstruction(Transform);
 
+	SubtileMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
 	Health = GetMaxHealth();
 	Range = GetRange();
 	Shape.Add(FIntPoint::ZeroValue);
@@ -111,6 +112,40 @@ bool APlant::ReceiveDamage(int Amount, ATile* Cause)
 
 /* ------------ *\
 \* \/ Growth \/ */
+
+/**
+ * Plants a plant with the given transform.
+ * 
+ * @param WoldContextObject - Any object in the would to spawn the plant in.
+ * @param EnergyReserve - The variable attempt to subtract the planting cost from.
+ * @param PlantClass - The type of plant to plant.
+ * @param Transform - The location to spawn the plant at.
+ * 
+ * @return Whether there was enough energy and space to plant the plant.
+ */
+bool APlant::SowPlant(UObject* WorldContextObject, int& EnergyReserve, TSubclassOf<APlant> PlantClass, FTransform Transform)
+{
+	if (!IsValid(PlantClass) || PlantClass.Get()->HasAnyClassFlags(CLASS_Abstract))
+	{
+		UE_LOG(LogPlant, Error, TEXT("Tried to sow null or abstract plant."))
+		return false;
+	}
+	APlant* DefaultPlant = PlantClass.GetDefaultObject();
+	int NeededEnergy = DefaultPlant->GetPlantingCost();
+	if (EnergyReserve >= NeededEnergy)
+	{
+		FGridTransform GridTransform = UGridLibrary::WorldTransformToGridTransform(Transform);
+		TSet<ATile*> BlockingTiles;
+
+		if(!UGridLibrary::OverlapShape(WorldContextObject, UGridLibrary::TransformShape(DefaultPlant->GetShape(), GridTransform), BlockingTiles, TArray<AActor*>())) 
+		{
+			WorldContextObject->GetWorld()->SpawnActor<APlant>(PlantClass, UGridLibrary::GridTransformToWorldTransform(GridTransform));
+			EnergyReserve -= NeededEnergy;
+			return true;
+		}
+	}
+	return false;
+}
 
 /**
  * Updates the plants so that it is 1 turn closer to fully grown, and causes the effects of being fully grown if needed.

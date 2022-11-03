@@ -57,6 +57,8 @@ void ATrash::OnConstruction(const FTransform& Transform)
 {
 	Super::OnConstruction(Transform);
 
+	SubtileMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
+
 	Range = GetRange();
 	Shape.Add(FIntPoint::ZeroValue);
 }

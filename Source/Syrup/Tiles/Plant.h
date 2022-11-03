@@ -134,6 +134,18 @@ protected:
 	\* \/ Growth \/ */
 
 public:
+	/**
+	 * Plants a plant with the given transform.
+	 *
+	 * @param WoldContextObject - Any object in the would to spawn the plant in.
+	 * @param EnergyReserve - The variable attempt to subtract the planting cost from.
+	 * @param PlantClass - The type of plant to plant.
+	 * @param Transform - The location to spawn the plant at.
+	 *
+	 * @return Whether there was enough energy and space to plant the plant.
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Growth", Meta = (WorldContext = "WorldContextObject"))
+	static bool SowPlant(UObject* WorldContextObject, UPARAM(Ref) int& EnergyReserve, TSubclassOf<APlant> PlantClass, FTransform Transform);
 
 	/**
 	 * Gets the turns taken for this plant type to grow.
