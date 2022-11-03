@@ -16,20 +16,6 @@
 \* \/ Initialization \/ */
 
 /**
- * Creates the mesh and effect components.
- */
-ATrash::ATrash()
-{
-	//Init Grass
-	GoopComponent = CreateDefaultSubobject<UApplyField>(FName("Goop Zone"));
-	GoopComponent->FieldType = EFieldType::Damage;
-
-	//Init Prevent Trash Spawn
-	DamageComponent = CreateDefaultSubobject<UDamagePlants>(FName("Damage Zone"));
-	UpdateDamage();
-}
-
-/**
  * Sets up this trash after it has fallen.
  */
 void ATrash::OnFinishedFalling()
@@ -63,25 +49,6 @@ void ATrash::OnConstruction(const FTransform& Transform)
 
 /* /\ Initialization /\ *\
 \* -------------------- */
-
-
-
-/* ------------ *\
-\* \/ Damage \/ */
-
-/**
- * Updates the damage that this trash will deal.
- *
- * @param AmountAdded - The number of damage points to add to the current damage of this trash. May be a negative number
- */
-void ATrash::UpdateDamage(int AmountAdded)
-{
-	Damage = FMath::Max(0, Damage + AmountAdded);
-	DamageComponent->SetDamage(Damage);
-}
-
-/* /\ Damage /\ *\
-\* ------------ */
 
 
 

@@ -28,7 +28,7 @@ public:
 	 * 
 	 * @return The number of damage points this effect will cause to plants.
 	 */
-	UFUNCTION(BlueprintPure, Category = "Damage")
+	UFUNCTION(BlueprintPure, Category = "Effect")
 	FORCEINLINE int GetDamage() const { return Damage; };
 
 	/**
@@ -36,7 +36,7 @@ public:
 	 * 
 	 * @param AmountAdded - The new number of damage points this effect will cause to plants.
 	 */
-	UFUNCTION(BlueprintCallable, Category = "Damage")
+	UFUNCTION(BlueprintCallable, Category = "Effect")
 	FORCEINLINE void SetDamage(int NewDamage) { Damage = FMath::Max(0, NewDamage); };
 
 protected:
@@ -48,8 +48,15 @@ protected:
 	 */
 	virtual void Affect(const TSet<FIntPoint>& Locations) override;
 
+	/**
+	 * Gets the subset of the given locations that will be labeled.
+	 *
+	 * @param Locations - The locations that will be effected by this component
+	 */
+	virtual TSet<FIntPoint> GetLabelLocations(const TSet<FIntPoint>& Locations) const override;
+
 	//The type of field to apply
-	UPROPERTY(EditDefaultsOnly, Category = "Damage", Meta = (ClampMin = "0"))
+	UPROPERTY(EditDefaultsOnly, Category = "Effect", Meta = (ClampMin = "0"))
 	int Damage = 1;
 };
 /* /\ ============= /\ *\

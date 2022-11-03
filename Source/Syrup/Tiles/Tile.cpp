@@ -41,6 +41,10 @@ ATile::ATile()
 	SubtileMesh->SetMaterial(0, TileMaterial);
 	SubtileMesh->NumCustomDataFloats = 2;
 	SubtileMesh->CastShadow = false;
+
+	//Create Label Root
+	LabelRoot = CreateDefaultSubobject<USceneComponent>(FName("Label Root"));
+	LabelRoot->AttachToComponent(SubtileMesh, FAttachmentTransformRules::KeepRelativeTransform);
 }
 
 /**
