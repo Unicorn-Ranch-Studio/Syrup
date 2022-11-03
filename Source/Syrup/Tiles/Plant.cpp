@@ -36,11 +36,6 @@ void APlant::BeginPlay()
 {
 	Super::BeginPlay();
 
-	SubtileMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
-	Health = GetMaxHealth();
-	Range = GetRange();
-	Shape.Add(FIntPoint::ZeroValue);
-
 	TimeUntilGrown = GetTimeUntilGrown() + 1;
 	Grow();
 
