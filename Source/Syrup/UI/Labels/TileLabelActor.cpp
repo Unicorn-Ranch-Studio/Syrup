@@ -39,7 +39,7 @@ UTileLabelContainer* ATileLabelActor::Create(const UObject* WorldContextObject, 
     CreatedActor->GridLocation = Location;
 
     ASyrupGameMode::GetTileEffectTriggerDelegate(WorldContextObject).AddDynamic(CreatedActor, &ATileLabelActor::ReceiveEffectTrigger);
-    CreatedContainer->OnContainerEmptied.AddLambda([CreatedActor]() { CreatedActor->Destroy(); });
+    //CreatedContainer->OnContainerEmptied.AddLambda([CreatedActor]() { CreatedActor->Destroy(); });
     CreatedActor->Snap();
 
     return CreatedContainer;

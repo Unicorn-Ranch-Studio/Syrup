@@ -162,8 +162,8 @@ private:
 	FIntPoint ActiveLabelLocation = FIntPoint::ZeroValue;
 
 	//The blueprint TileLabelContainer class.
-	UPROPERTY()
-	UClass* TileLabelContainerClass;
+	UPROPERTY(EditAnywhere, Category = "Classes")
+	TSubclassOf<UTileLabelContainer> TileLabelContainerClass;
 
 	/* /\ UI /\ *\
 	\* -------- */

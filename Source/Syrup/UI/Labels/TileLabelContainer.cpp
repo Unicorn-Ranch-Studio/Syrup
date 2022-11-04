@@ -42,16 +42,19 @@ void UTileLabelContainer::RegisterLabel(UTileLabel* Label)
  */
 void UTileLabelContainer::UnregisterLabel(const UTileLabel* Label)
 {
-	UTileLabel* ExistingLabel = *Labels.FindByPredicate([Label](UTileLabel* EachLabel) { return EachLabel->GetClass() == Label->GetClass(); });
-	if (IsValid(ExistingLabel))
+	if (!Labels.IsEmpty())
 	{
-		ExistingLabel->SplitFrom(Label);
-		if (!ExistingLabel->GetParent())
+		UTileLabel* ExistingLabel = *Labels.FindByPredicate([Label](UTileLabel* EachLabel) { return EachLabel->GetClass() == Label->GetClass(); });
+		if (IsValid(ExistingLabel))
 		{
-			Labels.Remove(ExistingLabel);
-			if (Labels.IsEmpty())
+			ExistingLabel->SplitFrom(Label);
+			if (!ExistingLabel->GetParent())
 			{
-				OnContainerEmptied.Broadcast();
+				Labels.Remove(ExistingLabel);
+				if (Labels.IsEmpty())
+				{
+					OnContainerEmptied.Broadcast();
+				}
 			}
 		}
 	}

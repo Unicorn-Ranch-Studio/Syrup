@@ -47,11 +47,11 @@ public:
 	void ActivateEffect(const ETileEffectTriggerType TriggerType, const TSet<FIntPoint>& Locations);
 	
 	//The label that will be added to the location of the owner of this.
-	UPROPERTY(Instanced, EditAnywhere/*, Category = "Effect", Meta = (AllowAbstract = "false")*/)
+	UPROPERTY(Instanced, EditAnywhere, BlueprintReadOnly, Category = "Effect", Meta = (AllowAbstract = "false"))
 	UTileLabel* SourceLabel = nullptr;
 
 	//The label that will be added to each of the effected locations.
-	UPROPERTY(Instanced, EditAnywhere/*, Category = "Effect", Meta = (AllowAbstract = "false")*/)
+	UPROPERTY(Instanced, EditAnywhere, BlueprintReadOnly, Category = "Effect", Meta = (AllowAbstract = "false"))
 	UTileLabel* EffectedLocationLabel = nullptr;
 
 protected:
@@ -76,7 +76,7 @@ protected:
 	 *
 	 * @param Locations - The locations that will be effected by this component
 	 */
-	virtual FORCEINLINE TSet<FIntPoint> GetLabelLocations(const TSet<FIntPoint>& Locations) const { return EffectedLocations; };
+	virtual FORCEINLINE TSet<FIntPoint> GetLabelLocations(const TSet<FIntPoint>& Locations) const { return Locations; };
 
 
 	//The triggers that will activate this effect.
@@ -95,6 +95,10 @@ private:
 	 * @param	bDestroyingHierarchy  - True if the entire component hierarchy is being torn down, allows avoiding expensive operations
 	 */
 	virtual FORCEINLINE void OnComponentDestroyed(bool bDestroyingHierarchy) override { Unaffect(); };
+
+	//Whether or not the source of this has been labeled.
+	UPROPERTY()
+	bool bSourceLabeled = false;
 };
 /* /\ =========== /\ *\
 |  /\ UTileEffect /\  |

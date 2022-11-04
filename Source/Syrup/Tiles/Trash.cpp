@@ -96,11 +96,14 @@ void ATrash::ReceiveEffectTrigger(const ETileEffectTriggerType TriggerType, cons
 	TSet<FIntPoint> EffectedLocations = GetEffectLocations();
 	TSet<FIntPoint> TriggeredLocations = LocationsToTrigger.IsEmpty() ? EffectedLocations : LocationsToTrigger.Intersect(EffectedLocations);
 
-	TInlineComponentArray<UActorComponent*> Components = TInlineComponentArray<UActorComponent*>();
-	GetComponents(UTileEffect::StaticClass(), Components);
-	for (UActorComponent* EachComponent : Components)
+	if (!TriggeredLocations.IsEmpty())
 	{
-		Cast<UTileEffect>(EachComponent)->ActivateEffect(TriggerType, EffectedLocations);
+		TInlineComponentArray<UActorComponent*> Components = TInlineComponentArray<UActorComponent*>();
+		GetComponents(UTileEffect::StaticClass(), Components);
+		for (UActorComponent* EachComponent : Components)
+		{
+			Cast<UTileEffect>(EachComponent)->ActivateEffect(TriggerType, TriggeredLocations);
+		}
 	}
 }
 
