@@ -18,7 +18,7 @@ class UBoxComponent;
 /**
  * Serves as a spawn point for trash.
  */
-UCLASS()
+UCLASS(HideCategories = ("Navigation", "HLOD", "Physics", "Collision", "Rendering", "Tags", "Cooking", "Replication", "Input", "Actor", "Mobile", "RayTracing", "AssetUserData"))
 class SYRUP_API ATrashfallVolume : public AActor
 {
 	GENERATED_BODY()
@@ -52,7 +52,7 @@ public:
 	bool bStartWithTrash = true;
 protected:
 	//The area in which this will attempt to spawn trash.
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
 	UBoxComponent* SpawnArea;
 
 private:
