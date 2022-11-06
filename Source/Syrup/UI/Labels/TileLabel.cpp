@@ -99,6 +99,17 @@ void UTileLabel::NativeConstruct()
 }
 
 /**
+ * Unbinds the appropriate visibility events
+ */
+void UTileLabel::NativeDestruct()
+{
+	if (LabelVisisbility != ETileLabelVisibility::Never || LabelVisisbility != ETileLabelVisibility::Always)
+	{
+		ASyrupGameMode::GetOnActiveLabelChangedDelegate(this).RemoveDynamic(this, &UTileLabel::OnTileLabelActivityChanged);
+	}
+}
+
+/**
  * Sets the appropriate visibility of this given the new activation state.
  */
 void UTileLabel::OnTileLabelActivityChanged(bool bNowActive, FIntPoint NewLocation)

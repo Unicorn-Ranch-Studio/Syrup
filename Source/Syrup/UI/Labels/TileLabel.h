@@ -81,6 +81,11 @@ private:
 	virtual void NativeConstruct() override;
 
 	/**
+	 * Unbinds the appropriate visibility events
+	 */
+	virtual void NativeDestruct() override;
+
+	/**
 	 * Sets the appropriate visibility of this given the new activation state.
 	 */
 	UFUNCTION()
