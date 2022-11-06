@@ -170,12 +170,41 @@ void ASyrupGameMode::UnregisterTileLabel(const UObject* WorldContextObject, cons
 			if (IsValid(LabelContainer))
 			{
 				LabelContainer->UnregisterLabel(Label);
+				if (LabelContainer->IsEmpty())
+				{
+					GameMode->LocationsToLabelConatiners.Remove(Location);
+				}
 			}
 		}
 	}
 	else
 	{
 		UE_LOG(LogLabel, Error, TEXT("Can't unregistered label. Label is null."))
+	}
+}
+
+/**
+ * Updates a tile label.
+ *
+ * @param WorldContextObject - An object in the same world as the label.
+ * @param PreviousLabel - The old label being rendered.
+ * @param Label - The new label to render.
+ * @param Location - The location being labeled.
+ */
+void ASyrupGameMode::UpdateTileLabel(const UObject* WorldContextObject, UTileLabel* PreviousLabel, UTileLabel* Label, const FIntPoint Location)
+{
+	if (IsValid(Label) && IsValid(PreviousLabel))
+	{
+		ASyrupGameMode* GameMode = Cast<ASyrupGameMode>(UGameplayStatics::GetGameMode(WorldContextObject));
+		UTileLabelContainer* LabelContainer = GameMode->LocationsToLabelConatiners.FindRef(Location);
+		if (ensure(IsValid(LabelContainer)))
+		{
+			LabelContainer->UpdateLabel(PreviousLabel, Label);
+		}
+	}
+	else
+	{
+		UE_LOG(LogLabel, Error, TEXT("Can't update label. Label is null."))
 	}
 }
 

@@ -78,6 +78,16 @@ void UTileLabel::SplitFrom_Implementation(const UTileLabel* Other)
 }
 
 /**
+ * Whether or not this label is empty of data
+ *
+ * @return Whether or not any labels (including the initial label) have been merged into this.
+ */
+bool UTileLabel::IsEmpty() const
+{
+	return MergeCount <= 0;
+}
+
+/**
  * Binds the appropriate visibility events
  */
 void UTileLabel::NativeConstruct()

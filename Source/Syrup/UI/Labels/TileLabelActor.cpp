@@ -39,7 +39,7 @@ UTileLabelContainer* ATileLabelActor::Create(const UObject* WorldContextObject, 
     CreatedActor->GridLocation = Location;
 
     ASyrupGameMode::GetTileEffectTriggerDelegate(WorldContextObject).AddDynamic(CreatedActor, &ATileLabelActor::ReceiveEffectTrigger);
-    //CreatedContainer->OnContainerEmptied.AddLambda([CreatedActor]() { CreatedActor->Destroy(); });
+    CreatedContainer->OnContainerEmptied.AddUObject(CreatedActor, &ATileLabelActor::DestroyLabel);
     CreatedActor->Snap();
 
     return CreatedContainer;
@@ -90,4 +90,10 @@ void ATileLabelActor::Snap()
     {
         WidgetComponent->SetRelativeLocation(FVector::ZeroVector);
     }
+}
+
+void ATileLabelActor::DestroyLabel()
+{
+    UE_LOG(LogTemp, Warning, TEXT("Destroy"))
+    Destroy();
 }

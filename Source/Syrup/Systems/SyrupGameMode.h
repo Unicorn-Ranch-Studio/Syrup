@@ -134,7 +134,18 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category = "UI", Meta = (WorldContext = "WorldContextObject"))
 	static void UnregisterTileLabel(const UObject* WorldContextObject, const UTileLabel* Label, const FIntPoint Location);
-
+	
+	/**
+	 * Updates a tile label.
+	 *
+	 * @param WorldContextObject - An object in the same world as the label.
+	 * @param PreviousLabel - The old label being rendered.
+	 * @param Label - The new label to render.
+	 * @param Location - The location being labeled.
+	 */
+	UFUNCTION(BlueprintCallable, Category = "UI", Meta = (WorldContext = "WorldContextObject"))
+	static void UpdateTileLabel(const UObject* WorldContextObject, UTileLabel* PreviousLabel, UTileLabel* Label, const FIntPoint Location);
+	
 	/**
 	 * Gets the delegate used to bind and trigger tile label activation change effects.
 	 * 

@@ -15,8 +15,12 @@
  */
 void UTileLabelComponent::UpdateLabel()
 {
-	ASyrupGameMode::UnregisterTileLabel(this, Label, Location);
-	ASyrupGameMode::RegisterTileLabel(this, Label, Location);
+	if (ensure(IsValid(CurrentLabel)))
+	{
+		ASyrupGameMode::UpdateTileLabel(this, CurrentLabel, Label, Location);
+		CurrentLabel = Label;
+		Label = Label->CreateCopy(this, FIntPoint());
+	}
 }
 
 /**
@@ -30,6 +34,8 @@ void UTileLabelComponent::BeginPlay()
 
 	Label->SourceLocations.Add(Location);
 	ASyrupGameMode::RegisterTileLabel(this, Label, Location);
+	CurrentLabel = Label;
+	Label = Label->CreateCopy(this, FIntPoint());
 }
 
 /**

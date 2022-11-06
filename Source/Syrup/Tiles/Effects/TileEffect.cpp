@@ -30,7 +30,8 @@ void UTileEffect::RegisterLabels(const TSet<FIntPoint>& Locations)
 
 	if (IsValid(EffectedLocationLabel))
 	{
-		for (FIntPoint EachLabelLocation : GetLabelLocations(Locations.Difference(EffectedLocations)))
+		TSet<FIntPoint> LabelLocations = GetLabelLocations(Locations.Difference(EffectedLocations));
+		for (FIntPoint EachLabelLocation : LabelLocations)
 		{
 			EffectedLocationLabel->SourceLocations.Add(GridLocation);
 			ASyrupGameMode::RegisterTileLabel(this, EffectedLocationLabel, EachLabelLocation);

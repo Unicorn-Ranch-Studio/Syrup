@@ -98,6 +98,7 @@ void ATrash::ReceiveEffectTrigger(const ETileEffectTriggerType TriggerType, cons
 
 	if (!TriggeredLocations.IsEmpty())
 	{
+		UE_LOG(LogTemp, Warning, TEXT("%s Received %s"), *GetName(), *StaticEnum<ETileEffectTriggerType>()->GetDisplayNameTextByValue((int64)TriggerType).ToString());
 		TInlineComponentArray<UActorComponent*> Components = TInlineComponentArray<UActorComponent*>();
 		GetComponents(UTileEffect::StaticClass(), Components);
 		for (UActorComponent* EachComponent : Components)

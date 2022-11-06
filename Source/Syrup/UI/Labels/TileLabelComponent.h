@@ -41,6 +41,11 @@ protected:
 	virtual void OnComponentDestroyed(bool bDestroyingHierarchy) override;
 
 private:
+
+	//The label currently registered.
+	UPROPERTY()
+	UTileLabel* CurrentLabel = nullptr;
+
 	//The location being labeled.
 	UPROPERTY()
 	FIntPoint Location = FIntPoint::ZeroValue;

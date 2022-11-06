@@ -52,6 +52,15 @@ public:
 	void SplitFrom(const UTileLabel* Other);
 	void SplitFrom_Implementation(const UTileLabel* Other);
 
+
+	/**
+	 * Whether or not this label is empty of data
+	 *
+	 * @return Whether or not any labels (including the initial label) have been merged into this.
+	 */
+	UFUNCTION(BlueprintPure)
+	bool IsEmpty() const;
+
 	//The locations of all the things creating this label.
 	UPROPERTY(BlueprintReadOnly)
 	TSet<FIntPoint> SourceLocations = TSet<FIntPoint>();

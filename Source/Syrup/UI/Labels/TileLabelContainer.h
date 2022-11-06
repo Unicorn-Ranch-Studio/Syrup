@@ -43,6 +43,23 @@ public:
 	UFUNCTION()
 	void UnregisterLabel(const UTileLabel* Label);
 	
+	/**
+	 * Updates a label inside this container.
+	 *
+	 * @param PrevousLabel - The old label whose values are to overridden.
+	 * @param Label - The new label to whose values are to be copied.
+	 */
+	UFUNCTION()
+	void UpdateLabel(const UTileLabel* PrevousLabel, const UTileLabel* Label);
+
+	/**
+	 * Whether or not this is empty of labels.
+	 *
+	 * @return Whether or not this does not contains labels.
+	 */
+	UFUNCTION(BlueprintPure)
+	bool IsEmpty() const;
+
 	//The location of this container.
 	UPROPERTY(BlueprintReadOnly)
 	FIntPoint Location = FIntPoint::ZeroValue;

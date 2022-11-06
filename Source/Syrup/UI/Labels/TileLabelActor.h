@@ -49,6 +49,9 @@ private:
 	UFUNCTION()
 	void ReceiveEffectTrigger(const ETileEffectTriggerType TriggerType, const TSet<FIntPoint>& LocationsToTrigger);
 
+	UFUNCTION()
+	void DestroyLabel();
+
 	//The location this actor is labeling.
 	UPROPERTY()
 	FIntPoint GridLocation = FIntPoint::ZeroValue;
