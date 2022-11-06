@@ -77,7 +77,7 @@ void ATrashfallVolume::OnConstruction(const FTransform& Transform)
 	TArray<AActor*> AttachedTrashPieces;
 	GetAttachedActors(AttachedTrashPieces);
 
-	if (!bStartWithTrash || (!AttachedTrashPieces.IsEmpty() && AttachedTrashPieces[0]->GetClass() != TrashType.Get()))
+	if ((!AttachedTrashPieces.IsEmpty() && AttachedTrashPieces[0]->GetClass() != TrashType.Get()))
 	{
 		for (AActor* EachAttachedTrashPiece : AttachedTrashPieces)
 		{
@@ -87,15 +87,15 @@ void ATrashfallVolume::OnConstruction(const FTransform& Transform)
 		AttachedTrashPieces.Empty();
 	}
 
-	while (AttachedTrashPieces.Num() > NumToMaintain)
+	while (AttachedTrashPieces.Num() > NumToMaintain * InitalTrashPercent)
 	{
 		AttachedTrashPieces.Last()->Destroy();
 		AttachedTrashPieces.RemoveAt(AttachedTrashPieces.Num() - 1);
 	}
 
-	if (bStartWithTrash && IsValid(TrashType))
+	if (IsValid(TrashType))
 	{
-		while (NumTrash < NumToMaintain)
+		while (NumTrash < NumToMaintain * InitalTrashPercent)
 		{
 			if (!SpawnTrash(true))
 			{

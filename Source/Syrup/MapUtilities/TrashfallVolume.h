@@ -48,8 +48,8 @@ public:
 	int TurnsBetweenSpawns = 1;
 
 	//Whether or not this volume should already be at capacity when the game starts.
-	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = "Trashfall")
-	bool bStartWithTrash = true;
+	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = "Trashfall", Meta = (ClampMin = "0", ClampMax = "1"))
+	float InitalTrashPercent = 1;
 protected:
 	//The area in which this will attempt to spawn trash.
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
