@@ -193,9 +193,9 @@ void ASyrupGameMode::UnregisterTileLabel(const UObject* WorldContextObject, cons
  */
 void ASyrupGameMode::UpdateTileLabel(const UObject* WorldContextObject, UTileLabel* PreviousLabel, UTileLabel* Label, const FIntPoint Location)
 {
-	if (IsValid(Label) && IsValid(PreviousLabel))
+	ASyrupGameMode* GameMode = Cast<ASyrupGameMode>(UGameplayStatics::GetGameMode(WorldContextObject));
+	if (IsValid(Label) && IsValid(PreviousLabel) && GameMode->LocationsToLabelConatiners.Contains(Location))
 	{
-		ASyrupGameMode* GameMode = Cast<ASyrupGameMode>(UGameplayStatics::GetGameMode(WorldContextObject));
 		UTileLabelContainer* LabelContainer = GameMode->LocationsToLabelConatiners.FindRef(Location);
 		if (ensure(IsValid(LabelContainer)))
 		{
