@@ -49,6 +49,8 @@ void ASyrupPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInp
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 	PlayerInputComponent->BindAxis(TEXT("MoveForward"), this, &ASyrupPlayerCharacter::MoveForward);
 	PlayerInputComponent->BindAxis(TEXT("MoveRight"), this, &ASyrupPlayerCharacter::MoveRight);
+	PlayerInputComponent->BindAction(TEXT("Plant"), this, &ASyrupPlayerCharacter::Plant);
+	PlayerInputComponent->BindAction(TEXT("EndTurn"), this, &ASyrupPlayerCharacter::EndTurn);
 }
 
 /**
@@ -71,6 +73,15 @@ void ASyrupPlayerCharacter::MoveRight(float AxisValue)
 	GetCharacterMovement()->AddInputVector(FVector(0.f, AxisValue, 0.f));
 }
 
+void ASyrupPlayerCharacter::Plant()
+{
+
+}
+
+void ASyrupPlayerCharacter::EndTurn()
+{
+
+}
 /* /\ ===================== /\ *\
 |  /\ ASyrupPlayerCharacter /\  |
 \* /\ ===================== /\ */

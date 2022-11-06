@@ -70,6 +70,12 @@ private:
 	UFUNCTION()
 	void MoveRight(float AxisValue);
 
+	UFUNCTION()
+	void Plant();
+
+	UFUNCTION()
+	void EndTurn();
+
 	/* /\ Input /\ *\
 	\* ----------- */
 };
