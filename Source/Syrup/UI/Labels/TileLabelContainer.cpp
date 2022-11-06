@@ -48,15 +48,12 @@ void UTileLabelContainer::UnregisterLabel(const UTileLabel* Label)
 		UTileLabel* ExistingLabel = *Labels.FindByPredicate([Label](UTileLabel* EachLabel) { return EachLabel->GetClass() == Label->GetClass(); });
 		if (IsValid(ExistingLabel))
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Split"))
 			ExistingLabel->SplitFrom(Label);
 			if (ExistingLabel->IsEmpty())
 			{
-				UE_LOG(LogTemp, Warning, TEXT("Maby should desroy"))
 				Labels.Remove(ExistingLabel);
 				if (Labels.IsEmpty())
 				{
-					UE_LOG(LogTemp, Warning, TEXT("Should Destroy"))
 					OnContainerEmptied.Broadcast();
 				}
 			}
@@ -83,10 +80,6 @@ void UTileLabelContainer::UpdateLabel(const UTileLabel* PrevousLabel, const UTil
 				SetUpLabel(ExistingLabel);
 			}
 			ExistingLabel->MergeFrom(Label);
-		}
-		else
-		{
-			UE_LOG(LogTemp, Error, TEXT("Test %i"), Labels.IsEmpty() ? 1:2)
 		}
 	}
 }

@@ -94,6 +94,5 @@ void ATileLabelActor::Snap()
 
 void ATileLabelActor::DestroyLabel()
 {
-    UE_LOG(LogTemp, Warning, TEXT("Destroy"))
     Destroy();
 }
