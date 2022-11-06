@@ -30,7 +30,7 @@ void UTileLabelComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	Location = UGridLibrary::WorldLocationToGridLocation(GetComponentLocation());
+	Location = UGridLibrary::WorldLocationToGridLocation(GetOwner()->GetActorLocation());
 
 	Label->SourceLocations.Add(Location);
 	ASyrupGameMode::RegisterTileLabel(this, Label, Location);
@@ -43,7 +43,7 @@ void UTileLabelComponent::BeginPlay()
  */
 void UTileLabelComponent::OnComponentDestroyed(bool bDestroyingHierarchy)
 {
-	ASyrupGameMode::UnregisterTileLabel(this, Label, UGridLibrary::WorldLocationToGridLocation(GetComponentLocation()));
+	ASyrupGameMode::UnregisterTileLabel(this, Label, UGridLibrary::WorldLocationToGridLocation(GetOwner()->GetActorLocation()));
 
 	Super::OnComponentDestroyed(bDestroyingHierarchy);
 }

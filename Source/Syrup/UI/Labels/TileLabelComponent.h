@@ -15,7 +15,7 @@ class UTileLabel;
  * Registers a tile label at its location.
  */
 UCLASS(ClassGroup=(Custom), Meta=(BlueprintSpawnableComponent))
-class SYRUP_API UTileLabelComponent : public USceneComponent
+class SYRUP_API UTileLabelComponent : public UActorComponent
 {
 	GENERATED_BODY()
 public:
