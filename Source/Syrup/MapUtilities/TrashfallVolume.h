@@ -45,7 +45,7 @@ public:
 
 	//The number of turns it takes for this volume to spawn a piece of trash.
 	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = "Trashfall", Meta = (ClampMin = "0"))
-	int TurnsBetweenSpawns = 1;
+	float TurnsBetweenSpawns = 1;
 
 	//Whether or not this volume should already be at capacity when the game starts.
 	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = "Trashfall", Meta = (ClampMin = "0", ClampMax = "1"))
@@ -110,9 +110,9 @@ private:
 	UPROPERTY()
 	int NumTiles = 0;
 	
-	//The number of turns until this will spawn another trash.
+	//The number of trash to spawn next turn.
 	UPROPERTY()
-	int TurnsUntilSpawn = 1;
+	float TrashToSpawn = 0;
 
 	//Locations known to block trash spawning.
 	UPROPERTY()

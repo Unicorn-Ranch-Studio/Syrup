@@ -45,8 +45,6 @@ void ATrashfallVolume::BeginPlay()
 
 	Super::BeginPlay();
 
-	TurnsUntilSpawn = TurnsBetweenSpawns;
-
 	ASyrupGameMode::GetTileEffectTriggerDelegate(this).AddDynamic(this, &ATrashfallVolume::ReceiveEffectTrigger);
 }
 
@@ -115,9 +113,14 @@ void ATrashfallVolume::ReceiveEffectTrigger(const ETileEffectTriggerType Trigger
 {
 	BadLocations = TSet<FIntPoint>();
 
-	if (TriggerType == ETileEffectTriggerType::TrashSpread && NumTrash < NumToMaintain && TurnsUntilSpawn-- <= 0)
+	if (TriggerType == ETileEffectTriggerType::TrashSpread && NumTrash < NumToMaintain)
 	{
-		SpawnTrash();
+		TrashToSpawn += TurnsBetweenSpawns ? 1 / TurnsBetweenSpawns : NumToMaintain - NumTrash;
+		while (TrashToSpawn >= 1)
+		{
+			TrashToSpawn--;
+			SpawnTrash();
+		}
 	}
 }
 
@@ -161,7 +164,6 @@ bool ATrashfallVolume::SpawnTrash(bool bAttachTrash)
 		ATrash* SpawnedTrash = GetWorld()->SpawnActor<ATrash>(TrashType, SpawnWorldTransform);
 		SpawnedTrash->OnDestroyed.AddDynamic(this, &ATrashfallVolume::ReciveTrashDestoryed);
 		NumTrash++;
-		TurnsUntilSpawn = TurnsBetweenSpawns;
 
 		//BadLocations = BadLocations.Union(SpawnLocations);
 
