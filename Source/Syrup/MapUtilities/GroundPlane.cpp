@@ -66,11 +66,12 @@ void AGroundPlane::OnConstruction(const FTransform& Transform)
 	LocationsToInstanceIndices.Empty();
 	FieldTypeToLocationToStrengths.Empty();
 
-	for (int IndexX = -(PlaneSize.X / 2); IndexX < PlaneSize.X / 2 + PlaneSize.X % 2; IndexX++)
+	FVector2D PlaneSize = FVector2D(GetActorScale().X * 5.7735027, GetActorScale().Y * 10);
+	for (int IndexX = -(PlaneSize.X / 2); IndexX < PlaneSize.X / 2 + (int)PlaneSize.X % 2; IndexX++)
 	{
-		for (int IndexY = -(PlaneSize.Y / 2); IndexY < PlaneSize.Y / 2 + PlaneSize.Y % 2; IndexY++)
+		for (int IndexY = -(PlaneSize.Y / 2); IndexY < PlaneSize.Y / 2 + (int)PlaneSize.Y % 2; IndexY++)
 		{
-			FIntPoint GridLocation = FIntPoint(IndexX, IndexY) + Offset;
+			FIntPoint GridLocation = FIntPoint(IndexX, IndexY) + UGridLibrary::WorldLocationToGridLocation(GetActorLocation());
 			LocationsToInstanceIndices.Add(GridLocation, GroundMeshComponent->AddInstance(UGridLibrary::GridTransformToWorldTransform(FGridTransform(GridLocation)) * FTransform(FVector(0, 0, -0.1)), true));
 		}
 	}

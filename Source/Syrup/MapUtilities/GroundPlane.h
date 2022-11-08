@@ -22,15 +22,7 @@ class SYRUP_API AGroundPlane : public AActor
 {
 	GENERATED_BODY()
 	
-public:	
-	//The size of the grid to track fields in.
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	FIntPoint PlaneSize = FIntPoint(100, 100);
-
-	//The grid offset of this plane.
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	FIntPoint Offset = FIntPoint(0, 0);
-
+public:
 	/**
 	 * Applies a field in a given area.
 	 *
