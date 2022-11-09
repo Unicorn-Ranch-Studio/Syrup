@@ -66,12 +66,61 @@ void AGroundPlane::OnConstruction(const FTransform& Transform)
 	LocationsToInstanceIndices.Empty();
 	FieldTypeToLocationToStrengths.Empty();
 
-	FVector2D PlaneSize = FVector2D(GetActorScale().X * 5.7735027, GetActorScale().Y * 10);
-	for (int IndexX = -(PlaneSize.X / 2); IndexX < PlaneSize.X / 2 + (int)PlaneSize.X % 2; IndexX++)
+
+
+	const double ActorAngle = FMath::Fmod(GetActorRotation().Yaw, 360);
+	const FVector2D PlaneSize = FVector2D(UGridLibrary::GetGridSideLength() * 25 * GetActorScale());
+	FVector2D TopCornerLocation;
+	FVector2D MiddleCornerLocation;
+	FVector2D RowOffset;
+
+	UE_LOG(LogTemp, Warning, TEXT("Mod: %f"), FMath::Fmod(ActorAngle + FMath::Sign(ActorAngle) * 0.01, 90))
+	if (FMath::IsNearlyZero(FMath::Fmod(ActorAngle + FMath::Sign(ActorAngle) * 0.01, 90), 0.02))
 	{
-		for (int IndexY = -(PlaneSize.Y / 2); IndexY < PlaneSize.Y / 2 + (int)PlaneSize.Y % 2; IndexY++)
+		FVector2D BoundsSize = ((FMath::IsNearlyZero(FMath::Fmod(ActorAngle + FMath::Sign(ActorAngle) * 0.01, 180), 0.02) ? PlaneSize : FVector2D(PlaneSize.Y, PlaneSize.X))* 4 / UGridLibrary::GetGridSideLength()) * FVector2D(0.57735027, 1);
+		for (int IndexX = -(BoundsSize.X / 2); IndexX < BoundsSize.X / 2 + (int)BoundsSize.X % 2; IndexX++)
 		{
-			FIntPoint GridLocation = FIntPoint(IndexX, IndexY) + UGridLibrary::WorldLocationToGridLocation(GetActorLocation());
+			for (int IndexY = -(BoundsSize.Y / 2); IndexY < BoundsSize.Y / 2 + (int)BoundsSize.Y % 2; IndexY++)
+			{
+				FIntPoint GridLocation = FIntPoint(IndexX, IndexY) + UGridLibrary::WorldLocationToGridLocation(GetActorLocation());
+				LocationsToInstanceIndices.Add(GridLocation, GroundMeshComponent->AddInstance(UGridLibrary::GridTransformToWorldTransform(FGridTransform(GridLocation)) * FTransform(FVector(0, 0, -0.1)), true));
+			}
+		}
+	}
+	else
+	{
+		TopCornerLocation = PlaneSize.GetRotated(ActorAngle);
+		MiddleCornerLocation = (PlaneSize * FVector2D(1, -1)).GetRotated(ActorAngle);
+		if (FMath::Abs(MiddleCornerLocation.X) > FMath::Abs(TopCornerLocation.X))
+		{
+			FVector2D Temp = TopCornerLocation;
+			TopCornerLocation = MiddleCornerLocation;
+			MiddleCornerLocation = Temp;
+		}
+		if (TopCornerLocation.X < 0)
+		{
+			TopCornerLocation *= -1;
+		}
+		if (MiddleCornerLocation.Y > 0)
+		{
+			MiddleCornerLocation *= -1;
+		}
+
+		RowOffset = (MiddleCornerLocation - TopCornerLocation);
+		RowOffset = FVector2D(UGridLibrary::GetGridHeight(), (UGridLibrary::GetGridHeight() / RowOffset.X) * RowOffset.Y);
+
+
+		UE_LOG(LogTemp, Warning, TEXT("Row ooff +: %s  |  Top: %s"), *RowOffset.ToString(), *TopCornerLocation.ToString())
+
+		for (FVector2D RowStartLocation = TopCornerLocation; RowStartLocation.SizeSquared() <= TopCornerLocation.SizeSquared(); RowStartLocation -= RowOffset)
+		{
+			FIntPoint GridLocation = UGridLibrary::WorldLocationToGridLocation(GetActorLocation() + FVector(RowStartLocation, 0));
+			LocationsToInstanceIndices.Add(GridLocation, GroundMeshComponent->AddInstance(UGridLibrary::GridTransformToWorldTransform(FGridTransform(GridLocation)) * FTransform(FVector(0, 0, -0.1)), true));
+		}
+		RowOffset.Y = -(UGridLibrary::GetGridHeight() / RowOffset.Y) * RowOffset.X;
+		for (FVector2D RowStartLocation = MiddleCornerLocation - RowOffset; RowStartLocation.SizeSquared() <= MiddleCornerLocation.SizeSquared(); RowStartLocation -= RowOffset)
+		{
+			FIntPoint GridLocation = UGridLibrary::WorldLocationToGridLocation(GetActorLocation() + FVector(RowStartLocation, 0));
 			LocationsToInstanceIndices.Add(GridLocation, GroundMeshComponent->AddInstance(UGridLibrary::GridTransformToWorldTransform(FGridTransform(GridLocation)) * FTransform(FVector(0, 0, -0.1)), true));
 		}
 	}
