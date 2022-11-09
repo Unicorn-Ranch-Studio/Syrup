@@ -14,7 +14,8 @@ UENUM(BlueprintType)
 enum class EFieldType : uint8
 {
 	Protection	UMETA(DisplayName = "Protection Radius"),
-	Damage		UMETA(DisplayName = "Damage Radius")
+	Damage		UMETA(DisplayName = "Damage Radius"),
+	Hole		UMETA(DisplayName = "Hole in Ground")
 };
 /* /\ ========== /\ *\
 |  /\ EFieldType /\  |

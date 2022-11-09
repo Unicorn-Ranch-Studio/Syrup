@@ -57,7 +57,7 @@ void AGroundPlane::OnConstruction(const FTransform& Transform)
 	GroundMeshComponent->SetStaticMesh(GroundMesh);
 	GroundMeshComponent->SetMaterial(0, Material);
 	GroundMeshComponent->CastShadow = false;
-	GroundMeshComponent->NumCustomDataFloats = 2;
+	GroundMeshComponent->NumCustomDataFloats = 3;
 	GroundMeshComponent->SetCollisionObjectType(ECollisionChannel::ECC_WorldStatic);
 	GroundMeshComponent->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 	GroundMeshComponent->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Block);

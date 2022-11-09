@@ -39,7 +39,7 @@ ATile::ATile()
 	SubtileMesh->SetAbsolute(true, true);
 	SubtileMesh->SetStaticMesh(TileMesh);
 	SubtileMesh->SetMaterial(0, TileMaterial);
-	SubtileMesh->NumCustomDataFloats = 2;
+	SubtileMesh->NumCustomDataFloats = 3;
 	SubtileMesh->CastShadow = false;
 
 	//Create Label Root
