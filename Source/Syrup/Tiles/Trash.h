@@ -48,34 +48,6 @@ private:
 	/* /\ Initialization /\ *\
 	\* -------------------- */
 
-	/* ----------- *\
-	\* \/ Shape \/ */
-
-public:
-
-	/**
-	 * Gets the shape of this trash.
-	 * 
-	 * @return A set containing all of the relative locations of the sub-tiles making up the shape of this trash.
-	 */
-	UFUNCTION(BlueprintPure, Category = "Shape")
-	FORCEINLINE TSet<FIntPoint> GetShape() const { return Shape; };
-
-protected:
-	/**
-	 * The relative locations of all of the sub-tiles of this trash.
-	 *
-	 * @return The relative locations of all of the sub-tiles of this trash.
-	 */
-	virtual FORCEINLINE TSet<FIntPoint> GetRelativeSubTileLocations() const override { return GetShape(); };
-
-	//A set containing all of the relative locations of the sub-tiles making up the shape of this trash.
-	UPROPERTY(EditDefaultsOnly, Category = "Shape")
-	TSet<FIntPoint> Shape = TSet<FIntPoint>();
-
-	/* /\ Shape /\ *\
-	\* ----------- */
-
 
 
 	/* ------------- *\

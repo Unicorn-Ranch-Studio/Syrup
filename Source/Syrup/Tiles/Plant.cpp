@@ -44,29 +44,11 @@ void APlant::OnConstruction(const FTransform& Transform)
 	SubtileMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
 	Health = GetMaxHealth();
 	Range = GetRange();
-	Shape.Add(FIntPoint::ZeroValue);
+	RelativeSubTileLocations.Add(FIntPoint::ZeroValue);
 }
 
 /* /\ Initialization /\ *\
 \* -------------------- */
-
-
-
-/* ----------- *\
-\* \/ Shape \/ */
-
-/*
- * The relative locations of all of the sub-tiles of this plant.
- *
- * @return The relative locations of all of the sub-tiles of this plant.
- */
-TSet<FIntPoint> APlant::GetRelativeSubTileLocations() const
-{
-	return GetShape();
-}
-
-/* /\ Shape /\ *\
-\* ----------- */
 
 
 
@@ -126,7 +108,7 @@ bool APlant::SowPlant(UObject* WorldContextObject, int& EnergyReserve, TSubclass
 		FGridTransform GridTransform = UGridLibrary::WorldTransformToGridTransform(Transform);
 		TSet<ATile*> BlockingTiles;
 
-		if(!UGridLibrary::OverlapShape(WorldContextObject, UGridLibrary::TransformShape(DefaultPlant->GetShape(), GridTransform), BlockingTiles, TArray<AActor*>())) 
+		if(!UGridLibrary::OverlapShape(WorldContextObject, UGridLibrary::TransformShape(DefaultPlant->GetRelativeSubTileLocations(), GridTransform), BlockingTiles, TArray<AActor*>())) 
 		{
 			WorldContextObject->GetWorld()->SpawnActor<APlant>(PlantClass, UGridLibrary::GridTransformToWorldTransform(GridTransform));
 			EnergyReserve -= NeededEnergy;

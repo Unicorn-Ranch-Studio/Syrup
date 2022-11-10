@@ -46,7 +46,7 @@ void ATrash::OnConstruction(const FTransform& Transform)
 	SubtileMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
 
 	Range = GetRange();
-	Shape.Add(FIntPoint::ZeroValue);
+	RelativeSubTileLocations.Add(FIntPoint::ZeroValue);
 }
 
 /* /\ Initialization /\ *\

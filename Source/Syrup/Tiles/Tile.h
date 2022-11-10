@@ -72,16 +72,14 @@ public:
 	//The root for any tile labels labeling this tile.
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	USceneComponent* LabelRoot;
-
-protected:
-
+	
 	/*
 	 * The relative locations of all of the sub-tiles of this tile.
 	 * 
 	 * @return The relative locations of all of the sub-tiles of this tile.
 	 */
 	UFUNCTION(BlueprintPure)
-	virtual TSet<FIntPoint> GetRelativeSubTileLocations() const;
+	TSet<FIntPoint> GetRelativeSubTileLocations() const;
 
 	/*
 	 * The locations of all of the sub-tiles of this tile.
@@ -90,13 +88,19 @@ protected:
 	 */
 	UFUNCTION(BlueprintPure)
 	TSet<FIntPoint> GetSubTileLocations() const;
-	
+
+protected:
+
+	//A set containing all of the relative locations of the sub-tiles making up the shape of this tile type.
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Shape")
+	TSet<FIntPoint> RelativeSubTileLocations = TSet<FIntPoint>();
+
 	//The material of the tile
 	UPROPERTY(EditDefaultsOnly, Category = "Visuals")
 	UMaterialInterface* TileMaterial;
 
 	//The mesh used to representing the tile's collision and the ground underneath the tile.
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UInstancedStaticMeshComponent* SubtileMesh;
 
 private:

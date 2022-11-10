@@ -131,7 +131,7 @@ void ATrashfallVolume::ReceiveEffectTrigger(const ETileEffectTriggerType Trigger
  */
 bool ATrashfallVolume::SpawnTrash(bool bAttachTrash)
 {
-	TSet<FIntPoint> RelativeTileLocations = TrashType.GetDefaultObject()->GetShape();
+	TSet<FIntPoint> RelativeTileLocations = TrashType.GetDefaultObject()->GetRelativeSubTileLocations();
 	int Count = 0;
 	while (Count++ < 50)
 	{

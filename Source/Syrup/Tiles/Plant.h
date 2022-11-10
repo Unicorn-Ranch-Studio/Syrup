@@ -43,34 +43,6 @@ private:
 	/* /\ Initialization /\ *\
 	\* -------------------- */
 
-	/* ----------- *\
-	\* \/ Shape \/ */
-
-public:
-
-	/**
-	 * Gets the shape of this plant type.
-	 * 
-	 * @return A set containing all of the relative locations of the sub-tiles making up the shape of this plant type.
-	 */
-	UFUNCTION(BlueprintPure, Category = "Shape")
-	FORCEINLINE TSet<FIntPoint> GetShape() const { return Shape; };
-
-protected:
-	/**
-	 * The relative locations of all of the sub-tiles of this plant.
-	 *
-	 * @return The relative locations of all of the sub-tiles of this plant.
-	 */
-	virtual TSet<FIntPoint> GetRelativeSubTileLocations() const override;
-
-	//A set containing all of the relative locations of the sub-tiles making up the shape of this plant type.
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Shape")
-	TSet<FIntPoint> Shape = TSet<FIntPoint>();
-
-	/* /\ Shape /\ *\
-	\* ----------- */
-
 	/* ------------ *\
 	\* \/ Health \/ */
 

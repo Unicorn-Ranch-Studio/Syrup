@@ -158,9 +158,7 @@ void ATile::RemoveField(EFieldType Type)
  */
 TSet<FIntPoint> ATile::GetRelativeSubTileLocations() const
 {
-	TSet<FIntPoint> ReturnValue = TSet<FIntPoint>();
-	ReturnValue.Add(FIntPoint::ZeroValue);
-	return ReturnValue;
+	return RelativeSubTileLocations;
 }
 
 /*
