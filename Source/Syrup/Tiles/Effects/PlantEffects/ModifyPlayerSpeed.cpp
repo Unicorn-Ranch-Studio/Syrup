@@ -26,7 +26,6 @@ void UModifyPlayerSpeed::OnBeginOverlap(AActor* OtherActor)
 	if (IsValid(Player))
 	{
 		Player->GetCharacterMovement()->MaxWalkSpeed += MovementSpeedChange;
-		UE_LOG(LogTemp, Warning, TEXT("Faster speed: = %f"), Player->GetCharacterMovement()->MaxWalkSpeed)
 	}
 }
 
@@ -41,7 +40,6 @@ void UModifyPlayerSpeed::OnEndOverlap(AActor* OtherActor)
 	if (IsValid(Player))
 	{
 		Player->GetCharacterMovement()->MaxWalkSpeed -= MovementSpeedChange;
-		UE_LOG(LogTemp, Warning, TEXT("Slower speed: = %f"), Player->GetCharacterMovement()->MaxWalkSpeed)
 	}
 }
 
