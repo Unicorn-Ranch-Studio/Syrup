@@ -38,20 +38,18 @@ protected:
 	/**
 	 * Applies the effect of this volume when overlap is begun.
 	 * 
-	 * @param OverlappedActor - The volume that was overlapped.
 	 * @param OtherActor - The actor that entered the volume.
 	 */
 	UFUNCTION()
-	virtual FORCEINLINE void OnBeginOverlap(AActor* OverlappedActor, AActor* OtherActor) {};
+	virtual FORCEINLINE void OnBeginOverlap(AActor* OtherActor) {};
 
 	/**
 	 * Applies the effect of this volume when overlap is ended.
 	 * 
-	 * @param OverlappedActor - The volume that was left.
 	 * @param OtherActor - The actor that left the volume.
 	 */
 	UFUNCTION()
-	virtual FORCEINLINE void OnEndOverlap(AActor* OverlappedActor, AActor* OtherActor) {};
+	virtual FORCEINLINE void OnEndOverlap(AActor* OtherActor) {};
 
 	/**
 	 * Gets the collision channels that this volume will overlap.
@@ -70,6 +68,29 @@ protected:
 	virtual FORCEINLINE TSet<TEnumAsByte<ECollisionChannel>> GetBlockedChannels() const { return TSet<TEnumAsByte<ECollisionChannel>>(); };
 
 private:
+	/**
+	 * Applies the effect of this volume when overlap is begun.
+	 *
+	 * @param OverlappedActor - The volume that was overlapped.
+	 * @param OtherActor - The actor that entered the volume.
+	 */
+	UFUNCTION()
+	void ReceiveBeginOverlap(AActor* OverlappedActor, AActor* OtherActor);
+
+	/**
+	 * Applies the effect of this volume when overlap is ended.
+	 *
+	 * @param OverlappedActor - The volume that was left.
+	 * @param OtherActor - The actor that left the volume.
+	 */
+	UFUNCTION()
+	void ReceiveEndOverlap(AActor* OverlappedActor, AActor* OtherActor);
+
+	//All actors currently being overlapped
+	UPROPERTY()
+	TSet<AActor*> OverlappedActors = TSet<AActor*>();
+
+	//The actor that handles the collision of this.
 	UPROPERTY()
 	AVolumetricEffectActor* VolumeActor;
 };

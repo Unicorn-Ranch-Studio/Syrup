@@ -27,8 +27,8 @@ void UVolumetricEffect::Affect(const TSet<FIntPoint>& Locations)
 		VolumeActor = GetWorld()->SpawnActor<AVolumetricEffectActor>(SpawnParams);
 		VolumeActor->SetActorLabel(SpawnParams.Name.ToString());
 		VolumeActor->SetCollisionResponses(GetOverlappedChannels(), GetBlockedChannels());
-		VolumeActor->OnActorBeginOverlap.AddDynamic(this, &UVolumetricEffect::OnBeginOverlap);
-		VolumeActor->OnActorEndOverlap.AddDynamic(this, &UVolumetricEffect::OnEndOverlap);
+		VolumeActor->OnActorBeginOverlap.AddDynamic(this, &UVolumetricEffect::ReceiveBeginOverlap);
+		VolumeActor->OnActorEndOverlap.AddDynamic(this, &UVolumetricEffect::ReceiveEndOverlap);
 	}
 
 	if (IsValid(VolumeActor))
@@ -48,6 +48,39 @@ void UVolumetricEffect::Unaffect()
 		VolumeActor->Destroy();
 	}
 }
+
+/**
+ * Applies the effect of this volume when overlap is begun.
+ *
+ * @param OverlappedActor - The volume that was overlapped.
+ * @param OtherActor - The actor that entered the volume.
+ */
+void UVolumetricEffect::ReceiveBeginOverlap(AActor* OverlappedActor, AActor* OtherActor)
+{	
+	if (!OverlappedActors.Contains(OtherActor))
+	{
+		OverlappedActors.Add(OtherActor);
+		OnBeginOverlap(OtherActor);
+	}
+}
+
+/**
+ * Applies the effect of this volume when overlap is ended.
+ *
+ * @param OverlappedActor - The volume that was left.
+ * @param OtherActor - The actor that left the volume.
+ */
+void UVolumetricEffect::ReceiveEndOverlap(AActor* OverlappedActor, AActor* OtherActor)
+{
+	TSet<AActor*> OverlapingActors;
+	OtherActor->GetOverlappingActors(OverlapingActors);
+	if (!OverlapingActors.Contains(OverlappedActor))
+	{
+		OverlappedActors.Remove(OtherActor);
+		OnEndOverlap(OtherActor);
+	}
+}
+
 /* /\ ================= /\ *\
 |  /\ UVolumetricEffect /\  |
 \* /\ ================= /\ */
