@@ -86,6 +86,18 @@ bool ATrash::PickUp(int& EnergyReserve)
 \* \/ Effect \/ */
 
 /**
+ * Sets the range of this trash's effects.
+ *
+ * @param NewRange - The value to set the range to. Will be clamped >= 0.
+ */
+void ATrash::SetRange(int NewRange)
+{
+	ReceiveEffectTrigger(ETileEffectTriggerType::OnDeactivated, TSet<FIntPoint>());
+	Range = FMath::Max(0, NewRange);
+	ReceiveEffectTrigger(ETileEffectTriggerType::OnActivated, TSet<FIntPoint>());
+}
+
+/**
  * Activates the appropriate effects given the trigger.
  *
  * @param TriggerType - The type of trigger that was activated.
