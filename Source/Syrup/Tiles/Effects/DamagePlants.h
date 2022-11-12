@@ -55,7 +55,7 @@ protected:
 	 */
 	virtual TSet<FIntPoint> GetLabelLocations(const TSet<FIntPoint>& Locations) const override;
 
-	//The type of field to apply
+	//The amount of damage to apply.
 	UPROPERTY(EditDefaultsOnly, Category = "Effect", Meta = (ClampMin = "0"))
 	int Damage = 1;
 };
