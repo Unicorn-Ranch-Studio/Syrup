@@ -72,6 +72,8 @@ void UApplyField::Affect(const TSet<FIntPoint>& Locations)
 
 /*
  * Undoes this effect.
+ *
+ * @param Locations - The locations undo the effect in.
  */
 void UApplyField::Unaffect(const TSet<FIntPoint>& Locations)
 {

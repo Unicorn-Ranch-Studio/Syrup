@@ -33,6 +33,8 @@ public:
 
 	/*
 	 * Undoes this effect.
+	 *
+	 * @param Locations - The locations undo the effect in.
 	 */
 	virtual void Unaffect(const TSet<FIntPoint>& Locations) override;
 

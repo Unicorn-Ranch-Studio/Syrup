@@ -64,8 +64,10 @@ protected:
 	UFUNCTION()
 	virtual FORCEINLINE void Affect(const TSet<FIntPoint>& Locations) { EffectedLocations = EffectedLocations.Union(Locations); };
 
-	/**
-	 * Undoes the effects of this.
+	/*
+	 * Undoes this effect.
+	 *
+	 * @param Locations - The locations undo the effect in.
 	 */
 	UFUNCTION()
 	virtual FORCEINLINE void Unaffect(const TSet<FIntPoint>& Locations) { EffectedLocations = EffectedLocations.Difference(Locations); };

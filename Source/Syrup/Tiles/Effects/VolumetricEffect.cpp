@@ -38,8 +38,10 @@ void UVolumetricEffect::Affect(const TSet<FIntPoint>& Locations)
 	}
 }
 
-/**
- * Undoes the effect of this.
+/*
+ * Undoes this effect.
+ *
+ * @param Locations - The locations undo the effect in.
  */
 void UVolumetricEffect::Unaffect(const TSet<FIntPoint>& Locations)
 {
