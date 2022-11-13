@@ -30,7 +30,7 @@ void UTileEffect::RegisterLabels(const TSet<FIntPoint>& Locations)
 
 	if (IsValid(EffectedLocationLabel))
 	{
-		TSet<FIntPoint> LabelLocations = GetLabelLocations(Locations.Difference(EffectedLocations), false);
+		TSet<FIntPoint> LabelLocations = GetLabelLocations(Locations, false);
 		for (FIntPoint EachLabelLocation : LabelLocations)
 		{
 			EffectedLocationLabel->SourceLocations.Add(GridLocation);

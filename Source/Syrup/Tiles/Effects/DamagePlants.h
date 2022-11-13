@@ -6,6 +6,8 @@
 #include "TileEffect.h"
 #include "DamagePlants.generated.h"
 
+class APlant;
+
 /* \/ ============= \/ *\
 |  \/ UDamagePlants \/  |
 \* \/ ============= \/ */
@@ -54,11 +56,16 @@ protected:
 	 * @param Locations - The locations that will be effected by this component.
 	 * @param bForUnregistration - Whether or not to get the label location in the case of unregistration or registration.
 	 */
-	virtual TSet<FIntPoint> GetLabelLocations(const TSet<FIntPoint>& Locations, const bool bForUnregistration) const override;
+	virtual TSet<FIntPoint> GetLabelLocations(const TSet<FIntPoint>& Locations, const bool bForUnregistration) override;
 
 	//The amount of damage to apply.
 	UPROPERTY(EditDefaultsOnly, Category = "Effect", Meta = (ClampMin = "0"))
 	int Damage = 1;
+
+private:
+	//All the plants that have been labeled by this.
+	UPROPERTY()
+	TSet<APlant*> LabeledPlants = TSet<APlant*>();
 };
 /* /\ ============= /\ *\
 |  /\ UDamagePlants /\  |

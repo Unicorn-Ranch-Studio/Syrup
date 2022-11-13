@@ -46,7 +46,7 @@ void UDamagePlants::Affect(const TSet<FIntPoint>& Locations)
  * @param Locations - The locations that will be effected by this component.
  * @param bForUnregistration - Whether or not to get the label location in the case of unregistration or registration.
  */
-TSet<FIntPoint> UDamagePlants::GetLabelLocations(const TSet<FIntPoint>& Locations, const bool bForUnregistration) const
+TSet<FIntPoint> UDamagePlants::GetLabelLocations(const TSet<FIntPoint>& Locations, const bool bForUnregistration)
 {
 	TSet<FIntPoint> ReturnValue = TSet<FIntPoint>();
 
@@ -56,9 +56,10 @@ TSet<FIntPoint> UDamagePlants::GetLabelLocations(const TSet<FIntPoint>& Location
 	for (ATile* EachEffectedTile : EffectTiles)
 	{
 		APlant* Plant = Cast<APlant>(EachEffectedTile);
-		if (IsValid(Plant) && (!bForUnregistration || Plant->GetSubTileLocations().Difference(Locations).Intersect(EffectedLocations).IsEmpty()))
+		if (IsValid(Plant) && (bForUnregistration ? Plant->GetSubTileLocations().Difference(Locations).Intersect(EffectedLocations).IsEmpty() : !LabeledPlants.Contains(Plant)))
 		{
 			ReturnValue.Add(Plant->GetGridTransform().Location);
+			LabeledPlants.Add(Plant);
 		}
 	}
 

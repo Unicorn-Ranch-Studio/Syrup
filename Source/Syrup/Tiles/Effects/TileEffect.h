@@ -79,7 +79,7 @@ protected:
 	 * @param Locations - The locations that will be effected by this component.
 	 * @param bForUnregistration - Whether or not to get the label location in the case of unregistration or registration.
 	 */
-	virtual FORCEINLINE TSet<FIntPoint> GetLabelLocations(const TSet<FIntPoint>& Locations, const bool bForUnregistration) const { return Locations; };
+	virtual FORCEINLINE TSet<FIntPoint> GetLabelLocations(const TSet<FIntPoint>& Locations, const bool bForUnregistration) { return Locations; };
 
 
 	//The triggers that will activate this effect.
