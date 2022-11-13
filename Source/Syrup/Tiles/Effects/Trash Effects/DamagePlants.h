@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "TileEffect.h"
+#include "Syrup/Tiles/Effects/TileEffect.h"
 #include "DamagePlants.generated.h"
 
 class APlant;
