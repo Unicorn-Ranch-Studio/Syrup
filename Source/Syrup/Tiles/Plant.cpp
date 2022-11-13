@@ -25,7 +25,7 @@ void APlant::BeginPlay()
 
 	SubtileMesh->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
 
-	TimeUntilGrown = GetTimeUntilGrown() + 1;
+	TimeUntilGrown = FMath::RoundToInt(GetTimeUntilGrown() * (1 - InitialGrowthPercent)) + 1;
 	Grow();
 
 	ASyrupGameMode::GetTileEffectTriggerDelegate(GetWorld()).Broadcast(ETileEffectTriggerType::PlantSpawned, GetSubTileLocations());

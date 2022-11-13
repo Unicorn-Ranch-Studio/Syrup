@@ -146,6 +146,10 @@ public:
 
 protected:
 
+	//The percent grown that this plant will start at.
+	UPROPERTY(EditInstanceOnly, Category = "Growth", Meta = (ClampMin = "0", ClampMax = "1"))
+	float InitialGrowthPercent = 0;
+
 	//The turns remaining until this plant is fully grown.
 	UPROPERTY(EditDefaultsOnly, Category = "Growth", Meta = (ClampMin = "1"))
 	int TimeUntilGrown = 1;
