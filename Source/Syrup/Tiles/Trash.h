@@ -121,7 +121,7 @@ public:
 	 * @param NewRange - The value to set the range to. Will be clamped >= 0.
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Effect")
-	void SetRange(int NewRange);
+	void SetRange(const int NewRange);
 
 	/**
 	 * Gets the range of this trash's effects.

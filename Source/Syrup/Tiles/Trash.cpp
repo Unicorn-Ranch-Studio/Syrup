@@ -90,13 +90,23 @@ bool ATrash::PickUp(int& EnergyReserve)
  *
  * @param NewRange - The value to set the range to. Will be clamped >= 0.
  */
-void ATrash::SetRange(int NewRange)
+void ATrash::SetRange(const int NewRange)
 {
 	TSet<FIntPoint> OldEffectLocations = GetEffectLocations();
+	TSet<FIntPoint> NewEffectLocations = UGridLibrary::ScaleShapeUp(GetSubTileLocations(), FMath::Max(0, NewRange));
+
+	TSet<FIntPoint> DeactivatedLocations = OldEffectLocations.Difference(NewEffectLocations);
+	if (!DeactivatedLocations.IsEmpty())
+	{
+		ReceiveEffectTrigger(ETileEffectTriggerType::OnDeactivated, DeactivatedLocations);
+	}
+
+	TSet<FIntPoint> ActivatedLocations = NewEffectLocations.Difference(OldEffectLocations);
+	if (!ActivatedLocations.IsEmpty())
+	{
+		ReceiveEffectTrigger(ETileEffectTriggerType::OnActivated, ActivatedLocations);
+	}
 	Range = FMath::Max(0, NewRange);
-	TSet<FIntPoint> NewEffectLocations = GetEffectLocations();
-	ReceiveEffectTrigger(ETileEffectTriggerType::OnDeactivated, OldEffectLocations.Difference(NewEffectLocations));
-	ReceiveEffectTrigger(ETileEffectTriggerType::OnActivated, NewEffectLocations.Difference(OldEffectLocations));
 }
 
 /**

@@ -51,9 +51,10 @@ protected:
 	/**
 	 * Gets the subset of the given locations that will be labeled.
 	 *
-	 * @param Locations - The locations that will be effected by this component
+	 * @param Locations - The locations that will be effected by this component.
+	 * @param bForUnregistration - Whether or not to get the label location in the case of unregistration or registration.
 	 */
-	virtual TSet<FIntPoint> GetLabelLocations(const TSet<FIntPoint>& Locations) const override;
+	virtual TSet<FIntPoint> GetLabelLocations(const TSet<FIntPoint>& Locations, const bool bForUnregistration) const override;
 
 	//The amount of damage to apply.
 	UPROPERTY(EditDefaultsOnly, Category = "Effect", Meta = (ClampMin = "0"))

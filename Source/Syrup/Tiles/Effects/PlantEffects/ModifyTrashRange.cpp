@@ -13,7 +13,8 @@
  */
 UModifyTrashRange::UModifyTrashRange()
 {
-	Triggers.Add(ETileEffectTriggerType::OnActivated);
+	AffectTriggers.Add(ETileEffectTriggerType::OnActivated);
+	UnaffectTriggers.Add(ETileEffectTriggerType::OnDeactivated);
 }
 
 /*
@@ -31,7 +32,7 @@ void UModifyTrashRange::Affect(const TSet<FIntPoint>& Locations)
 		ATrash* Trash = Cast<ATrash>(EachEffectedTile);
 		if (IsValid(Trash))
 		{
-			Trash->SetRange(Trash->GetRange());
+			Trash->SetRange(Trash->GetRange() + DeltaRange);
 			EffectedLocations.Add(Trash->GetGridTransform().Location);
 		}
 	}

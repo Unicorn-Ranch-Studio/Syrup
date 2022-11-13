@@ -73,8 +73,6 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	USceneComponent* LabelRoot;
 
-protected:
-
 	/*
 	 * The relative locations of all of the sub-tiles of this tile.
 	 * 
@@ -90,6 +88,8 @@ protected:
 	 */
 	UFUNCTION(BlueprintPure)
 	TSet<FIntPoint> GetSubTileLocations() const;
+
+protected:
 	
 	//The material of the tile
 	UPROPERTY(EditDefaultsOnly, Category = "Visuals")

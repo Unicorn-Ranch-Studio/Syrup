@@ -41,11 +41,11 @@ void UVolumetricEffect::Affect(const TSet<FIntPoint>& Locations)
 /**
  * Undoes the effect of this.
  */
-void UVolumetricEffect::Unaffect()
+void UVolumetricEffect::Unaffect(const TSet<FIntPoint>& Locations)
 {
 	if (IsValid(VolumeActor))
 	{
-		VolumeActor->Destroy();
+		VolumeActor->RemoveTiles(Locations);
 	}
 }
 

@@ -12,7 +12,8 @@
  */
 UModifyPlayerSpeed::UModifyPlayerSpeed()
 {
-	Triggers.Add(ETileEffectTriggerType::OnActivated);
+	AffectTriggers.Add(ETileEffectTriggerType::OnActivated);
+	UnaffectTriggers.Add(ETileEffectTriggerType::OnDeactivated);
 }
 
 /**

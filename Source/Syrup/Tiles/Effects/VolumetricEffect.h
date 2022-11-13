@@ -18,7 +18,6 @@ UCLASS(Abstract)
 class SYRUP_API UVolumetricEffect : public UTileEffect
 {
 	GENERATED_BODY()
-
 public:
 
 	/*
@@ -31,7 +30,7 @@ public:
 	/*
 	 * Undoes this effect.
 	 */
-	virtual void Unaffect() override;
+	virtual void Unaffect(const TSet<FIntPoint>& Locations) override;
 
 protected:
 

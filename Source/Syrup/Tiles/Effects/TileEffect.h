@@ -68,20 +68,25 @@ protected:
 	 * Undoes the effects of this.
 	 */
 	UFUNCTION()
-	virtual FORCEINLINE void Unaffect() {};
+	virtual FORCEINLINE void Unaffect(const TSet<FIntPoint>& Locations) { EffectedLocations = EffectedLocations.Difference(Locations); };
 
 
 	/**
 	 * Gets the subset of the given locations that will be labeled.
 	 *
-	 * @param Locations - The locations that will be effected by this component
+	 * @param Locations - The locations that will be effected by this component.
+	 * @param bForUnregistration - Whether or not to get the label location in the case of unregistration or registration.
 	 */
-	virtual FORCEINLINE TSet<FIntPoint> GetLabelLocations(const TSet<FIntPoint>& Locations) const { return Locations; };
+	virtual FORCEINLINE TSet<FIntPoint> GetLabelLocations(const TSet<FIntPoint>& Locations, const bool bForUnregistration) const { return Locations; };
 
 
 	//The triggers that will activate this effect.
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TSet<ETileEffectTriggerType> Triggers = TSet<ETileEffectTriggerType>();
+	TSet<ETileEffectTriggerType> AffectTriggers = TSet<ETileEffectTriggerType>();
+
+	//The triggers that will undo this effect.
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TSet<ETileEffectTriggerType> UnaffectTriggers = TSet<ETileEffectTriggerType>();
 
 	//The locations that have been effected by this tile already.
 	UPROPERTY()
@@ -94,7 +99,7 @@ private:
 	 *
 	 * @param	bDestroyingHierarchy  - True if the entire component hierarchy is being torn down, allows avoiding expensive operations
 	 */
-	virtual FORCEINLINE void OnComponentDestroyed(bool bDestroyingHierarchy) override { Unaffect(); };
+	virtual FORCEINLINE void OnComponentDestroyed(bool bDestroyingHierarchy) override { Unaffect(EffectedLocations); };
 
 	//Whether or not the source of this has been labeled.
 	UPROPERTY()

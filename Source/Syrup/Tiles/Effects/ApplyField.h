@@ -34,7 +34,7 @@ public:
 	/*
 	 * Undoes this effect.
 	 */
-	virtual void Unaffect() override;
+	virtual void Unaffect(const TSet<FIntPoint>& Locations) override;
 
 	//The type of field to apply
 	UPROPERTY(EditDefaultsOnly, Category = "Effect")

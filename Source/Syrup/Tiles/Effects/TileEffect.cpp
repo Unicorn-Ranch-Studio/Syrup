@@ -30,7 +30,7 @@ void UTileEffect::RegisterLabels(const TSet<FIntPoint>& Locations)
 
 	if (IsValid(EffectedLocationLabel))
 	{
-		TSet<FIntPoint> LabelLocations = GetLabelLocations(Locations.Difference(EffectedLocations));
+		TSet<FIntPoint> LabelLocations = GetLabelLocations(Locations.Difference(EffectedLocations), false);
 		for (FIntPoint EachLabelLocation : LabelLocations)
 		{
 			EffectedLocationLabel->SourceLocations.Add(GridLocation);
@@ -57,7 +57,7 @@ void UTileEffect::UnregisterLabels(const TSet<FIntPoint>& Locations)
 
 	if (IsValid(EffectedLocationLabel))
 	{
-		for (FIntPoint EachLabelLocation : GetLabelLocations(Locations))
+		for (FIntPoint EachLabelLocation : GetLabelLocations(Locations, true))
 		{
 			EffectedLocationLabel->SourceLocations.Add(GridLocation);
 			ASyrupGameMode::UnregisterTileLabel(this, EffectedLocationLabel, EachLabelLocation);
@@ -85,9 +85,14 @@ void UTileEffect::ActivateEffect(const ETileEffectTriggerType TriggerType, const
 		}
 	}
 
-	if (Triggers.Contains(TriggerType))
+	if (AffectTriggers.Contains(TriggerType))
 	{
 		Affect(Locations);
+	}
+
+	if (UnaffectTriggers.Contains(TriggerType))
+	{
+		Unaffect(Locations);
 	}
 }
 
