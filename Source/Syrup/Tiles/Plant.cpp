@@ -83,9 +83,10 @@ TSet<FIntPoint> APlant::GetRelativeSubTileLocations() const
  */
 bool APlant::ReceiveDamage(int Amount, ATile* Cause)
 {
+	int OldHealth = Health;
 	Health -= FMath::Max(0, Amount);
 	bool bDead = Health <= 0;
-	if (bDead)
+	if (bDead && OldHealth > 0)
 	{
 		ASyrupGameMode::GetTileEffectTriggerDelegate(GetWorld()).Broadcast(ETileEffectTriggerType::PlantKilled, GetSubTileLocations());
 		ReceiveEffectTrigger(ETileEffectTriggerType::OnDeactivated, TSet<FIntPoint>());
@@ -159,6 +160,30 @@ void APlant::Grow_Implementation()
 
 /* ------------ *\
 \* \/ Effect \/ */
+
+/**
+ * Sets the range of this plant's effects.
+ *
+ * @param NewRange - The value to set the range to. Will be clamped >= 0.
+ */
+void APlant::SetRange(const int NewRange)
+{
+	TSet<FIntPoint> OldEffectLocations = GetEffectLocations();
+	TSet<FIntPoint> NewEffectLocations = UGridLibrary::ScaleShapeUp(GetSubTileLocations(), FMath::Max(0, NewRange));
+
+	TSet<FIntPoint> DeactivatedLocations = OldEffectLocations.Difference(NewEffectLocations);
+	if (!DeactivatedLocations.IsEmpty())
+	{
+		ReceiveEffectTrigger(ETileEffectTriggerType::OnDeactivated, DeactivatedLocations);
+	}
+
+	Range = FMath::Max(0, NewRange);
+	TSet<FIntPoint> ActivatedLocations = NewEffectLocations.Difference(OldEffectLocations);
+	if (!ActivatedLocations.IsEmpty())
+	{
+		ReceiveEffectTrigger(ETileEffectTriggerType::OnActivated, ActivatedLocations);
+	}
+}
 
 /**
  * Activates the appropriate effects given the trigger.
