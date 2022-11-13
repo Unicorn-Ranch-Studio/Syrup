@@ -269,10 +269,12 @@ public:
 	 * @param GridLocation - The given grid location to check.
 	 * @param OverlapingTile - Will be set to the tile at the given location if there is one, otherwise is nullptr.
 	 * @param IgnoredTiles - The tiles to ignore when querying.
+	 * @param Channel - The channel to test overlaps against.
+	 * 
 	 * @return Whether or not a tile was at the given location.
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Transformation|Grid|Collision", Meta = (WorldContext = "WorldContext", AutoCreateRefTerm = "IgnoredTiles"))
-	static bool OverlapGridLocation(const UObject* WorldContext, const FIntPoint GridLocation, ATile*& OverlapingTile, const TArray<AActor*>& IgnoredTiles);
+	static bool OverlapGridLocation(const UObject* WorldContext, const FIntPoint GridLocation, ATile*& OverlapingTile, const TArray<AActor*>& IgnoredTiles, const ECollisionChannel Channel = ECC_WorldDynamic);
 	
 	
 	/**
@@ -282,10 +284,12 @@ public:
 	 * @param ShapeGridLocations - The given shape's grid locations to check.
 	 * @param OverlapingTiles - Will be set to the tile at the given location if there is one, otherwise is nullptr.
 	 * @param IgnoredTiles - The tiles to ignore when querying.
+	 * @param Channel - The channel to test overlaps against.
+	 * 
 	 * @return Whether or not a tile was at overlaping the given shape.
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Transformation|Grid|Collision", Meta=(WorldContext = "WorldContext", AutoCreateRefTerm = "IgnoredTiles"))
-	static bool OverlapShape(const UObject* WorldContext, const TSet<FIntPoint>& ShapeGridLocations, TSet<ATile*>& OverlapingTiles, const TArray<AActor*>& IgnoredTiles);
+	static bool OverlapShape(const UObject* WorldContext, const TSet<FIntPoint>& ShapeGridLocations, TSet<ATile*>& OverlapingTiles, const TArray<AActor*>& IgnoredTiles, const ECollisionChannel Channel = ECC_WorldDynamic);
 
 private:
 	UPROPERTY()

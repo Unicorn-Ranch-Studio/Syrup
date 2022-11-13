@@ -126,7 +126,7 @@ bool APlant::SowPlant(UObject* WorldContextObject, int& EnergyReserve, TSubclass
 		FGridTransform GridTransform = UGridLibrary::WorldTransformToGridTransform(Transform);
 		TSet<ATile*> BlockingTiles;
 
-		if(!UGridLibrary::OverlapShape(WorldContextObject, UGridLibrary::TransformShape(DefaultPlant->GetShape(), GridTransform), BlockingTiles, TArray<AActor*>())) 
+		if(!UGridLibrary::OverlapShape(WorldContextObject, UGridLibrary::TransformShape(DefaultPlant->GetShape(), GridTransform), BlockingTiles, TArray<AActor*>(), ECollisionChannel::ECC_GameTraceChannel3))
 		{
 			WorldContextObject->GetWorld()->SpawnActor<APlant>(PlantClass, UGridLibrary::GridTransformToWorldTransform(GridTransform));
 			EnergyReserve -= NeededEnergy;
