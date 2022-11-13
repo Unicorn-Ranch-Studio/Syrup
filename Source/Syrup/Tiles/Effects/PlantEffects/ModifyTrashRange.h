@@ -3,16 +3,16 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Tiles/Effects/TileEffect.h"
+#include "Syrup/Tiles/Effects/TileEffect.h"
 #include "ModifyTrashRange.generated.h"
 
 /* \/ ================= \/ *\
 |  \/ UModifyTrashRange \/  |
 \* \/ ================= \/ */
 /**
- * 
+ * Changes the range of trash within the effect of this.
  */
-UCLASS(ClassGroup = (TileEffects), Meta = (BlueprintSpawnableComponent)))
+UCLASS(ClassGroup = (TileEffects), Meta = (BlueprintSpawnableComponent))
 class SYRUP_API UModifyTrashRange : public UTileEffect
 {
 	GENERATED_BODY()
@@ -34,13 +34,6 @@ protected:
 	 * @param Locations - The locations to effect.
 	 */
 	virtual void Affect(const TSet<FIntPoint>& Locations) override;
-
-	/**
-	 * Gets the subset of the given locations that will be labeled.
-	 *
-	 * @param Locations - The locations that will be effected by this component
-	 */
-	virtual TSet<FIntPoint> GetLabelLocations(const TSet<FIntPoint>& Locations) const override;
 };
 /* /\ ================= /\ *\
 |  /\ UModifyTrashRange /\  |

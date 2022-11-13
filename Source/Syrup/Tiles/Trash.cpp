@@ -92,9 +92,11 @@ bool ATrash::PickUp(int& EnergyReserve)
  */
 void ATrash::SetRange(int NewRange)
 {
-	ReceiveEffectTrigger(ETileEffectTriggerType::OnDeactivated, TSet<FIntPoint>());
+	TSet<FIntPoint> OldEffectLocations = GetEffectLocations();
 	Range = FMath::Max(0, NewRange);
-	ReceiveEffectTrigger(ETileEffectTriggerType::OnActivated, TSet<FIntPoint>());
+	TSet<FIntPoint> NewEffectLocations = GetEffectLocations();
+	ReceiveEffectTrigger(ETileEffectTriggerType::OnDeactivated, OldEffectLocations.Difference(NewEffectLocations));
+	ReceiveEffectTrigger(ETileEffectTriggerType::OnActivated, NewEffectLocations.Difference(OldEffectLocations));
 }
 
 /**
