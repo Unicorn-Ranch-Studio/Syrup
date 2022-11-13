@@ -20,6 +20,7 @@
  */
 void ATrash::OnFinishedFalling()
 { 
+	bActive = true;
 	ReceiveEffectTrigger(ETileEffectTriggerType::OnActivated, TSet<FIntPoint>()); 
 }
 
@@ -101,12 +102,12 @@ void ATrash::SetRange(const int NewRange)
 		ReceiveEffectTrigger(ETileEffectTriggerType::OnDeactivated, DeactivatedLocations);
 	}
 
+	Range = FMath::Max(0, NewRange);
 	TSet<FIntPoint> ActivatedLocations = NewEffectLocations.Difference(OldEffectLocations);
 	if (!ActivatedLocations.IsEmpty())
 	{
 		ReceiveEffectTrigger(ETileEffectTriggerType::OnActivated, ActivatedLocations);
 	}
-	Range = FMath::Max(0, NewRange);
 }
 
 /**
@@ -117,16 +118,19 @@ void ATrash::SetRange(const int NewRange)
  */
 void ATrash::ReceiveEffectTrigger(const ETileEffectTriggerType TriggerType, const TSet<FIntPoint>& LocationsToTrigger)
 {
-	TSet<FIntPoint> EffectedLocations = GetEffectLocations();
-	TSet<FIntPoint> TriggeredLocations = LocationsToTrigger.IsEmpty() ? EffectedLocations : LocationsToTrigger.Intersect(EffectedLocations);
-
-	if (!TriggeredLocations.IsEmpty())
+	if (bActive)
 	{
-		TInlineComponentArray<UActorComponent*> Components = TInlineComponentArray<UActorComponent*>();
-		GetComponents(UTileEffect::StaticClass(), Components);
-		for (UActorComponent* EachComponent : Components)
+		TSet<FIntPoint> EffectedLocations = GetEffectLocations();
+		TSet<FIntPoint> TriggeredLocations = LocationsToTrigger.IsEmpty() ? EffectedLocations : LocationsToTrigger.Intersect(EffectedLocations);
+
+		if (!TriggeredLocations.IsEmpty())
 		{
-			Cast<UTileEffect>(EachComponent)->ActivateEffect(TriggerType, TriggeredLocations);
+			TInlineComponentArray<UActorComponent*> Components = TInlineComponentArray<UActorComponent*>();
+			GetComponents(UTileEffect::StaticClass(), Components);
+			for (UActorComponent* EachComponent : Components)
+			{
+				Cast<UTileEffect>(EachComponent)->ActivateEffect(TriggerType, TriggeredLocations);
+			}
 		}
 	}
 }

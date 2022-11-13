@@ -34,8 +34,28 @@ void UModifyTrashRange::Affect(const TSet<FIntPoint>& Locations)
 		{
 			Trash->SetRange(Trash->GetRange() + DeltaRange);
 			EffectedLocations.Add(Trash->GetGridTransform().Location);
+			EffectedTrash.Add(Trash);
 		}
 	}
+}
+
+/*
+ * Undoes this effect.
+ *
+ * @param Locations - The locations undo the effect in.
+ */
+void UModifyTrashRange::Unaffect(const TSet<FIntPoint>& Locations)
+{
+	TSet<FIntPoint> NewEffectedLocations = EffectedLocations.Difference(Locations);
+	for (TSet<ATrash*>::TIterator Iterator = EffectedTrash.CreateIterator(); Iterator; ++Iterator)
+	{
+		if (IsValid(*Iterator) && (*Iterator)->GetSubTileLocations().Intersect(NewEffectedLocations).IsEmpty())
+		{
+			(*Iterator)->SetRange((*Iterator)->GetRange() - DeltaRange);
+			Iterator.RemoveCurrent();
+		}
+	}
+	EffectedLocations = NewEffectedLocations;
 }
 /* /\ ================= /\ *\
 |  /\ UModifyTrashRange /\  |

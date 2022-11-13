@@ -140,6 +140,10 @@ public:
 	TSet<FIntPoint> GetEffectLocations() const;
 
 protected:
+	//Whether or not this trash can apply effects
+	UPROPERTY()
+	bool bActive = false;
+
 	//The scale applied to the shape of this trash to get all effected locations of this trash's effects.
 	UPROPERTY(EditDefaultsOnly, Category = "Effect", Meta = (ClampMin = "0"))
 	int Range = 1;

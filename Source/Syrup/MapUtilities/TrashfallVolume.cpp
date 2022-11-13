@@ -1,12 +1,12 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
+#include "TrashfallVolume.h"
+
 #include "Syrup/Systems/SyrupGameMode.h"
 #include "Syrup/Tiles/GridLibrary.h"
 #include "Syrup/Tiles/Trash.h"
 #include "Components/BoxComponent.h"
 #include "Syrup/Tiles/Trash.h"
-
-#include "TrashfallVolume.h"
 
 /* \/ ================ \/ *\
 |  \/ ATrashfallVolume \/  |

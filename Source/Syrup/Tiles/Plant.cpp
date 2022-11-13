@@ -173,7 +173,7 @@ void APlant::ReceiveEffectTrigger(const ETileEffectTriggerType TriggerType, cons
 		Grow();
 	}
 
-	if (IsGrown() || TriggerType == ETileEffectTriggerType::PlantsGrow)
+	if ((IsGrown() || TriggerType == ETileEffectTriggerType::PlantsGrow) && Health > 0)
 	{
 		TSet<FIntPoint> EffectedLocations = GetEffectLocations();
 		TSet<FIntPoint> TriggeredLocations = LocationsToTrigger.IsEmpty() ? EffectedLocations : LocationsToTrigger.Intersect(EffectedLocations);

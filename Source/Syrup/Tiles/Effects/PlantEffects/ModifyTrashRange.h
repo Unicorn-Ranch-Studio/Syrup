@@ -6,6 +6,8 @@
 #include "Syrup/Tiles/Effects/TileEffect.h"
 #include "ModifyTrashRange.generated.h"
 
+class ATrash;
+
 /* \/ ================= \/ *\
 |  \/ UModifyTrashRange \/  |
 \* \/ ================= \/ */
@@ -34,6 +36,19 @@ protected:
 	 * @param Locations - The locations to effect.
 	 */
 	virtual void Affect(const TSet<FIntPoint>& Locations) override;
+
+	/*
+	 * Undoes this effect.
+	 *
+	 * @param Locations - The locations undo the effect in.
+	 */
+	virtual void Unaffect(const TSet<FIntPoint>& Locations) override;
+
+private:
+	
+	//All the tiles that have been effected.
+	UPROPERTY()
+	TSet<ATrash*> EffectedTrash = TSet<ATrash*>();
 };
 /* /\ ================= /\ *\
 |  /\ UModifyTrashRange /\  |
