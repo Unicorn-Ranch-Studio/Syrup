@@ -44,6 +44,9 @@ ASyrupPlayerCharacter::ASyrupPlayerCharacter()
 	bUseControllerRotationPitch, bUseControllerRotationRoll, bUseControllerRotationYaw = false;
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	GetCharacterMovement()->bUseControllerDesiredRotation = false;
+
+	//Capsule Component
+	
 }
 
 /**
