@@ -27,7 +27,7 @@ void APlant::BeginPlay()
 	TimeUntilGrown = GetTimeUntilGrown() + 1;
 	Grow();
 
-	ASyrupGameMode::GetTileEffectTriggerDelegate(GetWorld()).Broadcast(ETileEffectTriggerType::PlantSpawned, GetSubTileLocations());
+	ASyrupGameMode::GetTileEffectTriggerDelegate(GetWorld()).Broadcast(ETileEffectTriggerType::PlantSpawned, this, GetSubTileLocations());
 	ASyrupGameMode::GetTileEffectTriggerDelegate(this).AddDynamic(this, &APlant::ReceiveEffectTrigger);
 }
 
@@ -87,8 +87,8 @@ bool APlant::ReceiveDamage(int Amount, ATile* Cause)
 	bool bDead = Health <= 0;
 	if (bDead && OldHealth > 0)
 	{
-		ASyrupGameMode::GetTileEffectTriggerDelegate(GetWorld()).Broadcast(ETileEffectTriggerType::PlantKilled, GetSubTileLocations());
-		ReceiveEffectTrigger(ETileEffectTriggerType::OnDeactivated, TSet<FIntPoint>());
+		ASyrupGameMode::GetTileEffectTriggerDelegate(GetWorld()).Broadcast(ETileEffectTriggerType::PlantKilled, this, GetSubTileLocations());
+		ReceiveEffectTrigger(ETileEffectTriggerType::OnDeactivated, nullptr, TSet<FIntPoint>());
 	}
 	OnDamageRecived(Amount, Cause, bDead);
 	return bDead;
@@ -147,7 +147,7 @@ void APlant::Grow_Implementation()
 
 		if (IsGrown())
 		{
-			ReceiveEffectTrigger(ETileEffectTriggerType::OnActivated, TSet<FIntPoint>());
+			ReceiveEffectTrigger(ETileEffectTriggerType::OnActivated, nullptr, TSet<FIntPoint>());
 		}
 	}
 }
@@ -173,14 +173,14 @@ void APlant::SetRange(const int NewRange)
 	TSet<FIntPoint> DeactivatedLocations = OldEffectLocations.Difference(NewEffectLocations);
 	if (!DeactivatedLocations.IsEmpty())
 	{
-		ReceiveEffectTrigger(ETileEffectTriggerType::OnDeactivated, DeactivatedLocations);
+		ReceiveEffectTrigger(ETileEffectTriggerType::OnDeactivated, nullptr, DeactivatedLocations);
 	}
 
 	Range = FMath::Max(0, NewRange);
 	TSet<FIntPoint> ActivatedLocations = NewEffectLocations.Difference(OldEffectLocations);
 	if (!ActivatedLocations.IsEmpty())
 	{
-		ReceiveEffectTrigger(ETileEffectTriggerType::OnActivated, ActivatedLocations);
+		ReceiveEffectTrigger(ETileEffectTriggerType::OnActivated, nullptr, ActivatedLocations);
 	}
 }
 
@@ -188,9 +188,10 @@ void APlant::SetRange(const int NewRange)
  * Activates the appropriate effects given the trigger.
  *
  * @param TriggerType - The type of trigger that was activated.
+ * @param Triggerer - The tile that triggered this effect.
  * @param LocationsToTrigger - The Locations where the trigger applies an effect. If this is empty all effect locations will be effected.
  */
-void APlant::ReceiveEffectTrigger(const ETileEffectTriggerType TriggerType, const TSet<FIntPoint>& LocationsToTrigger)
+void APlant::ReceiveEffectTrigger(const ETileEffectTriggerType TriggerType, const ATile* Triggerer, const TSet<FIntPoint>& LocationsToTrigger)
 {
 	if(TriggerType == ETileEffectTriggerType::PlantsGrow)
 	{
@@ -206,7 +207,7 @@ void APlant::ReceiveEffectTrigger(const ETileEffectTriggerType TriggerType, cons
 		GetComponents(UTileEffect::StaticClass(), Components);
 		for (UActorComponent* EachComponent : Components)
 		{
-			Cast<UTileEffect>(EachComponent)->ActivateEffect(TriggerType, TriggeredLocations);
+			Cast<UTileEffect>(EachComponent)->ActivateEffect(TriggerType, Triggerer, TriggeredLocations);
 		}
 	}
 }

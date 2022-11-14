@@ -41,10 +41,11 @@ public:
 	 * Tries to activate the effect
 	 *
 	 * @param TriggerType - The type of effects that are currently being triggered.
+	 * @param Triggerer - The tile that triggered this effect.
 	 * @param Locations - The locations to effect.
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Effect", Meta = (AutoCreateRefTerm = "Locations"))
-	void ActivateEffect(const ETileEffectTriggerType TriggerType, const TSet<FIntPoint>& Locations);
+	void ActivateEffect(const ETileEffectTriggerType TriggerType, const ATile* Triggerer, const TSet<FIntPoint>& Locations);
 	
 	//The label that will be added to the location of the owner of this.
 	UPROPERTY(Instanced, EditAnywhere, BlueprintReadOnly, Category = "Effect", Meta = (AllowAbstract = "false"))
@@ -89,6 +90,10 @@ protected:
 	//The triggers that will undo this effect.
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TSet<ETileEffectTriggerType> UnaffectTriggers = TSet<ETileEffectTriggerType>();
+	
+	//If the triggerer is a subclass of one of the given classes then it will not trigger this effect.
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TSet<TSubclassOf<ATile>> InvalidTriggererClasses = TSet<TSubclassOf<ATile>>();
 
 	//The locations that have been effected by this tile already.
 	UPROPERTY()

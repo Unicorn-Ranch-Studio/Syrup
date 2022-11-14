@@ -229,10 +229,11 @@ private:
 	 * Activates the appropriate effects given the trigger.
 	 * 
 	 * @param TriggerType - The type of trigger that was activated.
+	 * @param Triggerer - The tile that triggered this effect.
 	 * @param LocationsToTrigger - The Locations where the trigger applies an effect. If this is empty all effect locations will be effected.
 	 */
 	UFUNCTION()
-	void ReceiveEffectTrigger(const ETileEffectTriggerType TriggerType, const TSet<FIntPoint>& LocationsToTrigger);
+	void ReceiveEffectTrigger(const ETileEffectTriggerType TriggerType, const ATile* Triggerer, const TSet<FIntPoint>& LocationsToTrigger);
 
 	/**
 	 * Gets the locations where the effects of this plant will apply.

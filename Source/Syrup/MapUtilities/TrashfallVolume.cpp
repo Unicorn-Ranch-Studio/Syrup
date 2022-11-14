@@ -109,9 +109,10 @@ void ATrashfallVolume::OnConstruction(const FTransform& Transform)
  * Activates the trashfall if trigger type is trash spreads.
  *
  * @param TriggerType - The of trigger that was activated.
+ * @param Triggerer - The tile that triggered this effect.
  * @param LocationsToTrigger - The Locations where the trigger applies an effect.
  */
-void ATrashfallVolume::ReceiveEffectTrigger(const ETileEffectTriggerType TriggerType, const TSet<FIntPoint>& LocationsToTrigger)
+void ATrashfallVolume::ReceiveEffectTrigger(const ETileEffectTriggerType TriggerType, const ATile* Triggerer, const TSet<FIntPoint>& LocationsToTrigger)
 {
 	BadLocations = TSet<FIntPoint>();
 

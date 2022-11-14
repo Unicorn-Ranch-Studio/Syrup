@@ -69,7 +69,7 @@ void ASyrupGameMode::TriggerPhaseEvent(const ETileEffectTriggerType TriggerType)
 		}
 	)
 
-	TileEffectTriggerDelegate.Broadcast(TriggerType, TSet<FIntPoint>());
+	TileEffectTriggerDelegate.Broadcast(TriggerType, nullptr, TSet<FIntPoint>());
 }
 
 /* /\ Effect Triggers /\ *\

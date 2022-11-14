@@ -20,7 +20,7 @@
 void ATrash::OnFinishedFalling()
 { 
 	bActive = true;
-	ReceiveEffectTrigger(ETileEffectTriggerType::OnActivated, TSet<FIntPoint>()); 
+	ReceiveEffectTrigger(ETileEffectTriggerType::OnActivated, nullptr, TSet<FIntPoint>());
 }
 
 /**
@@ -30,7 +30,7 @@ void ATrash::BeginPlay()
 {
 	Super::BeginPlay();
 
-	ASyrupGameMode::GetTileEffectTriggerDelegate(GetWorld()).Broadcast(ETileEffectTriggerType::TrashSpawned, GetSubTileLocations());
+	ASyrupGameMode::GetTileEffectTriggerDelegate(GetWorld()).Broadcast(ETileEffectTriggerType::TrashSpawned, this, GetSubTileLocations());
 	ASyrupGameMode::GetTileEffectTriggerDelegate(this).AddDynamic(this, &ATrash::ReceiveEffectTrigger);
 }
 
@@ -68,8 +68,8 @@ bool ATrash::PickUp(int& EnergyReserve)
 	if (EnergyReserve >= PickUpCost)
 	{
 		EnergyReserve -= PickUpCost;
-		ASyrupGameMode::GetTileEffectTriggerDelegate(GetWorld()).Broadcast(ETileEffectTriggerType::TrashPickedUp, GetSubTileLocations());
-		ReceiveEffectTrigger(ETileEffectTriggerType::OnDeactivated, TSet<FIntPoint>());
+		ASyrupGameMode::GetTileEffectTriggerDelegate(GetWorld()).Broadcast(ETileEffectTriggerType::TrashPickedUp, this, GetSubTileLocations());
+		ReceiveEffectTrigger(ETileEffectTriggerType::OnDeactivated, nullptr, TSet<FIntPoint>());
 		Destroy();
 		return true;
 	}
@@ -98,14 +98,14 @@ void ATrash::SetRange(const int NewRange)
 	TSet<FIntPoint> DeactivatedLocations = OldEffectLocations.Difference(NewEffectLocations);
 	if (!DeactivatedLocations.IsEmpty())
 	{
-		ReceiveEffectTrigger(ETileEffectTriggerType::OnDeactivated, DeactivatedLocations);
+		ReceiveEffectTrigger(ETileEffectTriggerType::OnDeactivated, nullptr, DeactivatedLocations);
 	}
 
 	Range = FMath::Max(0, NewRange);
 	TSet<FIntPoint> ActivatedLocations = NewEffectLocations.Difference(OldEffectLocations);
 	if (!ActivatedLocations.IsEmpty())
 	{
-		ReceiveEffectTrigger(ETileEffectTriggerType::OnActivated, ActivatedLocations);
+		ReceiveEffectTrigger(ETileEffectTriggerType::OnActivated, nullptr, ActivatedLocations);
 	}
 }
 
@@ -113,9 +113,10 @@ void ATrash::SetRange(const int NewRange)
  * Activates the appropriate effects given the trigger.
  *
  * @param TriggerType - The type of trigger that was activated.
+ * @param Triggerer - The tile that triggered this effect.
  * @param LocationsToTrigger - The Locations where the trigger applies an effect. If this is empty all effect locations will be effected.
  */
-void ATrash::ReceiveEffectTrigger(const ETileEffectTriggerType TriggerType, const TSet<FIntPoint>& LocationsToTrigger)
+void ATrash::ReceiveEffectTrigger(const ETileEffectTriggerType TriggerType, const ATile* Triggerer, const TSet<FIntPoint>& LocationsToTrigger)
 {
 	if (bActive)
 	{
@@ -128,7 +129,7 @@ void ATrash::ReceiveEffectTrigger(const ETileEffectTriggerType TriggerType, cons
 			GetComponents(UTileEffect::StaticClass(), Components);
 			for (UActorComponent* EachComponent : Components)
 			{
-				Cast<UTileEffect>(EachComponent)->ActivateEffect(TriggerType, TriggeredLocations);
+				Cast<UTileEffect>(EachComponent)->ActivateEffect(TriggerType, Triggerer, TriggeredLocations);
 			}
 		}
 	}
