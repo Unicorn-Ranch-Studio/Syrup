@@ -114,25 +114,41 @@ bool APlant::ReceiveDamage(int Amount, ATile* Cause)
  */
 bool APlant::SowPlant(UObject* WorldContextObject, int& EnergyReserve, TSubclassOf<APlant> PlantClass, FTransform Transform)
 {
+	return SowPlant(WorldContextObject, EnergyReserve, PlantClass, UGridLibrary::WorldTransformToGridTransform(Transform));
+}
+bool APlant::SowPlant(UObject* WorldContextObject, int& EnergyReserve, TSubclassOf<APlant> PlantClass, FGridTransform Transform)
+{
+	APlant* DefaultPlant = PlantClass.GetDefaultObject();
+	int NeededEnergy = DefaultPlant->GetPlantingCost();
+	if (EnergyReserve >= NeededEnergy)
+	{
+		if (SowPlant(WorldContextObject, PlantClass, Transform))
+		{
+			EnergyReserve -= NeededEnergy;
+			return true;
+		}
+	}
+	return false;
+}
+bool APlant::SowPlant(UObject* WorldContextObject, TSubclassOf<APlant> PlantClass, FTransform Transform)
+{
+	return SowPlant(WorldContextObject, PlantClass, UGridLibrary::WorldTransformToGridTransform(Transform));
+}
+bool APlant::SowPlant(UObject* WorldContextObject, TSubclassOf<APlant> PlantClass, FGridTransform Transform)
+{
 	if (!IsValid(PlantClass) || PlantClass.Get()->HasAnyClassFlags(CLASS_Abstract))
 	{
 		UE_LOG(LogPlant, Error, TEXT("Tried to sow null or abstract plant."))
 		return false;
 	}
-	APlant* DefaultPlant = PlantClass.GetDefaultObject();
-	int NeededEnergy = DefaultPlant->GetPlantingCost();
-	if (EnergyReserve >= NeededEnergy)
+	
+	TSet<ATile*> BlockingTiles;
+	if (!UGridLibrary::OverlapShape(WorldContextObject, UGridLibrary::TransformShape(PlantClass.GetDefaultObject()->GetShape(), Transform), BlockingTiles, TArray<AActor*>(), ECollisionChannel::ECC_GameTraceChannel3))
 	{
-		FGridTransform GridTransform = UGridLibrary::WorldTransformToGridTransform(Transform);
-		TSet<ATile*> BlockingTiles;
-
-		if(!UGridLibrary::OverlapShape(WorldContextObject, UGridLibrary::TransformShape(DefaultPlant->GetShape(), GridTransform), BlockingTiles, TArray<AActor*>(), ECollisionChannel::ECC_GameTraceChannel3))
-		{
-			WorldContextObject->GetWorld()->SpawnActor<APlant>(PlantClass, UGridLibrary::GridTransformToWorldTransform(GridTransform));
-			EnergyReserve -= NeededEnergy;
-			return true;
-		}
+		WorldContextObject->GetWorld()->SpawnActor<APlant>(PlantClass, UGridLibrary::GridTransformToWorldTransform(Transform));
+		return true;
 	}
+
 	return false;
 }
 

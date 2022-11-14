@@ -139,6 +139,9 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Growth", Meta = (WorldContext = "WorldContextObject"))
 	static bool SowPlant(UObject* WorldContextObject, UPARAM(Ref) int& EnergyReserve, TSubclassOf<APlant> PlantClass, FTransform Transform);
+	static bool SowPlant(UObject* WorldContextObject, UPARAM(Ref) int& EnergyReserve, TSubclassOf<APlant> PlantClass, FGridTransform Transform);
+	static bool SowPlant(UObject* WorldContextObject, TSubclassOf<APlant> PlantClass, FTransform Transform);
+	static bool SowPlant(UObject* WorldContextObject, TSubclassOf<APlant> PlantClass, FGridTransform Transform);
 
 	/**
 	 * Gets the turns taken for this plant type to grow.
