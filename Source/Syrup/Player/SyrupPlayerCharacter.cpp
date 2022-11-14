@@ -5,6 +5,9 @@
 #include "GameFramework/Controller.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Camera/CameraComponent.h"
+#include "Syrup/Systems/SyrupGameMode.h"
+
+
 
 /* \/ ===================== \/ *\
 |  \/ ASyrupPlayerCharacter \/  |
@@ -18,11 +21,15 @@ ASyrupPlayerCharacter::ASyrupPlayerCharacter()
  	//Set this character to call Tick() every frame. You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	//Define Resources
+	Energy = 10;
+	PlantSelected = 0;
+	PlantTypes = { NULL };
+
 	//Create Camera Root
 	CameraRoot = CreateDefaultSubobject<USceneComponent>(FName("Camera Root"));
 	CameraRoot->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
 	CameraRoot->SetAbsolute(false, true);
-
 
 	//Create Camera
 	Camera = CreateDefaultSubobject<UCameraComponent>(FName("Camera Component"));
@@ -49,8 +56,8 @@ void ASyrupPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInp
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 	PlayerInputComponent->BindAxis(TEXT("MoveForward"), this, &ASyrupPlayerCharacter::MoveForward);
 	PlayerInputComponent->BindAxis(TEXT("MoveRight"), this, &ASyrupPlayerCharacter::MoveRight);
-	PlayerInputComponent->BindAction(TEXT("Plant"), this, &ASyrupPlayerCharacter::Plant);
-	PlayerInputComponent->BindAction(TEXT("EndTurn"), this, &ASyrupPlayerCharacter::EndTurn);
+	PlayerInputComponent->BindAction(TEXT("Plant"), IE_Pressed, this, &ASyrupPlayerCharacter::Plant);
+	PlayerInputComponent->BindAction(TEXT("EndTurn"), IE_Pressed, this, &ASyrupPlayerCharacter::EndTurn);
 }
 
 /**
@@ -73,14 +80,23 @@ void ASyrupPlayerCharacter::MoveRight(float AxisValue)
 	GetCharacterMovement()->AddInputVector(FVector(0.f, AxisValue, 0.f));
 }
 
+
 void ASyrupPlayerCharacter::Plant()
 {
-
+	APlant::SowPlant(this, Energy, PlantTypes[PlantSelected], (ASyrupPlayerCharacter::GetTransform()));
+	
+	//UGridLibrary::OverlapGridLocation(const UObject * WorldContext, const FIntPoint GridLocation, ATile * &OverlapingTile, const TArray<AActor*>&IgnoredTiles)
+	//UGridLibrary::OverlapGridLocation(this, UGridLibrary::WorldLocationToGridLocation(ASyrupPlayerCharacter::GetActorLocation()), ATile * &OverlapingTile,);
+	//UGridLibrary::WorldTransformToGridTransform(GetActorTransform());
+	UE_LOG(LogTemp, Warning, TEXT("PLANT"));
 }
 
 void ASyrupPlayerCharacter::EndTurn()
 {
+	Energy = 10;
+	ASyrupGameMode::EndPlayerTurn(this);
 
+	UE_LOG(LogTemp, Warning, TEXT("EndTurn"));
 }
 /* /\ ===================== /\ *\
 |  /\ ASyrupPlayerCharacter /\  |

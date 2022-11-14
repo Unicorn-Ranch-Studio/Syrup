@@ -4,6 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Syrup/Tiles/GridLibrary.h"
+#include "Syrup/Tiles/Plant.h"
+
 #include "SyrupPlayerCharacter.generated.h"
 
 class UCameraComponent;
@@ -34,8 +37,28 @@ private:
 	
 	/* /\ Components /\ *\
 	\* ---------------- */
+	
+	/* ----------------- *\
+	\* \/  Resources  \/ */
+private:
+	//Energy of the Character
+	UPROPERTY(EditAnywhere, Category = "Resources")
+	int Energy;
 
+	/* /\  Resources  /\ *\
+	\* ----------------- */
 
+	/* ------------------------ *\
+	\* \/  Plant Management  \/ */
+public:
+	UPROPERTY(EditAnywhere, Category = "Plant")
+	int PlantSelected;
+
+	UPROPERTY(EditAnywhere, Category = "Plant")
+	TArray<TSubclassOf<APlant>> PlantTypes;
+
+	/* /\  Plant Management  /\ *\
+	\* ------------------------ */
 public:
 	/**
 	 * Sets up camera and movement components.
