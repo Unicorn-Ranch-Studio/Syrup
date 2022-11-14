@@ -87,10 +87,7 @@ void ASyrupPlayerCharacter::MoveRight(float AxisValue)
 void ASyrupPlayerCharacter::Plant()
 {
 	APlant::SowPlant(this, Energy, PlantTypes[PlantSelected], (ASyrupPlayerCharacter::GetTransform()));
-	
-	//UGridLibrary::OverlapGridLocation(const UObject * WorldContext, const FIntPoint GridLocation, ATile * &OverlapingTile, const TArray<AActor*>&IgnoredTiles)
-	//UGridLibrary::OverlapGridLocation(this, UGridLibrary::WorldLocationToGridLocation(ASyrupPlayerCharacter::GetActorLocation()), ATile * &OverlapingTile,);
-	//UGridLibrary::WorldTransformToGridTransform(GetActorTransform());
+
 	UE_LOG(LogTemp, Warning, TEXT("PLANT"));
 }
 
