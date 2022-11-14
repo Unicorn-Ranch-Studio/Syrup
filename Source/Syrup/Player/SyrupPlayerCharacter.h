@@ -51,7 +51,7 @@ private:
 	/* ------------------------ *\
 	\* \/  Plant Management  \/ */
 public:
-	UPROPERTY(EditAnywhere, Category = "Plant")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Plant")
 	int PlantSelected;
 
 	UPROPERTY(EditAnywhere, Category = "Plant")
