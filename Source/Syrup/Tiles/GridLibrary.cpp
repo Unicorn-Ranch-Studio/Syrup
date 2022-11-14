@@ -21,7 +21,7 @@ FTransform UGridLibrary::GridTransformToWorldTransform(const FGridTransform Grid
 	bool bIsFlipped = IsGridLocationFlipped(Location);
 	int Offset = (bIsFlipped ? 180 : 120);
 	int Direction = (bIsFlipped ? 120 : -120);
-	int Multiplier = (int)GridTransform.Direction;
+	int Multiplier = (int)(IsDirectionValidAtLocation(GridTransform.Direction, Location) ? GridTransform.Direction : FlipDirection(GridTransform.Direction));
 	FRotator Rotation = FRotator(0, Offset + Direction * Multiplier, 0);
 
 	return FTransform(Rotation, GridLocationToWorldLocation(Location));
