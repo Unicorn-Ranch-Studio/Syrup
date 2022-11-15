@@ -75,11 +75,14 @@ void UTileEffect::UnregisterLabels(const TSet<FIntPoint>& Locations)
  */
 void UTileEffect::ActivateEffect(const ETileEffectTriggerType TriggerType, const ATile* Triggerer, const TSet<FIntPoint>& Locations)
 {
-	for (TSubclassOf<ATile> EachInvalidTriggererClass : InvalidTriggererClasses)
+	if (IsValid(Triggerer))
 	{
-		if (Triggerer->IsA(EachInvalidTriggererClass.Get()))
+		for (TSubclassOf<ATile> EachInvalidTriggererClass : InvalidTriggererClasses)
 		{
-			return;
+			if (Triggerer->IsA(EachInvalidTriggererClass.Get()))
+			{
+				return;
+			}
 		}
 	}
 

@@ -185,6 +185,10 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Growth", Meta = (ClampMin = "0"))
 	int PlantingCost = 1;
 
+	//Whether or not this plant has finished being planted.
+	UPROPERTY(BlueprintReadOnly, Category = "Growth")
+	bool bIsFinishedPlanting = false;
+
 	/**
 	 * Updates the plants so that it is 1 turn closer to fully grown, and causes the effects of being fully grown if needed.
 	 */

@@ -24,11 +24,13 @@ void APlant::BeginPlay()
 
 	SubtileMesh->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
 
+	bIsFinishedPlanting = true;
 	TimeUntilGrown = GetTimeUntilGrown() + 1;
 	Grow();
+	bIsFinishedPlanting = ASyrupGameMode::IsPlayerTurn(this);
 
-	ASyrupGameMode::GetTileEffectTriggerDelegate(GetWorld()).Broadcast(ETileEffectTriggerType::PlantSpawned, this, GetSubTileLocations());
 	ASyrupGameMode::GetTileEffectTriggerDelegate(this).AddDynamic(this, &APlant::ReceiveEffectTrigger);
+	ASyrupGameMode::GetTileEffectTriggerDelegate(GetWorld()).Broadcast(ETileEffectTriggerType::PlantSpawned, this, GetSubTileLocations());
 }
 
 /**
@@ -82,11 +84,17 @@ TSet<FIntPoint> APlant::GetRelativeSubTileLocations() const
  */
 bool APlant::ReceiveDamage(int Amount, ATile* Cause)
 {
+	if (!bIsFinishedPlanting)
+	{
+		return false;
+	}
+
 	int OldHealth = Health;
 	Health -= FMath::Max(0, Amount);
 	bool bDead = Health <= 0;
 	if (bDead && OldHealth > 0)
 	{
+		SubtileMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		ASyrupGameMode::GetTileEffectTriggerDelegate(GetWorld()).Broadcast(ETileEffectTriggerType::PlantKilled, this, GetSubTileLocations());
 		ReceiveEffectTrigger(ETileEffectTriggerType::OnDeactivated, nullptr, TSet<FIntPoint>());
 	}
@@ -157,7 +165,7 @@ bool APlant::SowPlant(UObject* WorldContextObject, TSubclassOf<APlant> PlantClas
  */
 void APlant::Grow_Implementation()
 {
-	if (!IsGrown())
+	if (bIsFinishedPlanting && !IsGrown())
 	{
 		TimeUntilGrown--;
 
@@ -212,6 +220,10 @@ void APlant::ReceiveEffectTrigger(const ETileEffectTriggerType TriggerType, cons
 	if(TriggerType == ETileEffectTriggerType::PlantsGrow)
 	{
 		Grow();
+	} 
+	else if (!bIsFinishedPlanting && TriggerType == ETileEffectTriggerType::PlayerTurn)
+	{
+		bIsFinishedPlanting = true;
 	}
 
 	if ((IsGrown() || TriggerType == ETileEffectTriggerType::PlantsGrow) && Health > 0)

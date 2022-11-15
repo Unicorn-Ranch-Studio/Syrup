@@ -116,7 +116,7 @@ void ATrashfallVolume::ReceiveEffectTrigger(const ETileEffectTriggerType Trigger
 {
 	BadLocations = TSet<FIntPoint>();
 
-	if (TriggerType == ETileEffectTriggerType::TrashSpread && NumTrash < NumToMaintain && TurnsUntilSpawn-- <= 0)
+	if (TriggerType == ETileEffectTriggerType::TrashSpawn && NumTrash < NumToMaintain && TurnsUntilSpawn-- <= 0)
 	{
 		SpawnTrash();
 	}

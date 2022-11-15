@@ -40,13 +40,31 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Player Turn", Meta = (WorldContext = "WorldContextObject"))
 	static void EndPlayerTurn(const UObject* WorldContextObject);
 
+	/**
+	 * Gets whether or not it is currently the player's turn.
+	 *
+	 * @param WorldContextObject - An object in the same world as the player.
+	 * 
+	 * @return If it is the player's turn.
+	 */
+	UFUNCTION(BlueprintPure, Category = "Player Turn", Meta = (WorldContext = "WorldContextObject"))
+	static bool IsPlayerTurn(const UObject* WorldContextObject);
+
 protected:
 
 	/**
-	 * Causes night to fall and non-player objects to take their turns.
+	 * Causes night to fall and non-player objects to take their turns. 
+	 * Must call TriggerPhaseEvent for Non-player Turn then the following in any order: 
+	 * Plant Active Phase, Plant Damage Phase, Trash Active Phase, Trash Spread Phase, and Plant Growing Phase, 
+	 * then Player Turn.
 	 */
 	UFUNCTION(BlueprintImplementableEvent, Category = "Player Turn")
 	void BeginNight();
+
+private:
+	//Whether or not it is currently the player's turn.
+	UPROPERTY()
+	bool bIsPlayerTurn = true;
 
 	/* /\ Player Turn /\ *\
 	\* ----------------- */
@@ -78,7 +96,7 @@ protected:
 	 * @param TriggerType - The type of trigger to activate. Must be a phase event trigger.
 	 */
 	UFUNCTION(BlueprintCallable)
-	void TriggerPhaseEvent(const ETileEffectTriggerType TriggerType) const;
+	void TriggerPhaseEvent(const ETileEffectTriggerType TriggerType);
 
 	/* /\ Effect Triggers /\ *\
 	\* --------------------- */
