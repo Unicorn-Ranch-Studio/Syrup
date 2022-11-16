@@ -1,17 +1,17 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "ModifyTrashRange.h"
+#include "ModifyTrashDamage.h"
 
 #include "Syrup/Tiles/Trash.h"
 
-/* \/ ================= \/ *\
-|  \/ UModifyTrashRange \/  |
-\* \/ ================= \/ */
+/* \/ ================== \/ *\
+|  \/ UModifyTrashDamage \/  |
+\* \/ ================== \/ */
 /**
  * Overrides the triggers variable.
  */
-UModifyTrashRange::UModifyTrashRange()
+UModifyTrashDamage::UModifyTrashDamage()
 {
 	AffectTriggers.Add(ETileEffectTriggerType::OnActivated);
 	AffectTriggers.Add(ETileEffectTriggerType::TrashSpawned);
@@ -24,7 +24,7 @@ UModifyTrashRange::UModifyTrashRange()
  *
  * @param Locations - The locations to effect.
  */
-void UModifyTrashRange::Affect(const TSet<FIntPoint>& Locations)
+void UModifyTrashDamage::Affect(const TSet<FIntPoint>& Locations)
 {
 	TSet<ATile*> EffectTiles;
 	UGridLibrary::OverlapShape(GetWorld(), Locations, EffectTiles, TArray<AActor*>());
@@ -34,7 +34,7 @@ void UModifyTrashRange::Affect(const TSet<FIntPoint>& Locations)
 		ATrash* Trash = Cast<ATrash>(EachEffectedTile);
 		if (IsValid(Trash) && !EffectedTrash.Contains(Trash))
 		{
-			Trash->SetRange(Trash->GetRange() + DeltaRange);
+			Trash->SetDamage(Trash->GetDamage() + DeltaDamage);
 			EffectedLocations.Add(Trash->GetGridTransform().Location);
 			EffectedTrash.Add(Trash);
 		}
@@ -46,19 +46,19 @@ void UModifyTrashRange::Affect(const TSet<FIntPoint>& Locations)
  *
  * @param Locations - The locations undo the effect in.
  */
-void UModifyTrashRange::Unaffect(const TSet<FIntPoint>& Locations)
+void UModifyTrashDamage::Unaffect(const TSet<FIntPoint>& Locations)
 {
 	TSet<FIntPoint> NewEffectedLocations = EffectedLocations.Difference(Locations);
 	for (TSet<ATrash*>::TIterator Iterator = EffectedTrash.CreateIterator(); Iterator; ++Iterator)
 	{
 		if (IsValid(*Iterator) && (*Iterator)->GetSubTileLocations().Intersect(NewEffectedLocations).IsEmpty())
 		{
-			(*Iterator)->SetRange((*Iterator)->GetRange() - DeltaRange);
+			(*Iterator)->SetDamage((*Iterator)->GetDamage() - DeltaDamage);
 			Iterator.RemoveCurrent();
 		}
 	}
 	EffectedLocations = NewEffectedLocations;
 }
-/* /\ ================= /\ *\
-|  /\ UModifyTrashRange /\  |
-\* /\ ================= /\ */
+/* /\ ================== /\ *\
+|  /\ UModifyTrashDamage /\  |
+\* /\ ================== /\ */

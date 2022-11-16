@@ -132,6 +132,22 @@ public:
 	FORCEINLINE int GetRange() const { return Range; };
 
 	/**
+	 * Sets the damage of this trash.
+	 *
+	 * @param NewDamage - The value to set the damage to.
+	 */
+	UFUNCTION(BlueprintImplementableEvent, Category = "Effect")
+	void SetDamage(const int NewDamage);
+
+	/**
+	 * Gets the damage of this trash.
+	 * 
+	 * @return The damage this trash will deal to plants within its effect area every turn.
+	 */
+	UFUNCTION(BlueprintPure, BlueprintImplementableEvent, Category = "Effect")
+	int GetDamage() const;
+
+	/**
 	 * Gets the locations where the effects of this plant will apply.
 	 * 
 	 * @return A set of all locations where the effects of this plant will apply.
