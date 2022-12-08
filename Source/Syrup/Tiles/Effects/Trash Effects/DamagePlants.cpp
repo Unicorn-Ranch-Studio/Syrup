@@ -14,7 +14,8 @@
  */
 UDamagePlants::UDamagePlants()
 {
-	Triggers.Add(ETileEffectTriggerType::TrashDamage);
+	AffectTriggers.Add(ETileEffectTriggerType::TrashDamage);
+	UnaffectTriggers.Add(ETileEffectTriggerType::OnDeactivated);
 }
 
 /*
@@ -33,17 +34,19 @@ void UDamagePlants::Affect(const TSet<FIntPoint>& Locations)
 		if (IsValid(Plant))
 		{
 			Plant->ReceiveDamage(GetDamage(), Cast<ATile>(GetOwner()));
-			EffectedLocations.Add(Plant->GetGridTransform().Location);
 		}
 	}
+
+	Super::Affect(Locations);
 }
 
 /**
  * Gets the subset of the given locations that will be labeled.
  * 
- * @param Locations - The locations that will be effected by this component
+ * @param Locations - The locations that will be effected by this component.
+ * @param bForUnregistration - Whether or not to get the label location in the case of unregistration or registration.
  */
-TSet<FIntPoint> UDamagePlants::GetLabelLocations(const TSet<FIntPoint>& Locations) const
+TSet<FIntPoint> UDamagePlants::GetLabelLocations(const TSet<FIntPoint>& Locations, const bool bForUnregistration)
 {
 	TSet<FIntPoint> ReturnValue = TSet<FIntPoint>();
 
@@ -53,9 +56,10 @@ TSet<FIntPoint> UDamagePlants::GetLabelLocations(const TSet<FIntPoint>& Location
 	for (ATile* EachEffectedTile : EffectTiles)
 	{
 		APlant* Plant = Cast<APlant>(EachEffectedTile);
-		if (IsValid(Plant))
+		if (IsValid(Plant) && (bForUnregistration ? Plant->GetSubTileLocations().Difference(Locations).Intersect(EffectedLocations).IsEmpty() : !LabeledPlants.Contains(Plant)))
 		{
 			ReturnValue.Add(Plant->GetGridTransform().Location);
+			LabeledPlants.Add(Plant);
 		}
 	}
 

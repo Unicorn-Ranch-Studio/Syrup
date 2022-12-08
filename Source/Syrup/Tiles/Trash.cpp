@@ -4,8 +4,7 @@
 #include "Trash.h"
 
 #include "Syrup/Systems/SyrupGameMode.h"
-#include "Effects/ApplyField.h"
-#include "Effects/DamagePlants.h"
+#include "Effects/TileEffect.h"
 #include "Components/InstancedStaticMeshComponent.h"
 
 /* \/ ====== \/ *\
@@ -20,7 +19,8 @@
  */
 void ATrash::OnFinishedFalling()
 { 
-	ReceiveEffectTrigger(ETileEffectTriggerType::OnActivated, TSet<FIntPoint>()); 
+	bActive = true;
+	ReceiveEffectTrigger(ETileEffectTriggerType::OnActivated, nullptr, TSet<FIntPoint>());
 }
 
 /**
@@ -30,7 +30,7 @@ void ATrash::BeginPlay()
 {
 	Super::BeginPlay();
 
-	ASyrupGameMode::GetTileEffectTriggerDelegate(GetWorld()).Broadcast(ETileEffectTriggerType::TrashSpawned, GetSubTileLocations());
+	ASyrupGameMode::GetTileEffectTriggerDelegate(GetWorld()).Broadcast(ETileEffectTriggerType::TrashSpawned, this, GetSubTileLocations());
 	ASyrupGameMode::GetTileEffectTriggerDelegate(this).AddDynamic(this, &ATrash::ReceiveEffectTrigger);
 }
 
@@ -68,8 +68,8 @@ bool ATrash::PickUp(int& EnergyReserve)
 	if (EnergyReserve >= PickUpCost)
 	{
 		EnergyReserve -= PickUpCost;
-		ASyrupGameMode::GetTileEffectTriggerDelegate(GetWorld()).Broadcast(ETileEffectTriggerType::TrashPickedUp, GetSubTileLocations());
-		ReceiveEffectTrigger(ETileEffectTriggerType::OnDeactivated, TSet<FIntPoint>());
+		ASyrupGameMode::GetTileEffectTriggerDelegate(GetWorld()).Broadcast(ETileEffectTriggerType::TrashPickedUp, this, GetSubTileLocations());
+		ReceiveEffectTrigger(ETileEffectTriggerType::OnDeactivated, nullptr, TSet<FIntPoint>());
 		Destroy();
 		return true;
 	}
@@ -86,23 +86,51 @@ bool ATrash::PickUp(int& EnergyReserve)
 \* \/ Effect \/ */
 
 /**
+ * Sets the range of this trash's effects.
+ *
+ * @param NewRange - The value to set the range to. Will be clamped >= 0.
+ */
+void ATrash::SetRange(const int NewRange)
+{
+	TSet<FIntPoint> OldEffectLocations = GetEffectLocations();
+	TSet<FIntPoint> NewEffectLocations = UGridLibrary::ScaleShapeUp(GetSubTileLocations(), FMath::Max(0, NewRange));
+
+	TSet<FIntPoint> DeactivatedLocations = OldEffectLocations.Difference(NewEffectLocations);
+	if (!DeactivatedLocations.IsEmpty())
+	{
+		ReceiveEffectTrigger(ETileEffectTriggerType::OnDeactivated, nullptr, DeactivatedLocations);
+	}
+
+	Range = FMath::Max(0, NewRange);
+	TSet<FIntPoint> ActivatedLocations = NewEffectLocations.Difference(OldEffectLocations);
+	if (!ActivatedLocations.IsEmpty())
+	{
+		ReceiveEffectTrigger(ETileEffectTriggerType::OnActivated, nullptr, ActivatedLocations);
+	}
+}
+
+/**
  * Activates the appropriate effects given the trigger.
  *
  * @param TriggerType - The type of trigger that was activated.
+ * @param Triggerer - The tile that triggered this effect.
  * @param LocationsToTrigger - The Locations where the trigger applies an effect. If this is empty all effect locations will be effected.
  */
-void ATrash::ReceiveEffectTrigger(const ETileEffectTriggerType TriggerType, const TSet<FIntPoint>& LocationsToTrigger)
+void ATrash::ReceiveEffectTrigger(const ETileEffectTriggerType TriggerType, const ATile* Triggerer, const TSet<FIntPoint>& LocationsToTrigger)
 {
-	TSet<FIntPoint> EffectedLocations = GetEffectLocations();
-	TSet<FIntPoint> TriggeredLocations = LocationsToTrigger.IsEmpty() ? EffectedLocations : LocationsToTrigger.Intersect(EffectedLocations);
-
-	if (!TriggeredLocations.IsEmpty())
+	if (bActive)
 	{
-		TInlineComponentArray<UActorComponent*> Components = TInlineComponentArray<UActorComponent*>();
-		GetComponents(UTileEffect::StaticClass(), Components);
-		for (UActorComponent* EachComponent : Components)
+		TSet<FIntPoint> EffectedLocations = GetEffectLocations();
+		TSet<FIntPoint> TriggeredLocations = LocationsToTrigger.IsEmpty() ? EffectedLocations : LocationsToTrigger.Intersect(EffectedLocations);
+
+		if (!TriggeredLocations.IsEmpty())
 		{
-			Cast<UTileEffect>(EachComponent)->ActivateEffect(TriggerType, TriggeredLocations);
+			TInlineComponentArray<UActorComponent*> Components = TInlineComponentArray<UActorComponent*>();
+			GetComponents(UTileEffect::StaticClass(), Components);
+			for (UActorComponent* EachComponent : Components)
+			{
+				Cast<UTileEffect>(EachComponent)->ActivateEffect(TriggerType, Triggerer, TriggeredLocations);
+			}
 		}
 	}
 }

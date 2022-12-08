@@ -49,9 +49,10 @@ UTileLabelContainer* ATileLabelActor::Create(const UObject* WorldContextObject, 
  * Updates the label to snap/unsnap from tiles.
  *
  * @param TriggerType - The of trigger that was activated.
+ * @param Triggerer - The tile that triggered this effect.
  * @param LocationsToTrigger - The Locations where the trigger applies an effect. If this is empty all effect locations will be effected.
  */
-void ATileLabelActor::ReceiveEffectTrigger(const ETileEffectTriggerType TriggerType, const TSet<FIntPoint>& LocationsToTrigger)
+void ATileLabelActor::ReceiveEffectTrigger(const ETileEffectTriggerType TriggerType, const ATile* Triggerer, const TSet<FIntPoint>& LocationsToTrigger)
 {
     switch (TriggerType)
     {

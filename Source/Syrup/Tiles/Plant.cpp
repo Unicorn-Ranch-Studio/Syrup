@@ -3,8 +3,7 @@
 #include "Plant.h"
 
 #include "Syrup/Systems/SyrupGameMode.h"
-#include "Effects/ApplyField.h"
-#include "Effects/PreventTrashSpawn.h"
+#include "Effects/TileEffect.h"
 #include "Components/InstancedStaticMeshComponent.h"
 
 DEFINE_LOG_CATEGORY(LogPlant);
@@ -25,11 +24,13 @@ void APlant::BeginPlay()
 
 	SubtileMesh->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
 
+	bIsFinishedPlanting = true;
 	TimeUntilGrown = GetTimeUntilGrown() + 1;
 	Grow();
+	bIsFinishedPlanting = ASyrupGameMode::IsPlayerTurn(this);
 
-	ASyrupGameMode::GetTileEffectTriggerDelegate(GetWorld()).Broadcast(ETileEffectTriggerType::PlantSpawned, GetSubTileLocations());
 	ASyrupGameMode::GetTileEffectTriggerDelegate(this).AddDynamic(this, &APlant::ReceiveEffectTrigger);
+	ASyrupGameMode::GetTileEffectTriggerDelegate(GetWorld()).Broadcast(ETileEffectTriggerType::PlantSpawned, this, GetSubTileLocations());
 }
 
 /**
@@ -83,12 +84,19 @@ TSet<FIntPoint> APlant::GetRelativeSubTileLocations() const
  */
 bool APlant::ReceiveDamage(int Amount, ATile* Cause)
 {
+	if (!bIsFinishedPlanting)
+	{
+		return false;
+	}
+
+	int OldHealth = Health;
 	Health -= FMath::Max(0, Amount);
 	bool bDead = Health <= 0;
-	if (bDead)
+	if (bDead && OldHealth > 0)
 	{
-		ASyrupGameMode::GetTileEffectTriggerDelegate(GetWorld()).Broadcast(ETileEffectTriggerType::PlantKilled, GetSubTileLocations());
-		ReceiveEffectTrigger(ETileEffectTriggerType::OnDeactivated, TSet<FIntPoint>());
+		SubtileMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		ASyrupGameMode::GetTileEffectTriggerDelegate(GetWorld()).Broadcast(ETileEffectTriggerType::PlantKilled, this, GetSubTileLocations());
+		ReceiveEffectTrigger(ETileEffectTriggerType::OnDeactivated, nullptr, TSet<FIntPoint>());
 	}
 	OnDamageRecived(Amount, Cause, bDead);
 	return bDead;
@@ -114,25 +122,41 @@ bool APlant::ReceiveDamage(int Amount, ATile* Cause)
  */
 bool APlant::SowPlant(UObject* WorldContextObject, int& EnergyReserve, TSubclassOf<APlant> PlantClass, FTransform Transform)
 {
+	return SowPlant(WorldContextObject, EnergyReserve, PlantClass, UGridLibrary::WorldTransformToGridTransform(Transform));
+}
+bool APlant::SowPlant(UObject* WorldContextObject, int& EnergyReserve, TSubclassOf<APlant> PlantClass, FGridTransform Transform)
+{
+	APlant* DefaultPlant = PlantClass.GetDefaultObject();
+	int NeededEnergy = DefaultPlant->GetPlantingCost();
+	if (EnergyReserve >= NeededEnergy)
+	{
+		if (SowPlant(WorldContextObject, PlantClass, Transform))
+		{
+			EnergyReserve -= NeededEnergy;
+			return true;
+		}
+	}
+	return false;
+}
+bool APlant::SowPlant(UObject* WorldContextObject, TSubclassOf<APlant> PlantClass, FTransform Transform)
+{
+	return SowPlant(WorldContextObject, PlantClass, UGridLibrary::WorldTransformToGridTransform(Transform));
+}
+bool APlant::SowPlant(UObject* WorldContextObject, TSubclassOf<APlant> PlantClass, FGridTransform Transform)
+{
 	if (!IsValid(PlantClass) || PlantClass.Get()->HasAnyClassFlags(CLASS_Abstract))
 	{
 		UE_LOG(LogPlant, Error, TEXT("Tried to sow null or abstract plant."))
 		return false;
 	}
-	APlant* DefaultPlant = PlantClass.GetDefaultObject();
-	int NeededEnergy = DefaultPlant->GetPlantingCost();
-	if (EnergyReserve >= NeededEnergy)
+	
+	TSet<ATile*> BlockingTiles;
+	if (!UGridLibrary::OverlapShape(WorldContextObject, UGridLibrary::TransformShape(PlantClass.GetDefaultObject()->GetShape(), Transform), BlockingTiles, TArray<AActor*>(), ECollisionChannel::ECC_GameTraceChannel3))
 	{
-		FGridTransform GridTransform = UGridLibrary::WorldTransformToGridTransform(Transform);
-		TSet<ATile*> BlockingTiles;
-
-		if(!UGridLibrary::OverlapShape(WorldContextObject, UGridLibrary::TransformShape(DefaultPlant->GetShape(), GridTransform), BlockingTiles, TArray<AActor*>())) 
-		{
-			WorldContextObject->GetWorld()->SpawnActor<APlant>(PlantClass, UGridLibrary::GridTransformToWorldTransform(GridTransform));
-			EnergyReserve -= NeededEnergy;
-			return true;
-		}
+		WorldContextObject->GetWorld()->SpawnActor<APlant>(PlantClass, UGridLibrary::GridTransformToWorldTransform(Transform));
+		return true;
 	}
+
 	return false;
 }
 
@@ -141,13 +165,13 @@ bool APlant::SowPlant(UObject* WorldContextObject, int& EnergyReserve, TSubclass
  */
 void APlant::Grow_Implementation()
 {
-	if (!IsGrown())
+	if (bIsFinishedPlanting && !IsGrown())
 	{
 		TimeUntilGrown--;
 
 		if (IsGrown())
 		{
-			ReceiveEffectTrigger(ETileEffectTriggerType::OnActivated, TSet<FIntPoint>());
+			ReceiveEffectTrigger(ETileEffectTriggerType::OnActivated, nullptr, TSet<FIntPoint>());
 		}
 	}
 }
@@ -161,19 +185,48 @@ void APlant::Grow_Implementation()
 \* \/ Effect \/ */
 
 /**
+ * Sets the range of this plant's effects.
+ *
+ * @param NewRange - The value to set the range to. Will be clamped >= 0.
+ */
+void APlant::SetRange(const int NewRange)
+{
+	TSet<FIntPoint> OldEffectLocations = GetEffectLocations();
+	TSet<FIntPoint> NewEffectLocations = UGridLibrary::ScaleShapeUp(GetSubTileLocations(), FMath::Max(0, NewRange));
+
+	TSet<FIntPoint> DeactivatedLocations = OldEffectLocations.Difference(NewEffectLocations);
+	if (!DeactivatedLocations.IsEmpty())
+	{
+		ReceiveEffectTrigger(ETileEffectTriggerType::OnDeactivated, nullptr, DeactivatedLocations);
+	}
+
+	Range = FMath::Max(0, NewRange);
+	TSet<FIntPoint> ActivatedLocations = NewEffectLocations.Difference(OldEffectLocations);
+	if (!ActivatedLocations.IsEmpty())
+	{
+		ReceiveEffectTrigger(ETileEffectTriggerType::OnActivated, nullptr, ActivatedLocations);
+	}
+}
+
+/**
  * Activates the appropriate effects given the trigger.
  *
  * @param TriggerType - The type of trigger that was activated.
+ * @param Triggerer - The tile that triggered this effect.
  * @param LocationsToTrigger - The Locations where the trigger applies an effect. If this is empty all effect locations will be effected.
  */
-void APlant::ReceiveEffectTrigger(const ETileEffectTriggerType TriggerType, const TSet<FIntPoint>& LocationsToTrigger)
+void APlant::ReceiveEffectTrigger(const ETileEffectTriggerType TriggerType, const ATile* Triggerer, const TSet<FIntPoint>& LocationsToTrigger)
 {
 	if(TriggerType == ETileEffectTriggerType::PlantsGrow)
 	{
 		Grow();
+	} 
+	else if (!bIsFinishedPlanting && TriggerType == ETileEffectTriggerType::PlayerTurn)
+	{
+		bIsFinishedPlanting = true;
 	}
 
-	if (IsGrown() || TriggerType == ETileEffectTriggerType::PlantsGrow)
+	if ((IsGrown() || TriggerType == ETileEffectTriggerType::PlantsGrow) && Health > 0)
 	{
 		TSet<FIntPoint> EffectedLocations = GetEffectLocations();
 		TSet<FIntPoint> TriggeredLocations = LocationsToTrigger.IsEmpty() ? EffectedLocations : LocationsToTrigger.Intersect(EffectedLocations);
@@ -182,7 +235,7 @@ void APlant::ReceiveEffectTrigger(const ETileEffectTriggerType TriggerType, cons
 		GetComponents(UTileEffect::StaticClass(), Components);
 		for (UActorComponent* EachComponent : Components)
 		{
-			Cast<UTileEffect>(EachComponent)->ActivateEffect(TriggerType, TriggeredLocations);
+			Cast<UTileEffect>(EachComponent)->ActivateEffect(TriggerType, Triggerer, TriggeredLocations);
 		}
 	}
 }

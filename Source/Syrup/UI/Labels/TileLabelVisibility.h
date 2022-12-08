@@ -14,15 +14,15 @@ UENUM(BlueprintType)
 enum class ETileLabelVisibility : uint8
 {
 	//Label will appear when its location is or one of its source locations are selected.
-	LocationOrSource	UMETA(DysplayName = "Location or Source Locations Selected"),
+	LocationOrSource	UMETA(DisplayName = "Location or Source Locations Selected"),
 	//Label will appear when its location is selected.
-	Location			UMETA(DysplayName = "Location Selected"),
+	Location			UMETA(DisplayName = "Location Selected"),
 	//Label will appear when one of its source locations are selected.
-	Source				UMETA(DysplayName = "Source Locations Selected"),
+	Source				UMETA(DisplayName = "Source Locations Selected"),
 	//Label will always appear.
-	Always				UMETA(DysplayName = "Always Visible"),
+	Always				UMETA(DisplayName = "Always Visible"),
 	//Label will never appear.
-	Never				UMETA(DysplayName = "Never Visible")
+	Never				UMETA(DisplayName = "Never Visible")
 };
 /* /\ ==================== /\ *\
 |  /\ ETileLabelVisibility /\  |

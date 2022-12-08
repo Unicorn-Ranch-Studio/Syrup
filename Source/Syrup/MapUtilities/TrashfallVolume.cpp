@@ -1,12 +1,12 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
+#include "TrashfallVolume.h"
+
 #include "Syrup/Systems/SyrupGameMode.h"
 #include "Syrup/Tiles/GridLibrary.h"
 #include "Syrup/Tiles/Trash.h"
 #include "Components/BoxComponent.h"
 #include "Syrup/Tiles/Trash.h"
-
-#include "TrashfallVolume.h"
 
 /* \/ ================ \/ *\
 |  \/ ATrashfallVolume \/  |
@@ -109,13 +109,14 @@ void ATrashfallVolume::OnConstruction(const FTransform& Transform)
  * Activates the trashfall if trigger type is trash spreads.
  *
  * @param TriggerType - The of trigger that was activated.
+ * @param Triggerer - The tile that triggered this effect.
  * @param LocationsToTrigger - The Locations where the trigger applies an effect.
  */
-void ATrashfallVolume::ReceiveEffectTrigger(const ETileEffectTriggerType TriggerType, const TSet<FIntPoint>& LocationsToTrigger)
+void ATrashfallVolume::ReceiveEffectTrigger(const ETileEffectTriggerType TriggerType, const ATile* Triggerer, const TSet<FIntPoint>& LocationsToTrigger)
 {
 	BadLocations = TSet<FIntPoint>();
 
-	if (TriggerType == ETileEffectTriggerType::TrashSpread && NumTrash < NumToMaintain && TurnsUntilSpawn-- <= 0)
+	if (TriggerType == ETileEffectTriggerType::TrashSpawn && NumTrash < NumToMaintain && TurnsUntilSpawn-- <= 0)
 	{
 		SpawnTrash();
 	}
@@ -151,7 +152,7 @@ bool ATrashfallVolume::SpawnTrash(bool bAttachTrash)
 		for (FIntPoint EachSpawnLocation : SpawnLocations)
 		{
 			FVector WorldLocation = UGridLibrary::GridLocationToWorldLocation(EachSpawnLocation);
-			if (GetWorld()->LineTraceTestByChannel(WorldLocation + FVector(0, 0, 1), WorldLocation + FVector(0, 0, -0.5), ECollisionChannel::ECC_GameTraceChannel2))
+			if (GetWorld()->LineTraceTestByChannel(WorldLocation + FVector(0, 0, 1), WorldLocation + FVector(0, 0, -0.05), ECollisionChannel::ECC_GameTraceChannel2))
 			{
 				BadLocations.Add(EachSpawnLocation);
 				goto endOfLoop;

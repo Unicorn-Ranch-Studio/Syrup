@@ -4,6 +4,7 @@
 
 #include "TileEffect.h"
 
+#include "Syrup/Tiles/Tile.h"
 #include "Syrup/Tiles/GridLibrary.h"
 #include "Syrup/Systems/SyrupGameMode.h"
 #include "Syrup/UI/Labels/TileLabel.h"
@@ -30,7 +31,7 @@ void UTileEffect::RegisterLabels(const TSet<FIntPoint>& Locations)
 
 	if (IsValid(EffectedLocationLabel))
 	{
-		TSet<FIntPoint> LabelLocations = GetLabelLocations(Locations.Difference(EffectedLocations));
+		TSet<FIntPoint> LabelLocations = GetLabelLocations(Locations, false);
 		for (FIntPoint EachLabelLocation : LabelLocations)
 		{
 			EffectedLocationLabel->SourceLocations.Add(GridLocation);
@@ -57,7 +58,7 @@ void UTileEffect::UnregisterLabels(const TSet<FIntPoint>& Locations)
 
 	if (IsValid(EffectedLocationLabel))
 	{
-		for (FIntPoint EachLabelLocation : GetLabelLocations(Locations))
+		for (FIntPoint EachLabelLocation : GetLabelLocations(Locations, true))
 		{
 			EffectedLocationLabel->SourceLocations.Add(GridLocation);
 			ASyrupGameMode::UnregisterTileLabel(this, EffectedLocationLabel, EachLabelLocation);
@@ -69,10 +70,22 @@ void UTileEffect::UnregisterLabels(const TSet<FIntPoint>& Locations)
  * Tries to activate the effect
  *
  * @param TriggerType - The type of effects that are currently being triggered.
+ * @param Triggerer - The tile that triggered this effect.
  * @param Locations - The locations to effect.
  */
-void UTileEffect::ActivateEffect(const ETileEffectTriggerType TriggerType, const TSet<FIntPoint>& Locations)
+void UTileEffect::ActivateEffect(const ETileEffectTriggerType TriggerType, const ATile* Triggerer, const TSet<FIntPoint>& Locations)
 {
+	if (IsValid(Triggerer))
+	{
+		for (TSubclassOf<ATile> EachInvalidTriggererClass : InvalidTriggererClasses)
+		{
+			if (Triggerer->IsA(EachInvalidTriggererClass.Get()))
+			{
+				return;
+			}
+		}
+	}
+
 	if ((IsValid(SourceLabel) || IsValid(EffectedLocationLabel)))
 	{
 		if (TriggerType == ETileEffectTriggerType::OnActivated || TriggerType == ETileEffectTriggerType::PlantSpawned || TriggerType == ETileEffectTriggerType::TrashSpawned)
@@ -85,9 +98,14 @@ void UTileEffect::ActivateEffect(const ETileEffectTriggerType TriggerType, const
 		}
 	}
 
-	if (Triggers.Contains(TriggerType))
+	if (AffectTriggers.Contains(TriggerType))
 	{
 		Affect(Locations);
+	}
+
+	if (UnaffectTriggers.Contains(TriggerType))
+	{
+		Unaffect(Locations);
 	}
 }
 
