@@ -15,9 +15,10 @@
  */
 UApplyField::UApplyField()
 {
-	Triggers.Add(ETileEffectTriggerType::OnActivated);
-	Triggers.Add(ETileEffectTriggerType::PlantSpawned);
-	Triggers.Add(ETileEffectTriggerType::TrashSpawned);
+	AffectTriggers.Add(ETileEffectTriggerType::OnActivated);
+	AffectTriggers.Add(ETileEffectTriggerType::PlantSpawned);
+	AffectTriggers.Add(ETileEffectTriggerType::TrashSpawned);
+	UnaffectTriggers.Add(ETileEffectTriggerType::OnDeactivated);
 }
 
 /*
@@ -27,15 +28,6 @@ UApplyField::UApplyField()
  */
 void UApplyField::Affect(const TSet<FIntPoint>& Locations)
 {
-	////Remove invalid planes
-	//for (TSet<AGroundPlane*>::TIterator Itterator = EffectedGroundPlanes.CreateIterator(); Itterator; ++Itterator)
-	//{
-	//	if (!IsValid(*Itterator))
-	//	{
-	//		Itterator.RemoveCurrent();
-	//	}
-	//}
-
 	TSet<FIntPoint> NewlyEffectedLocations = Locations.Difference(EffectedLocations);
 
 	//If no ground planes are known
@@ -80,8 +72,10 @@ void UApplyField::Affect(const TSet<FIntPoint>& Locations)
 
 /*
  * Undoes this effect.
+ *
+ * @param Locations - The locations undo the effect in.
  */
-void UApplyField::Unaffect()
+void UApplyField::Unaffect(const TSet<FIntPoint>& Locations)
 {
 	//Remove invalid planes
 	for (TSet<AGroundPlane*>::TIterator Itterator = EffectedGroundPlanes.CreateIterator(); Itterator; ++Itterator)
@@ -97,20 +91,21 @@ void UApplyField::Unaffect()
 	{
 		if (IsValid(EachGroundPlane))
 		{
-			EachGroundPlane->RemoveField(FieldType, EffectedLocations);
+			EachGroundPlane->RemoveField(FieldType, Locations);
 		}
 	}
 
 	//Remove from tiles
-	for (ATile* EachEffectedTile : EffectedTiles)
+	TSet<FIntPoint> NewEffectedLocations = EffectedLocations.Difference(Locations);
+	for (TSet<ATile*>::TIterator Iterator = EffectedTiles.CreateIterator(); Iterator; ++Iterator)
 	{
-		if (IsValid(EachEffectedTile))
+		if (IsValid(*Iterator) && (*Iterator)->GetSubTileLocations().Intersect(NewEffectedLocations).IsEmpty())
 		{
-			EachEffectedTile->RemoveField(FieldType);
+			(*Iterator)->RemoveField(FieldType);
+			Iterator.RemoveCurrent();
 		}
 	}
-	EffectedTiles.Empty();
-	EffectedLocations.Empty();
+	EffectedLocations = NewEffectedLocations;
 }
 /* /\ =========== /\ *\
 |  /\ UTileEffect /\  |

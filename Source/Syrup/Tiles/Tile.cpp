@@ -168,14 +168,7 @@ TSet<FIntPoint> ATile::GetRelativeSubTileLocations() const
  */
 TSet<FIntPoint> ATile::GetSubTileLocations() const
 {
-	FGridTransform GridTransform = GetGridTransform();
-	TSet<FIntPoint> ReturnValues = UGridLibrary::PointShapeInDirection(GridTransform.Direction, GetRelativeSubTileLocations());
-	for (FIntPoint& EachReturnValue : ReturnValues)
-	{
-		EachReturnValue += GridTransform.Location;
-	}
-
-	return ReturnValues;
+	return UGridLibrary::TransformShape(GetRelativeSubTileLocations(), GetGridTransform());
 }
 /* /\ ===== /\ *\
 |  /\ ATile /\  |

@@ -30,9 +30,27 @@ ASyrupGameMode::ASyrupGameMode()
 void ASyrupGameMode::EndPlayerTurn(const UObject* WorldContextObject)
 {
 	ASyrupGameMode* GameMode = Cast<ASyrupGameMode>(UGameplayStatics::GetGameMode(WorldContextObject));
-	GameMode->BeginNight();
+	if (GameMode->bIsPlayerTurn)
+	{
+		GameMode->BeginNight();
+		GameMode->bIsPlayerTurn = false;
+	}
 }
 
+
+/**
+ * Gets whether or not it is currently the player's turn.
+ *
+ * @param WorldContextObject - An object in the same world as the player.
+ *
+ * @return If it is the player's turn.
+ */
+bool ASyrupGameMode::IsPlayerTurn(const UObject* WorldContextObject)
+{
+	ASyrupGameMode* GameMode = Cast<ASyrupGameMode>(UGameplayStatics::GetGameMode(WorldContextObject));
+	return GameMode->bIsPlayerTurn;
+
+}
 /* /\ Player Turn /\ *\
 \* ----------------- */
 
@@ -59,17 +77,23 @@ FTileEffectTrigger& ASyrupGameMode::GetTileEffectTriggerDelegate(const UObject* 
  *
  * @param TriggerType - The type of trigger to activate. Must be a phase event trigger.
  */
-void ASyrupGameMode::TriggerPhaseEvent(const ETileEffectTriggerType TriggerType) const
+void ASyrupGameMode::TriggerPhaseEvent(const ETileEffectTriggerType TriggerType)
 {
 	checkCode
 	(
 		if(TriggerType > LAST_PHASE_TRIGGER)
 		{
 			UE_LOG(LogTemp, Error, TEXT("%s is not a Phase Event"), *StaticEnum<ETileEffectTriggerType>()->GetNameStringByValue((int64)TriggerType))
+			return;
 		}
 	)
 
-	TileEffectTriggerDelegate.Broadcast(TriggerType, TSet<FIntPoint>());
+	TileEffectTriggerDelegate.Broadcast(TriggerType, nullptr, TSet<FIntPoint>());
+
+	if (TriggerType == LAST_PHASE_TRIGGER)
+	{
+		bIsPlayerTurn = true;
+	}
 }
 
 /* /\ Effect Triggers /\ *\

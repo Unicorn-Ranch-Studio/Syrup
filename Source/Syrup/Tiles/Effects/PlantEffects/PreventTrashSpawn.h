@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "VolumetricEffect.h"
+#include "Syrup/Tiles/Effects/VolumetricEffect.h"
 #include "PreventTrashSpawn.generated.h"
 
 /* \/ ================== \/ *\

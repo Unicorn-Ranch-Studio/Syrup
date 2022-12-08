@@ -86,7 +86,15 @@ protected:
 	\* \/ Effect \/ */
 		
 public:
-	
+
+	/**
+	 * Sets the range of this trash's effects.
+	 *
+	 * @param NewRange - The value to set the range to. Will be clamped >= 0.
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Effect")
+	void SetRange(const int NewRange);
+
 	/**
 	 * Gets the range of this trash's effects.
 	 * 
@@ -94,6 +102,22 @@ public:
 	 */
 	UFUNCTION(BlueprintPure, Category = "Effect")
 	FORCEINLINE int GetRange() const { return Range; };
+
+	/**
+	 * Sets the damage of this trash.
+	 *
+	 * @param NewDamage - The value to set the damage to.
+	 */
+	UFUNCTION(BlueprintImplementableEvent, Category = "Effect")
+	void SetDamage(const int NewDamage);
+
+	/**
+	 * Gets the damage of this trash.
+	 * 
+	 * @return The damage this trash will deal to plants within its effect area every turn.
+	 */
+	UFUNCTION(BlueprintPure, BlueprintImplementableEvent, Category = "Effect")
+	int GetDamage() const;
 
 	/**
 	 * Gets the locations where the effects of this plant will apply.
@@ -104,6 +128,10 @@ public:
 	TSet<FIntPoint> GetEffectLocations() const;
 
 protected:
+	//Whether or not this trash can apply effects
+	UPROPERTY()
+	bool bActive = false;
+
 	//The scale applied to the shape of this trash to get all effected locations of this trash's effects.
 	UPROPERTY(EditDefaultsOnly, Category = "Effect", Meta = (ClampMin = "0"))
 	int Range = 1;
@@ -114,10 +142,11 @@ private:
 	 * Activates the appropriate effects given the trigger.
 	 * 
 	 * @param TriggerType - The of trigger that was activated.
+	 * @param Triggerer - The tile that triggered this effect.
 	 * @param LocationsToTrigger - The Locations where the trigger applies an effect. If this is empty all effect locations will be effected.
 	 */
 	UFUNCTION()
-	void ReceiveEffectTrigger(const ETileEffectTriggerType TriggerType, const TSet<FIntPoint>& LocationsToTrigger);
+	void ReceiveEffectTrigger(const ETileEffectTriggerType TriggerType, const ATile* Triggerer, const TSet<FIntPoint>& LocationsToTrigger);
 
 	/* /\ Effect /\ *\
 	\* ------------ */

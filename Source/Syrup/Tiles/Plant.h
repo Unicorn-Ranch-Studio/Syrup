@@ -111,6 +111,9 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Growth", Meta = (WorldContext = "WorldContextObject"))
 	static bool SowPlant(UObject* WorldContextObject, UPARAM(Ref) int& EnergyReserve, TSubclassOf<APlant> PlantClass, FTransform Transform);
+	static bool SowPlant(UObject* WorldContextObject, UPARAM(Ref) int& EnergyReserve, TSubclassOf<APlant> PlantClass, FGridTransform Transform);
+	static bool SowPlant(UObject* WorldContextObject, TSubclassOf<APlant> PlantClass, FTransform Transform);
+	static bool SowPlant(UObject* WorldContextObject, TSubclassOf<APlant> PlantClass, FGridTransform Transform);
 
 	/**
 	 * Gets the turns taken for this plant type to grow.
@@ -158,6 +161,10 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Growth", Meta = (ClampMin = "0"))
 	int PlantingCost = 1;
 
+	//Whether or not this plant has finished being planted.
+	UPROPERTY(BlueprintReadOnly, Category = "Growth")
+	bool bIsFinishedPlanting = false;
+
 	/**
 	 * Updates the plants so that it is 1 turn closer to fully grown, and causes the effects of being fully grown if needed.
 	 */
@@ -177,7 +184,14 @@ protected:
 	\* \/ Effect \/ */
 
 public:
-	
+	/**
+	 * Sets the range of this plant's effects.
+	 *
+	 * @param NewRange - The value to set the range to. Will be clamped >= 0.
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Effect")
+	void SetRange(const int NewRange);
+
 	/**
 	 * Gets the range of this plant type's effects.
 	 * 
@@ -198,10 +212,11 @@ private:
 	 * Activates the appropriate effects given the trigger.
 	 * 
 	 * @param TriggerType - The type of trigger that was activated.
+	 * @param Triggerer - The tile that triggered this effect.
 	 * @param LocationsToTrigger - The Locations where the trigger applies an effect. If this is empty all effect locations will be effected.
 	 */
 	UFUNCTION()
-	void ReceiveEffectTrigger(const ETileEffectTriggerType TriggerType, const TSet<FIntPoint>& LocationsToTrigger);
+	void ReceiveEffectTrigger(const ETileEffectTriggerType TriggerType, const ATile* Triggerer, const TSet<FIntPoint>& LocationsToTrigger);
 
 	/**
 	 * Gets the locations where the effects of this plant will apply.

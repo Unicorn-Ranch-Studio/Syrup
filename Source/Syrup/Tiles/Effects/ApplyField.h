@@ -33,8 +33,10 @@ public:
 
 	/*
 	 * Undoes this effect.
+	 *
+	 * @param Locations - The locations undo the effect in.
 	 */
-	virtual void Unaffect() override;
+	virtual void Unaffect(const TSet<FIntPoint>& Locations) override;
 
 	//The type of field to apply
 	UPROPERTY(EditDefaultsOnly, Category = "Effect")
