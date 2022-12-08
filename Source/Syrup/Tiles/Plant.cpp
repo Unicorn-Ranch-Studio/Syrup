@@ -45,7 +45,6 @@ void APlant::OnConstruction(const FTransform& Transform)
 	SubtileMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
 	Health = GetMaxHealth();
 	Range = GetRange();
-	RelativeSubTileLocations.Add(FIntPoint::ZeroValue);
 }
 
 /* /\ Initialization /\ *\
@@ -133,7 +132,7 @@ bool APlant::SowPlant(UObject* WorldContextObject, TSubclassOf<APlant> PlantClas
 	}
 	
 	TSet<ATile*> BlockingTiles;
-	if (!UGridLibrary::OverlapShape(WorldContextObject, UGridLibrary::TransformShape(PlantClass.GetDefaultObject()->GetShape(), Transform), BlockingTiles, TArray<AActor*>(), ECollisionChannel::ECC_GameTraceChannel3))
+	if (!UGridLibrary::OverlapShape(WorldContextObject, UGridLibrary::TransformShape(PlantClass.GetDefaultObject()->GetRelativeSubTileLocations(), Transform), BlockingTiles, TArray<AActor*>(), ECollisionChannel::ECC_GameTraceChannel3))
 	{
 		WorldContextObject->GetWorld()->SpawnActor<APlant>(PlantClass, UGridLibrary::GridTransformToWorldTransform(Transform));
 		return true;

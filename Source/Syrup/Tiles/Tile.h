@@ -99,6 +99,11 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UInstancedStaticMeshComponent* SubtileMesh;
 
+
+	//The locations of the subtiles of this tile.
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Visuals")
+	TSet<FIntPoint> RelativeSubTileLocations;
+
 private:
 	//The mesh used for each tile as the ground.
 	UPROPERTY()
