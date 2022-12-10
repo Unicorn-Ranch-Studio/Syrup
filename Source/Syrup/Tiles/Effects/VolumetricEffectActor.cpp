@@ -73,11 +73,14 @@ void AVolumetricEffectActor::AddTiles(const TSet<FIntPoint>& TileLocations)
  *
  * @param TileLocations - The locations of the tiles to remove from the volume.
  */
-void AVolumetricEffectActor::RemoveTiles(const TSet<FIntPoint>& TileLocations)
+void AVolumetricEffectActor::RemoveTiles(const TSet<FIntPoint> TileLocations)
 {
-	for (FIntPoint EachTileLocation : TileLocations)
+	if (!TileLocations.IsEmpty())
 	{
-		CollisionMesh->RemoveInstance(InstanceLocationsToIndices.FindRef(EachTileLocation));
+		for (FIntPoint EachTileLocation : TileLocations)
+		{
+			CollisionMesh->RemoveInstance(InstanceLocationsToIndices.FindRef(EachTileLocation));
+		}
 	}
 }
 /* /\ ====================== /\ *\

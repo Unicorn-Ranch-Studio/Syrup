@@ -43,7 +43,7 @@ public:
 	 * @param TileLocations - The locations of the tiles to remove from the volume.
 	 */
 	UFUNCTION(BlueprintCallable)
-	void RemoveTiles(const TSet<FIntPoint>& TileLocations);
+	void RemoveTiles(const TSet<FIntPoint> TileLocations);
 
 //private:
 	//The mesh used to generate overlap events.
