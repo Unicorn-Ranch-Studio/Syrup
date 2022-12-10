@@ -254,17 +254,34 @@ FIntPoint UGridLibrary::PointLocationInDirection(const EGridDirection Direction,
 {
 	FIntPoint ReturnValue = Location;
 
-	// Gets the world location of the location to rotate.
-	FVector WorldLocation = GridTransformToWorldTransform(Location).GetTranslation() - FVector(GetGridHeight() * 0.33333333333333, 0, 0);
-	// Rotates that location in world space
-	WorldLocation = WorldLocation.RotateAngleAxis(((uint8)Direction / 2) * 120, FVector(0, 0, 1));
-	// Translates that back to grid space
-	ReturnValue = WorldTransformToGridTransform(FTransform(WorldLocation + FVector(GetGridHeight() * 0.33333333333333, 0, 0))).Location;
-
 	// Flip if Necessary
 	if (IsDirectionValidAtLocation(Direction, FIntPoint::ZeroValue))
 	{
-		ReturnValue.X = -ReturnValue.X;
+		ReturnValue.X = -ReturnValue.X + 1;
+		ReturnValue.Y = -ReturnValue.Y;
+
+		FVector Offset = FVector(GetGridHeight() * 1.666666666666666, 0, 0);
+
+		// Gets the world location of the location to rotate.
+		FVector WorldLocation = GridTransformToWorldTransform(ReturnValue).GetTranslation() - Offset;
+		// Rotates that location in world space.
+		WorldLocation =	 WorldLocation.RotateAngleAxis(((uint8)Direction / 2) * -120, FVector(0, 0, 1));
+		// Translates that back to grid space.
+		ReturnValue = WorldTransformToGridTransform(FTransform(WorldLocation + Offset)).Location;
+		ReturnValue.X = ReturnValue.X - 1;
+	}
+	else
+	{
+		FVector Offset = FVector(GetGridHeight() * 0.333333333333333, 0, 0);
+
+		// Gets the world location of the location to rotate.
+		FVector WorldLocation = GridTransformToWorldTransform(ReturnValue).GetTranslation() - Offset;
+		UE_LOG(LogTemp, Warning, TEXT("Rot pos = %s -> %s"), *Location.ToString(), *WorldLocation.ToString())
+		// Rotates that location in world space
+		WorldLocation =  WorldLocation.RotateAngleAxis(((uint8)Direction / 2) * 120, FVector(0, 0, 1));
+		// Translates that back to grid space
+		ReturnValue = WorldTransformToGridTransform(FTransform(WorldLocation + Offset)).Location;
+
 	}
 
 	return ReturnValue;
@@ -497,7 +514,6 @@ bool UGridLibrary::OverlapGridLocation(const UObject* WorldContext, const FIntPo
 	{
 		return false;
 	}
-	UE_LOG(LogTemp, Warning, TEXT("ColidedWith: %s"), *Hit.Component->GetName());
 
 	OverlapingTile = Cast<ATile>(Hit.GetActor());
 	return true;
