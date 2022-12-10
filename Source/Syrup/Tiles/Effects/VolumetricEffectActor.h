@@ -50,9 +50,9 @@ public:
 	UPROPERTY(VisibleAnywhere)
 	UInstancedStaticMeshComponent* CollisionMesh;
 
-	//The instances used to represent each location.
+	//The index where the location is stored is the index of the index storing it.
 	UPROPERTY()
-	TMap<FIntPoint, int> InstanceLocationsToIndices = TMap<FIntPoint, int>();
+	TArray<FIntPoint> InstanceLocationsToIndices = TArray<FIntPoint>();
 };
 /* /\ ====================== /\ *\
 |  /\ AVolumetricEffectActor /\  |

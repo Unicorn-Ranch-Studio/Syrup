@@ -64,7 +64,8 @@ void AVolumetricEffectActor::AddTiles(const TSet<FIntPoint>& TileLocations)
 {
 	for (FIntPoint EachTileLocation : TileLocations)
 	{
-		InstanceLocationsToIndices.Add(EachTileLocation, CollisionMesh->AddInstance(UGridLibrary::GridTransformToWorldTransform(EachTileLocation)));
+		InstanceLocationsToIndices.Add(EachTileLocation);
+		CollisionMesh->AddInstance(UGridLibrary::GridTransformToWorldTransform(EachTileLocation));
 	}
 }
 
@@ -77,9 +78,11 @@ void AVolumetricEffectActor::RemoveTiles(const TSet<FIntPoint> TileLocations)
 {
 	if (!TileLocations.IsEmpty())
 	{
+		TArray<int32> Indices = TArray<int32>();
 		for (FIntPoint EachTileLocation : TileLocations)
 		{
-			CollisionMesh->RemoveInstance(InstanceLocationsToIndices.FindRef(EachTileLocation));
+			CollisionMesh->RemoveInstance(InstanceLocationsToIndices.Find(EachTileLocation));
+			InstanceLocationsToIndices.RemoveSingle(EachTileLocation);
 		}
 	}
 }

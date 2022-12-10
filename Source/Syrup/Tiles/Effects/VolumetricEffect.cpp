@@ -48,6 +48,7 @@ void UVolumetricEffect::Unaffect(const TSet<FIntPoint>& Locations)
 	if (IsValid(VolumeActor))
 	{
 		VolumeActor->RemoveTiles(Locations);
+		Super::Unaffect(Locations);
 	}
 }
 
