@@ -68,7 +68,15 @@ protected:
 	UFUNCTION()
 	virtual FORCEINLINE TSet<TEnumAsByte<ECollisionChannel>> GetBlockedChannels() const { return TSet<TEnumAsByte<ECollisionChannel>>(); };
 
+	/**
+	 * Destroys the collision actor.
+	 * 
+	 * @param	bDestroyingHierarchy  - True if the entire component hierarchy is being torn down, allows avoiding expensive operations
+	 */
+	virtual void OnComponentDestroyed(bool bDestroyingHierarchy) override;
+
 private:
+
 	/**
 	 * Applies the effect of this volume when overlap is begun.
 	 *

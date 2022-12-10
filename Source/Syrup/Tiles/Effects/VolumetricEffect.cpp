@@ -22,10 +22,9 @@ void UVolumetricEffect::Affect(const TSet<FIntPoint>& Locations)
 		FActorSpawnParameters SpawnParams = FActorSpawnParameters();
 		SpawnParams.Owner = GetOwner();
 		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-		SpawnParams.Name = FName(GetOwner()->GetName() + " " + GetClass()->GetName() + " Actor");
 
 		VolumeActor = GetWorld()->SpawnActor<AVolumetricEffectActor>(SpawnParams);
-		VolumeActor->SetActorLabel(SpawnParams.Name.ToString());
+		VolumeActor->SetActorLabel(GetOwner()->GetName() + " " + GetClass()->GetName() + " Actor");
 		VolumeActor->SetCollisionResponses(GetOverlappedChannels(), GetBlockedChannels());
 		VolumeActor->OnActorBeginOverlap.AddDynamic(this, &UVolumetricEffect::ReceiveBeginOverlap);
 		VolumeActor->OnActorEndOverlap.AddDynamic(this, &UVolumetricEffect::ReceiveEndOverlap);
@@ -50,6 +49,20 @@ void UVolumetricEffect::Unaffect(const TSet<FIntPoint>& Locations)
 		VolumeActor->RemoveTiles(Locations);
 		Super::Unaffect(Locations);
 	}
+}
+
+/**
+ * Destroys the collision actor.
+ *
+ * @param	bDestroyingHierarchy  - True if the entire component hierarchy is being torn down, allows avoiding expensive operations
+ */
+void UVolumetricEffect::OnComponentDestroyed(bool bDestroyingHierarchy) {
+	if (IsValid(VolumeActor))
+	{
+		VolumeActor->Destroy();
+	}
+
+	Super::OnComponentDestroyed(bDestroyingHierarchy);
 }
 
 /**
