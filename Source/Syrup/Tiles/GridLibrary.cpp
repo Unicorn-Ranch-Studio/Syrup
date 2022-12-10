@@ -276,7 +276,6 @@ FIntPoint UGridLibrary::PointLocationInDirection(const EGridDirection Direction,
 
 		// Gets the world location of the location to rotate.
 		FVector WorldLocation = GridTransformToWorldTransform(ReturnValue).GetTranslation() - Offset;
-		UE_LOG(LogTemp, Warning, TEXT("Rot pos = %s -> %s"), *Location.ToString(), *WorldLocation.ToString())
 		// Rotates that location in world space
 		WorldLocation =  WorldLocation.RotateAngleAxis(((uint8)Direction / 2) * 120, FVector(0, 0, 1));
 		// Translates that back to grid space
