@@ -106,14 +106,15 @@ public:
 	 * @param EnergyReserve - The variable attempt to subtract the planting cost from.
 	 * @param PlantClass - The type of plant to plant.
 	 * @param Transform - The location to spawn the plant at.
+	 * @param InitalGrowth - The percent fully grown that the spawned plant will be.
 	 *
 	 * @return Whether there was enough energy and space to plant the plant.
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Growth", Meta = (WorldContext = "WorldContextObject"))
 	static bool SowPlant(UObject* WorldContextObject, UPARAM(Ref) int& EnergyReserve, TSubclassOf<APlant> PlantClass, FTransform Transform);
 	static bool SowPlant(UObject* WorldContextObject, UPARAM(Ref) int& EnergyReserve, TSubclassOf<APlant> PlantClass, FGridTransform Transform);
-	static bool SowPlant(UObject* WorldContextObject, TSubclassOf<APlant> PlantClass, FTransform Transform);
-	static bool SowPlant(UObject* WorldContextObject, TSubclassOf<APlant> PlantClass, FGridTransform Transform);
+	static bool SowPlant(UObject* WorldContextObject, TSubclassOf<APlant> PlantClass, FTransform Transform, float InitalGrowth = 0);
+	static bool SowPlant(UObject* WorldContextObject, TSubclassOf<APlant> PlantClass, FGridTransform Transform, float InitalGrowth = 0);
 
 	/**
 	 * Gets the turns taken for this plant type to grow.
@@ -154,7 +155,7 @@ protected:
 	float InitialGrowthPercent = 0;
 
 	//The turns remaining until this plant is fully grown.
-	UPROPERTY(EditDefaultsOnly, Category = "Growth", Meta = (ClampMin = "1"))
+	UPROPERTY(EditDefaultsOnly, Category = "Growth", Meta = (ClampMin = "0"))
 	int TimeUntilGrown = 1;
 	
 	//The amount of energy required to plant a plant of this type.

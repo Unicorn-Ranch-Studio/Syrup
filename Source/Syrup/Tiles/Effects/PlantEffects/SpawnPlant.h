@@ -23,6 +23,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Meta=(AllowAbstract = "false"))
 	TSubclassOf<APlant> PlantClass;
 
+	//The percent grown that the plant spawned will start at.
+	UPROPERTY(EditAnywhere, Meta = (ClampMin = "0", ClampMax = "1"))
+	float InitialGrowthPercent = 0;
+
 protected:
 	/*
 	 * Causes this effect.

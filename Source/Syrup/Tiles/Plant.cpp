@@ -98,6 +98,7 @@ bool APlant::ReceiveDamage(int Amount, ATile* Cause)
  * @param EnergyReserve - The variable attempt to subtract the planting cost from.
  * @param PlantClass - The type of plant to plant.
  * @param Transform - The location to spawn the plant at.
+ * @param InitalGrowth - The percent fully grown that the spawned plant will be.
  * 
  * @return Whether there was enough energy and space to plant the plant.
  */
@@ -119,11 +120,11 @@ bool APlant::SowPlant(UObject* WorldContextObject, int& EnergyReserve, TSubclass
 	}
 	return false;
 }
-bool APlant::SowPlant(UObject* WorldContextObject, TSubclassOf<APlant> PlantClass, FTransform Transform)
+bool APlant::SowPlant(UObject* WorldContextObject, TSubclassOf<APlant> PlantClass, FTransform Transform, float InitalGrowth)
 {
-	return SowPlant(WorldContextObject, PlantClass, UGridLibrary::WorldTransformToGridTransform(Transform));
+	return SowPlant(WorldContextObject, PlantClass, UGridLibrary::WorldTransformToGridTransform(Transform), InitalGrowth);
 }
-bool APlant::SowPlant(UObject* WorldContextObject, TSubclassOf<APlant> PlantClass, FGridTransform Transform)
+bool APlant::SowPlant(UObject* WorldContextObject, TSubclassOf<APlant> PlantClass, FGridTransform Transform, float InitalGrowth)
 {
 	if (!IsValid(PlantClass) || PlantClass.Get()->HasAnyClassFlags(CLASS_Abstract))
 	{
@@ -134,7 +135,10 @@ bool APlant::SowPlant(UObject* WorldContextObject, TSubclassOf<APlant> PlantClas
 	TSet<ATile*> BlockingTiles;
 	if (!UGridLibrary::OverlapShape(WorldContextObject, UGridLibrary::TransformShape(PlantClass.GetDefaultObject()->GetRelativeSubTileLocations(), Transform), BlockingTiles, TArray<AActor*>(), ECollisionChannel::ECC_GameTraceChannel3))
 	{
-		WorldContextObject->GetWorld()->SpawnActor<APlant>(PlantClass, UGridLibrary::GridTransformToWorldTransform(Transform));
+		FTransform PlantTransform = UGridLibrary::GridTransformToWorldTransform(Transform);
+		APlant* NewPlant = WorldContextObject->GetWorld()->SpawnActorDeferred<APlant>(PlantClass, PlantTransform);
+		NewPlant->InitialGrowthPercent = InitalGrowth;
+		NewPlant->FinishSpawning(PlantTransform);
 		return true;
 	}
 

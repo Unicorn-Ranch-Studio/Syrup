@@ -17,7 +17,7 @@ void USpawnPlant::Affect(const TSet<FIntPoint>& Locations)
 {
 	for (FIntPoint EachLocation : Locations)
 	{
-		APlant::SowPlant(this, PlantClass, FGridTransform(EachLocation, (EGridDirection)FMath::RandHelper(3)));
+		APlant::SowPlant(this, PlantClass, FGridTransform(EachLocation, (EGridDirection)FMath::RandHelper(3)), InitialGrowthPercent);
 	}
 }
 /* /\ =========== /\ *\
