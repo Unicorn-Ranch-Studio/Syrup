@@ -77,7 +77,7 @@ void ATile::OnConstruction(const FTransform& Transform)
 		for (FIntPoint EachTileLocation : TileLocations)
 		{
 			TileLocalTransforms.Add(UGridLibrary::GridTransformToWorldTransform(FGridTransform(EachTileLocation)) * FTransform(FVector(UGridLibrary::GetGridHeight() * -0.333333333333333,0,0)));
-			checkCode
+			/*checkCode
 			(
 				ATile* OverlapedTile = nullptr;
 				TArray<AActor*> IgnoredActors = TArray<AActor*>();
@@ -88,7 +88,7 @@ void ATile::OnConstruction(const FTransform& Transform)
 					UE_LOG(LogLevel, Warning, TEXT("%s is overlapping %s at: %s"), *GetName(), *OverlapedTile->GetName(), *GridTransform.Location.ToString());
 					DrawDebugPoint(GetWorld(), (TileLocalTransforms.Last() * SubtileMesh->GetComponentTransform()).GetLocation() + FVector(0, 0, 50), 50, FColor::Red, false, 5);
 				}
-			);
+			);*/
 		}
 
 		SubtileMesh->AddInstances(TileLocalTransforms, false, false);
