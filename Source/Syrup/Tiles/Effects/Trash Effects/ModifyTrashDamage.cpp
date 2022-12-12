@@ -27,7 +27,13 @@ UModifyTrashDamage::UModifyTrashDamage()
 void UModifyTrashDamage::Affect(const TSet<FIntPoint>& Locations)
 {
 	TSet<ATile*> EffectTiles;
-	UGridLibrary::OverlapShape(GetWorld(), Locations, EffectTiles, TArray<AActor*>());
+	TArray<AActor*> IgnoredActors = TArray<AActor*>();
+	if(!bEffectParent)
+	{
+		IgnoredActors.Add(GetOwner());
+	}
+
+	UGridLibrary::OverlapShape(GetWorld(), Locations, EffectTiles, IgnoredActors);
 
 	for (ATile* EachEffectedTile : EffectTiles)
 	{

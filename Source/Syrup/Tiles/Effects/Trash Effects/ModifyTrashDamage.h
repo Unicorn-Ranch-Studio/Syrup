@@ -23,6 +23,10 @@ public:
 	//The amount to add to the damage of trash in the effected area.
 	UPROPERTY(EditDefaultsOnly, Category = "Effect")
 	int DeltaDamage = 1;
+	
+	//The amount to add to the range of the parent
+	UPROPERTY(EditDefaultsOnly, Category = "Effect")
+	bool bEffectParent = false;
 
 protected:
 	/**
