@@ -77,10 +77,11 @@ private:
 	 * Activates the trashfall if trigger type is trash spreads.
 	 * 
 	 * @param TriggerType - The of trigger that was activated.
+	 * @param Triggerer - The tile that triggered this effect.
 	 * @param LocationsToTrigger - The Locations where the trigger applies an effect.
 	 */
 	UFUNCTION()
-	void ReceiveEffectTrigger(const ETileEffectTriggerType TriggerType, const TSet<FIntPoint>& LocationsToTrigger);
+	void ReceiveEffectTrigger(const ETileEffectTriggerType TriggerType, const ATile* Triggerer, const TSet<FIntPoint>& LocationsToTrigger);
 
 	/**
 	 * Called when one of the trash spawned by this is destroyed.

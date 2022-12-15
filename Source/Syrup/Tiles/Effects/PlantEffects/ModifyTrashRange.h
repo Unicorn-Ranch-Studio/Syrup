@@ -2,27 +2,33 @@
 
 #pragma once
 
-#include "Syrup/MapUtilities/GroundPlane.h"
-
 #include "CoreMinimal.h"
-#include "TileEffect.h"
-#include "ApplyField.generated.h"
+#include "Syrup/Tiles/Effects/TileEffect.h"
+#include "ModifyTrashRange.generated.h"
 
-/* \/ =========== \/ *\
-|  \/ UApplyField \/  |
-\* \/ =========== \/ */
+class ATrash;
+
+/* \/ ================= \/ *\
+|  \/ UModifyTrashRange \/  |
+\* \/ ================= \/ */
 /**
- * Applies a field in the affect area.
+ * Changes the range of trash within the effect of this.
  */
 UCLASS(ClassGroup = (TileEffects), Meta = (BlueprintSpawnableComponent))
-class SYRUP_API UApplyField : public UTileEffect
+class SYRUP_API UModifyTrashRange : public UTileEffect
 {
 	GENERATED_BODY()
+	
 public:
+	//The amount to add to the range of trash in the effected area.
+	UPROPERTY(EditDefaultsOnly, Category = "Effect")
+	int DeltaRange = -1;
+
+protected:
 	/**
 	 * Overrides the triggers variable.
 	 */
-	UApplyField();
+	UModifyTrashRange();
 
 	/*
 	 * Causes this effect.
@@ -38,19 +44,12 @@ public:
 	 */
 	virtual void Unaffect(const TSet<FIntPoint>& Locations) override;
 
-	//The type of field to apply
-	UPROPERTY(EditDefaultsOnly, Category = "Effect")
-	EFieldType FieldType = EFieldType::Protection;
-
 private:
+	
 	//All the tiles that have been effected.
 	UPROPERTY()
-	TSet<ATile*> EffectedTiles = TSet<ATile*>();
-
-	//All the ground planes that have been effected.
-	UPROPERTY()
-	TSet<AGroundPlane*> EffectedGroundPlanes = TSet<AGroundPlane*>();
+	TSet<ATrash*> EffectedTrash = TSet<ATrash*>();
 };
-/* /\ =========== /\ *\
-|  /\ UApplyField /\  |
-\* /\ =========== /\ */
+/* /\ ================= /\ *\
+|  /\ UModifyTrashRange /\  |
+\* /\ ================= /\ */

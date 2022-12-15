@@ -21,7 +21,7 @@ FTransform UGridLibrary::GridTransformToWorldTransform(const FGridTransform Grid
 	bool bIsFlipped = IsGridLocationFlipped(Location);
 	int Offset = (bIsFlipped ? 180 : 120);
 	int Direction = (bIsFlipped ? 120 : -120);
-	int Multiplier = (int)GridTransform.Direction;
+	int Multiplier = (int)(IsDirectionValidAtLocation(GridTransform.Direction, Location) ? FlipDirection(GridTransform.Direction) : GridTransform.Direction);
 	FRotator Rotation = FRotator(0, Offset + Direction * Multiplier, 0);
 
 	return FTransform(Rotation, GridLocationToWorldLocation(Location));
@@ -481,25 +481,24 @@ TSet<FIntPoint> UGridLibrary::GetLocationsInLine(const FIntPoint LineOrigin, con
  * @param GridLocation - The given grid location to check.
  * @param OverlapingTile - Will be set to the tile at the given location if there is one, otherwise is nullptr.
  * @param IgnoredTiles - The tiles to ignore when querying.
+ * @param Channel - The channel to test overlaps against.
+ * 
  * @return Whether or not a tile was at the given location.
  */
-bool UGridLibrary::OverlapGridLocation(const UObject* WorldContext, const FIntPoint GridLocation, ATile*& OverlapingTile, const TArray<AActor*>& IgnoredTiles)
+bool UGridLibrary::OverlapGridLocation(const UObject* WorldContext, const FIntPoint GridLocation, ATile*& OverlapingTile, const TArray<AActor*>& IgnoredTiles, const ECollisionChannel Channel)
 {
 	FCollisionQueryParams Params = FCollisionQueryParams();
 	Params.AddIgnoredActors(IgnoredTiles);
-	FCollisionObjectQueryParams ObjectParams = FCollisionObjectQueryParams();
-	ObjectParams.AddObjectTypesToQuery(ECollisionChannel::ECC_WorldDynamic);
-
 	FHitResult Hit = FHitResult();
 
 	FVector WorldLocation = GridTransformToWorldTransform(GridLocation).GetTranslation();
-	if (!WorldContext->GetWorld()->LineTraceSingleByObjectType(Hit, WorldLocation, WorldLocation - FVector(0, 0, KINDA_SMALL_NUMBER), ObjectParams, Params))
+	if (!WorldContext->GetWorld()->LineTraceSingleByChannel(Hit, WorldLocation + FVector(0, 0, 100), WorldLocation - FVector(0, 0, 0.05), Channel, Params))
 	{
 		return false;
 	}
 
 	OverlapingTile = Cast<ATile>(Hit.GetActor());
-	return IsValid(OverlapingTile);
+	return true;
 }
 
 /**
@@ -509,21 +508,24 @@ bool UGridLibrary::OverlapGridLocation(const UObject* WorldContext, const FIntPo
  * @param ShapeGridLocations - The given shape's grid locations to check.
  * @param OverlapingTiles - Will be set to the tile at the given location if there is one, otherwise is nullptr.
  * @param IgnoredTiles - The tiles to ignore when querying.
+ * @param Channel - The channel to test overlaps against.
+ * 
  * @return Whether or not a tile was at overlapping the given shape.
  */
-bool UGridLibrary::OverlapShape(const UObject* WorldContext, const TSet<FIntPoint>& ShapeGridLocations, TSet<ATile*>& OverlapingTiles, const TArray<AActor*>& IgnoredTiles)
+bool UGridLibrary::OverlapShape(const UObject* WorldContext, const TSet<FIntPoint>& ShapeGridLocations, TSet<ATile*>& OverlapingTiles, const TArray<AActor*>& IgnoredTiles, const ECollisionChannel Channel)
 {
+	bool bTileOverlaped = false;
 	OverlapingTiles = TSet<ATile*>();
 	for (FIntPoint EachShapeGridLocation : ShapeGridLocations)
 	{
 		ATile* OverlapedTile = nullptr;
-		OverlapGridLocation(WorldContext, EachShapeGridLocation, OverlapedTile, IgnoredTiles);
+		bTileOverlaped = OverlapGridLocation(WorldContext, EachShapeGridLocation, OverlapedTile, IgnoredTiles, Channel) || bTileOverlaped;
 		if (IsValid(OverlapedTile))
 		{
 			OverlapingTiles.Add(OverlapedTile);
 		}
 	}
-	return (bool)(OverlapingTiles.Num());
+	return bTileOverlaped;
 }
 /* /\ ============ /\ *\
 |  /\ UGridLibrary /\  |
