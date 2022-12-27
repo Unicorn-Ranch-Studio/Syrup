@@ -230,6 +230,19 @@ private:
 	/* /\ Effect /\ *\
 	\* ------------ */
 
+	/* -------------- *\
+	\* \/ Resource \/ */
+//public:
+//	UFUNCTION(BlueprintCallable)
+//	TArray<Resource*> GetResouces() const;
+//
+//private:
+//	UPROPERTY()
+//	TArray<Resource*> Resouces;
+
+	/* /\ Resource /\ *\
+	\* -------------- */
+
 	/* -------- *\
 	\* \/ UI \/ */
 
