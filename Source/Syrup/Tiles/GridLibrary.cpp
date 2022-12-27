@@ -322,16 +322,16 @@ TMap<EGridDirection, FIntPoint> UGridLibrary::GetAdjacentGridLocations(const FIn
 }
 
 /*
- * Gets all the grid locations within a radius of a given grid location.
+ * Gets all the grid locations within a range of a given grid location.
  *
  * @param Location - The given location.
- * @param Radius -  The Radius to get locations within.
- * @return All the grid locations within a radius of a given grid location.
+ * @param Range -  The Range to get locations within.
+ * @return All the grid locations within a range of a given grid location.
  */
-TSet<FIntPoint> UGridLibrary::GetGridLocationsInRadius(const FIntPoint Location, const double Radius)
+TSet<FIntPoint> UGridLibrary::GetGridLocationsInRange(const FIntPoint Location, const double Range)
 {
-	float AbsRadius = FMath::Abs(Radius);
-	FIntPoint SearchArea = FIntPoint(FMath::CeilToDouble(AbsRadius), FMath::CeilToDouble(AbsRadius * 2 * 0.86602540378));
+	float AbsRange = FMath::Abs(Range);
+	FIntPoint SearchArea = FIntPoint(FMath::CeilToDouble(AbsRange), FMath::CeilToDouble(AbsRange * 2 * 0.86602540378));
 	double YSize = 1 / (2 * 0.86602540378);
 	TSet<FIntPoint> ReturnValue = TSet<FIntPoint>();
 
@@ -339,7 +339,7 @@ TSet<FIntPoint> UGridLibrary::GetGridLocationsInRadius(const FIntPoint Location,
 	{
 		for (int IndexY = -SearchArea.Y; IndexY <= 0; IndexY++)
 		{
-			if (IndexX * IndexX + IndexY * IndexY * YSize * YSize < AbsRadius * AbsRadius)
+			if (IndexX * IndexX + IndexY * IndexY * YSize * YSize < AbsRange * AbsRange)
 			{
 				ReturnValue.Add(FIntPoint( IndexX,  IndexY));
 				ReturnValue.Add(FIntPoint(-IndexX,  IndexY));

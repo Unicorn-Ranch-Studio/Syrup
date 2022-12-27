@@ -19,7 +19,7 @@ DECLARE_LOG_CATEGORY_EXTERN(LogResource, Log, All);
 /**
  * Represents a resource that can be linked to a tile to modify it.
  */
-UCLASS()
+UCLASS(BlueprintType)
 class SYRUP_API UResource : public UObject
 {
 	GENERATED_BODY()

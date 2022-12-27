@@ -25,7 +25,7 @@ void USpawnPlant::SpawnPlants()
 {
 	for (FIntPoint EachSpawnLocation : SpawnLocations)
 	{
-		APlant::SowPlant(this, PlantClass, FGridTransform(EachSpawnLocation, (EGridDirection)FMath::RandHelper(3)), InitialGrowthPercent);
+		APlant::SowPlant(this, PlantClass, FGridTransform(EachSpawnLocation, (EGridDirection)FMath::RandHelper(3)));
 	}
 	SpawnLocations.Empty();
 }

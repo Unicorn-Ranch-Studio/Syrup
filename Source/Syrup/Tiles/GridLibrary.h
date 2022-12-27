@@ -231,14 +231,14 @@ public:
 	static TMap<EGridDirection, FIntPoint> GetAdjacentGridLocations(const FIntPoint Location);
 
 	/*
-	 * Gets all the grid locations within a radius of a given grid location.
+	 * Gets all the grid locations within a range of a given grid location.
 	 *
 	 * @param Location - The given location.
-	 * @param Radius -  The Radius to get locations within.
-	 * @return All the grid locations within a radius of a given grid location.
+	 * @param Range -  The Range to get locations within.
+	 * @return All the grid locations within a range of a given grid location.
 	 */
 	UFUNCTION(BlueprintPure, Category = "Transformation|Grid|Adjacency")
-	static TSet<FIntPoint> GetGridLocationsInRadius(const FIntPoint Location, const double Radius);
+	static TSet<FIntPoint> GetGridLocationsInRange(const FIntPoint Location, const double Range);
 
 	/*
 	 * Gets all the grid locations of a given shape when scaled up.

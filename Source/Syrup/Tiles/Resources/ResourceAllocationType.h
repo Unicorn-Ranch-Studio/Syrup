@@ -18,10 +18,10 @@ enum class EResourceAllocationType : uint8
 {
 	NotAllocated		UMETA(DisplayName = "Not Allocated"),
 	PlantHealth			UMETA(DisplayName = "Plant Health"),
-	PlantRadius			UMETA(DisplayName = "Plant Radius"),
+	PlantRange			UMETA(DisplayName = "Plant Range"),
 	PlantProduction		UMETA(DisplayName = "Plant Production"),
 	TrashDamage			UMETA(DisplayName = "Trash Damage"),
-	TrashRadius			UMETA(DisplayName = "Trash Radius"),
+	TrashRange			UMETA(DisplayName = "Trash Range"),
 	TrashCost			UMETA(DisplayName = "Trash Pickup Cost")
 };
 /* /\ ====================== /\ *\

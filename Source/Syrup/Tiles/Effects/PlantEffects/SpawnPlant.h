@@ -23,10 +23,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Meta=(AllowAbstract = "false"))
 	TSubclassOf<APlant> PlantClass;
 
-	//The percent grown that the plant spawned will start at.
-	UPROPERTY(EditAnywhere, Meta = (ClampMin = "0", ClampMax = "1"))
-	float InitialGrowthPercent = 0;
-
 	//The time to wait until the spawned plant spawns.
 	UPROPERTY(EditAnywhere, Meta = (ClampMin = "0"))
 	float SpawnDelay = 1;

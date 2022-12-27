@@ -25,6 +25,8 @@ void APlant::BeginPlay()
 
 	SubtileMesh->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
 	Health = 1;
+	Production = 0;
+	Range = 0;
 	bIsFinishedPlanting = ASyrupGameMode::IsPlayerTurn(this);
 
 	ASyrupGameMode::GetTileEffectTriggerDelegate(this).AddDynamic(this, &APlant::ReceiveEffectTrigger);
@@ -41,8 +43,6 @@ void APlant::OnConstruction(const FTransform& Transform)
 	Super::OnConstruction(Transform);
 
 	SubtileMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
-	Health = GetMaxHealth();
-	Range = GetRange();
 }
 
 /* /\ Initialization /\ *\
@@ -72,12 +72,35 @@ bool APlant::ReceiveDamage(int Amount, ATile* Cause)
 	bool bDead = Health <= DamageTaken;
 	if (bDead && DamageTaken - Amount < Health)
 	{
-		SubtileMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		ASyrupGameMode::GetTileEffectTriggerDelegate(GetWorld()).Broadcast(ETileEffectTriggerType::PlantKilled, this, GetSubTileLocations());
-		ReceiveEffectTrigger(ETileEffectTriggerType::OnDeactivated, nullptr, TSet<FIntPoint>());
+		Die();
 	}
 	OnDamageRecived(Amount, Cause, bDead);
 	return bDead;
+}
+
+
+/**
+ * Updates this plant to have the new amount of health.
+ *
+ * @param NewHealth - The new health of this plant.
+ */
+void APlant::SetHealth_Implementation(int NewHealth)
+{
+	Health = NewHealth;
+	if (DamageTaken > NewHealth)
+	{
+		Die();
+	}
+}
+
+/**
+ * Causes the effects of this plants death.
+ */
+void APlant::Die()
+{
+	SubtileMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	ASyrupGameMode::GetTileEffectTriggerDelegate(GetWorld()).Broadcast(ETileEffectTriggerType::PlantKilled, this, GetSubTileLocations());
+	ReceiveEffectTrigger(ETileEffectTriggerType::OnDeactivated, nullptr, TSet<FIntPoint>());
 }
 
 /* /\ Health /\ *\
@@ -95,7 +118,6 @@ bool APlant::ReceiveDamage(int Amount, ATile* Cause)
  * @param EnergyReserve - The variable attempt to subtract the planting cost from.
  * @param PlantClass - The type of plant to plant.
  * @param Transform - The location to spawn the plant at.
- * @param InitalGrowth - The percent fully grown that the spawned plant will be.
  * 
  * @return Whether there was enough energy and space to plant the plant.
  */
@@ -117,11 +139,11 @@ bool APlant::SowPlant(UObject* WorldContextObject, int& EnergyReserve, TSubclass
 	}
 	return false;
 }
-bool APlant::SowPlant(UObject* WorldContextObject, TSubclassOf<APlant> PlantClass, FTransform Transform, float InitalGrowth)
+bool APlant::SowPlant(UObject* WorldContextObject, TSubclassOf<APlant> PlantClass, FTransform Transform)
 {
-	return SowPlant(WorldContextObject, PlantClass, UGridLibrary::WorldTransformToGridTransform(Transform), InitalGrowth);
+	return SowPlant(WorldContextObject, PlantClass, UGridLibrary::WorldTransformToGridTransform(Transform));
 }
-bool APlant::SowPlant(UObject* WorldContextObject, TSubclassOf<APlant> PlantClass, FGridTransform Transform, float InitalGrowth)
+bool APlant::SowPlant(UObject* WorldContextObject, TSubclassOf<APlant> PlantClass, FGridTransform Transform)
 {
 	if (!IsValid(PlantClass) || PlantClass.Get()->HasAnyClassFlags(CLASS_Abstract))
 	{
@@ -132,10 +154,7 @@ bool APlant::SowPlant(UObject* WorldContextObject, TSubclassOf<APlant> PlantClas
 	TSet<ATile*> BlockingTiles;
 	if (!UGridLibrary::OverlapShape(WorldContextObject, UGridLibrary::TransformShape(PlantClass.GetDefaultObject()->GetRelativeSubTileLocations(), Transform), BlockingTiles, TArray<AActor*>(), ECollisionChannel::ECC_GameTraceChannel3))
 	{
-		FTransform PlantTransform = UGridLibrary::GridTransformToWorldTransform(Transform);
-		APlant* NewPlant = WorldContextObject->GetWorld()->SpawnActorDeferred<APlant>(PlantClass, PlantTransform);
-		NewPlant->InitialGrowthPercent = InitalGrowth;
-		NewPlant->FinishSpawning(PlantTransform);
+		WorldContextObject->GetWorld()->SpawnActor<APlant>(PlantClass, UGridLibrary::GridTransformToWorldTransform(Transform));
 		return true;
 	}
 
@@ -147,14 +166,22 @@ bool APlant::SowPlant(UObject* WorldContextObject, TSubclassOf<APlant> PlantClas
  */
 void APlant::Grow_Implementation()
 {
-	if (bIsFinishedPlanting && !IsGrown())
+	if (!bIsFinishedPlanting)
 	{
-		TimeUntilGrown--;
+		return;
+	}
 
-		if (IsGrown())
-		{
-			ReceiveEffectTrigger(ETileEffectTriggerType::OnActivated, nullptr, TSet<FIntPoint>());
-		}
+	if (bHealthGrowing)
+	{
+		SetHealth(GetHealth() + 1);
+	}
+	if (bRangeGrowing)
+	{
+		SetRange(GetRange() + 1);
+	}
+	if (bRangeGrowing)
+	{
+		SetProduction(GetProduction() + 2);
 	}
 }
 
@@ -208,7 +235,7 @@ void APlant::ReceiveEffectTrigger(const ETileEffectTriggerType TriggerType, cons
 		bIsFinishedPlanting = true;
 	}
 
-	if ((IsGrown() || TriggerType == ETileEffectTriggerType::PlantsGrow) && Health > 0)
+	if ((GetRange() >= 0 || TriggerType == ETileEffectTriggerType::PlantsGrow) && Health > 0)
 	{
 		TSet<FIntPoint> EffectedLocations = GetEffectLocations();
 		TSet<FIntPoint> TriggeredLocations = LocationsToTrigger.IsEmpty() ? EffectedLocations : LocationsToTrigger.Intersect(EffectedLocations);
@@ -241,6 +268,119 @@ TSet<FIntPoint> APlant::GetEffectLocations() const
 \* \/ Resource \/ */
 
 /**
+ * Gets whether or not this can grow more health.
+ *
+ * @return Whether or not this can grow more health.
+ */
+bool APlant::CanGrowHealth() const
+{
+	return !bHealthGrowing && Health + 1 <= GetMaxHealth();
+}
+
+/**
+ * Gets whether or not this can grow more range.
+ *
+ * @return Whether or not this can grow more range.
+ */
+bool APlant::CanGrowRange() const
+{
+	return !bRangeGrowing && Health + 1 <= GetMaxRange();
+}
+
+/**
+ * Gets whether or not this can grow more production.
+ *
+ * @return Whether or not this can grow more production.
+ */
+bool APlant::CanGrowProduction() const
+{
+	return !bProductionGrowing && Production + 2 <= GetMaxProduction();
+}
+
+/**
+ * Causes this plant to grow more health, and allocates the given resource.
+ *
+ * @param Resource - The resource used to grow this health.
+ *
+ * @return Whether or not this was successful at growing more health.
+ */
+bool APlant::GrowHealth(UResource* Resource)
+{
+	if (!CanGrowHealth())
+	{
+		return false;
+	}
+
+	bHealthGrowing = true;
+	return true;
+}
+
+/**
+ * Causes this plant to grow more range, and allocates the given resource.
+ *
+ * @param Resource - The resource used to grow this range.
+ *
+ * @return Whether or not this was successful at growing more range.
+ */
+bool APlant::GrowRange(UResource* Resource)
+{
+	if (!CanGrowRange())
+	{
+		return false;
+	}
+
+	bRangeGrowing = true;
+	return true;
+}
+
+/**
+ * Causes this plant to grow more production, and allocates the given resource.
+ *
+ * @param Resource - The resource used to grow this production.
+ *
+ * @return Whether or not this was successful at growing more production.
+ */
+bool APlant::GrowProduction(UResource* Resource)
+{
+	if (!CanGrowProduction())
+	{
+		return false;
+	}
+
+	bProductionGrowing = true;
+	return true;
+}
+
+/**
+ * Updates this plant to have the new amount of production.
+ *
+ * @param NewHealth - The new production of this plant.
+ */
+void APlant::SetProduction_Implementation(int NewProduction)
+{
+	NewProduction = FMath::Max(0, NewProduction);
+	while (ProducedResources.Num() < NewProduction)
+	{
+		ProducedResources.Add(NewObject<UResource>());
+		Production++;
+	}
+
+	while (ProducedResources.Num() > NewProduction)
+	{
+		UResource* ResourceToRemove = *ProducedResources.FindByPredicate([](UResource* EachLabel) { return !EachLabel->IsAllocated(); });
+		if (!IsValid(ResourceToRemove))
+		{
+			ProducedResources[ProducedResources.Num() - 1]->Free();
+			ProducedResources.SetNum(ProducedResources.Num() - 1);
+			return;
+		}
+		ResourceToRemove->Free();
+		ProducedResources.RemoveSingle(ResourceToRemove);
+		Production--;
+	}
+}
+
+/**
  * Gets all the resources supplied by this plant.
  *
  * @return The resources supplied by this plant.
@@ -263,10 +403,13 @@ void APlant::ResourceFreed(EResourceAllocationType FreedAllocation)
 		UE_LOG(LogResource, Warning, TEXT("Cant free unallocated resource on  %s"), *GetName());
 		return;
 	case EResourceAllocationType::PlantHealth:
+		SetHealth(GetHealth() - 1);
 		return;
-	case EResourceAllocationType::PlantRadius:
+	case EResourceAllocationType::PlantRange:
+		SetRange(GetRange() - 1);
 		return;
 	case EResourceAllocationType::PlantProduction:
+		SetProduction(GetProduction() - 2);
 		return;
 	default:
 		UE_LOG(LogResource, Error, TEXT("Tried to free a resource of non-plant type allocation from plant: %s"), *GetName());
