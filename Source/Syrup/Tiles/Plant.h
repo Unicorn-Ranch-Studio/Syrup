@@ -58,7 +58,7 @@ public:
 	 * 
 	 * @return Whether or not this plant was killed by the damage.
 	 */
-	UFUNCTION(BlueprintCallable, Category = "Health")
+	UFUNCTION(BlueprintCallable, Category = "Plant|Health")
 	bool ReceiveDamage(int Amount, ATile* Cause);
 
 	/**
@@ -68,7 +68,7 @@ public:
 	 * @param Cause - The tile that caused this damage.
 	 * @param bShouldDestroy - Whether or not the plant should be destroyed once the VFX has finished.
 	 */
-	UFUNCTION(BlueprintNativeEvent , Category = "Health")
+	UFUNCTION(BlueprintNativeEvent , Category = "Plant|Health")
 	void OnDamageRecived(int Amount, ATile* Cause, bool bShouldDestroy);
 	FORCEINLINE void OnDamageRecived_Implementation(int Amount, ATile* Cause, bool bShouldDestroy) { if (bShouldDestroy) { Destroy(); } };
 	
@@ -77,7 +77,7 @@ public:
 	 * 
 	 * @param NewHealth - The new health of this plant.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category = "Health")
+	UFUNCTION(BlueprintNativeEvent, Category = "Plant|Health")
 	void SetHealth(int NewHealth);
 	void SetHealth_Implementation(int NewHealth);
 
@@ -86,7 +86,7 @@ public:
 	 * 
 	 * @return The number of damage points this plant can take before dying.
 	 */
-	UFUNCTION(BlueprintPure, Category = "Health")
+	UFUNCTION(BlueprintPure, Category = "Plant|Health")
 	FORCEINLINE int GetHealth() const { return Health; };
 
 	/**
@@ -94,7 +94,7 @@ public:
 	 *
 	 * @return The amount of damage this plant has taken.
 	 */
-	UFUNCTION(BlueprintPure, Category = "Health")	
+	UFUNCTION(BlueprintPure, Category = "Plant|Health")	
 	FORCEINLINE int GetDamageTaken() const { return DamageTaken; };
 
 	/**
@@ -102,7 +102,7 @@ public:
 	 * 
 	 * @return The number of damage points a plant of this type can take before dying.
 	 */
-	UFUNCTION(BlueprintPure, Category = "Health")
+	UFUNCTION(BlueprintPure, Category = "Plant|Health")
 	FORCEINLINE int GetMaxHealth() const { return Cast<APlant>(GetClass()->GetDefaultObject())->Health; };
 
 	/**
@@ -113,7 +113,7 @@ public:
 protected:
 
 	//The health of this plant.
-	UPROPERTY(EditDefaultsOnly, Category = "Health", Meta = (ClampMin = "1"))
+	UPROPERTY(EditDefaultsOnly, Category = "Plant|Health", Meta = (ClampMin = "1"))
 	int Health = 1;
 
 	//The damage taken by this plant.
@@ -137,7 +137,7 @@ public:
 	 *
 	 * @return Whether there was enough energy and space to plant the plant.
 	 */
-	UFUNCTION(BlueprintCallable, Category = "Growth", Meta = (WorldContext = "WorldContextObject"))
+	UFUNCTION(BlueprintCallable, Category = "Plant|Growth", Meta = (WorldContext = "WorldContextObject"))
 	static bool SowPlant(UObject* WorldContextObject, UPARAM(Ref) int& EnergyReserve, TSubclassOf<APlant> PlantClass, FTransform Transform);
 	static bool SowPlant(UObject* WorldContextObject, UPARAM(Ref) int& EnergyReserve, TSubclassOf<APlant> PlantClass, FGridTransform Transform);
 	static bool SowPlant(UObject* WorldContextObject, TSubclassOf<APlant> PlantClass, FTransform Transform);
@@ -148,7 +148,7 @@ public:
 	 * 
 	 * @return Whether or not this can grow more health.
 	 */
-	UFUNCTION(BlueprintPure, Category = "Growth|Upgrades")
+	UFUNCTION(BlueprintPure, Category = "Plant|Growth|Upgrades")
 	bool CanGrowHealth() const;
 
 	/**
@@ -156,7 +156,7 @@ public:
 	 *
 	 * @return Whether or not this can grow more range.
 	 */
-	UFUNCTION(BlueprintPure, Category = "Growth|Upgrades")
+	UFUNCTION(BlueprintPure, Category = "Plant|Growth|Upgrades")
 	bool CanGrowRange() const;
 
 	/**
@@ -164,7 +164,7 @@ public:
 	 *
 	 * @return Whether or not this can grow more production.
 	 */
-	UFUNCTION(BlueprintPure, Category = "Growth|Upgrades")
+	UFUNCTION(BlueprintPure, Category = "Plant|Growth|Upgrades")
 	bool CanGrowProduction() const;
 
 	/**
@@ -174,7 +174,7 @@ public:
 	 * 
 	 * @return Whether or not this was successful at growing more health.
 	 */
-	UFUNCTION(BlueprintCallable, Category = "Growth|Upgrades")
+	UFUNCTION(BlueprintCallable, Category = "Plant|Growth|Upgrades")
 	bool GrowHealth(UResource* Resource);
 
 	/**
@@ -184,7 +184,7 @@ public:
 	 *
 	 * @return Whether or not this was successful at growing more range.
 	 */
-	UFUNCTION(BlueprintCallable, Category = "Growth|Upgrades")
+	UFUNCTION(BlueprintCallable, Category = "Plant|Growth|Upgrades")
 	bool GrowRange(UResource* Resource);
 
 	/**
@@ -194,15 +194,39 @@ public:
 	 *
 	 * @return Whether or not this was successful at growing more production.
 	 */
-	UFUNCTION(BlueprintCallable, Category = "Growth|Upgrades")
+	UFUNCTION(BlueprintCallable, Category = "Plant|Growth|Upgrades")
 	bool GrowProduction(UResource* Resource);
+	
+	/**
+	 * Gets whether health is due to grow.
+	 *
+	 * @return Whether health is due to grow.
+	 */
+	UFUNCTION(BlueprintPure, Category = "Plant|Growth|Upgrades")
+	FORCEINLINE bool IsHealthGrowing() const { return bHealthGrowing; };
+
+	/**
+	 * Gets whether range is due to grow.
+	 *
+	 * @return Whether range is due to grow.
+	 */
+	UFUNCTION(BlueprintPure, Category = "Plant|Growth|Upgrades")
+	FORCEINLINE bool IsRangeGrowing() const { return bRangeGrowing; };
+
+	/**
+	 * Gets whether production is due to grow.
+	 * 
+	 * @return Whether production is due to grow.
+	 */
+	UFUNCTION(BlueprintPure, Category = "Plant|Growth|Upgrades")
+	FORCEINLINE bool IsProductionGrowing() const { return bProductionGrowing; };
 
 	/**
 	 * Gets cost to plant this plant type.
 	 * 
 	 * @return The amount of energy required to plant a plant of this type.
 	 */
-	UFUNCTION(BlueprintPure, Category = "Growth")
+	UFUNCTION(BlueprintPure, Category = "Plant|Growth")
 	FORCEINLINE int GetPlantingCost() const { return PlantingCost; };
 
 protected:
@@ -218,12 +242,16 @@ protected:
 	UFUNCTION()
 	void Grow_Implementation();
 
+	//DELETE THIS WHEN NPCs GIVE RESOURCE. 
+	UPROPERTY(EditInstanceOnly)
+	bool bStartGrown = false;
+
 	//The amount of energy required to plant a plant of this type.
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Growth", Meta = (ClampMin = "0"))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Plant|Growth", Meta = (ClampMin = "0"))
 	int PlantingCost = 1;
 
 	//Whether or not this plant has finished being planted.
-	UPROPERTY(BlueprintReadOnly, Category = "Growth")
+	UPROPERTY(BlueprintReadOnly, Category = "Plant|Growth")
 	bool bIsFinishedPlanting = false;
 
 private:
@@ -235,6 +263,7 @@ private:
 	
 	UPROPERTY()
 	bool bProductionGrowing = false;
+
 	/* /\ Growth /\ *\
 	\* ------------ */
 
@@ -247,7 +276,7 @@ public:
 	 *
 	 * @param NewRange - The value to set the range to. Will be clamped >= 0.
 	 */
-	UFUNCTION(BlueprintCallable, Category = "Effect")
+	UFUNCTION(BlueprintCallable, Category = "Plant|Effect")
 	void SetRange(const int NewRange);
 
 	/**
@@ -255,7 +284,7 @@ public:
 	 * 
 	 * @return The scale applied to the shape of this plant type to get all effected locations of this plant type's effects.
 	 */
-	UFUNCTION(BlueprintPure, Category = "Effect")
+	UFUNCTION(BlueprintPure, Category = "Plant|Effect")
 	FORCEINLINE int GetRange() const { return Range; };
 
 	/**
@@ -263,13 +292,13 @@ public:
 	 * 
 	 * @return The scale applied to the shape of this plant type to get all effected locations of this plant type's effects when fully upgraded.
 	 */
-	UFUNCTION(BlueprintPure, Category = "Effect")
+	UFUNCTION(BlueprintPure, Category = "Plant|Effect")
 	FORCEINLINE int GetMaxRange() const { return Cast<APlant>(GetClass()->GetDefaultObject())->Range; };
 
 protected:
 
 	//The scale applied to the shape of this plant type to get all effected locations of this plant type's effects.
-	UPROPERTY(EditDefaultsOnly, Category = "Effect", Meta = (ClampMin = "0"))
+	UPROPERTY(EditDefaultsOnly, Category = "Plant|Effect", Meta = (ClampMin = "0"))
 	int Range = 1;
 
 private:
@@ -304,7 +333,7 @@ public:
 	 * 
 	 * @param NewHealth - The new production of this plant.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category = "Resources")
+	UFUNCTION(BlueprintNativeEvent, Category = "Plant|Resources")
 	void SetProduction(int NewProduction);
 	void SetProduction_Implementation(int NewProduction);
 	
@@ -313,7 +342,7 @@ public:
 	 * 
 	 * @return The number of resources supplied by this plant.
 	 */
-	UFUNCTION(BlueprintPure, Category = "Resources")
+	UFUNCTION(BlueprintPure, Category = "Plant|Resources")
 	FORCEINLINE int GetProduction() const { return Production; };
 
 	/**
@@ -321,7 +350,7 @@ public:
 	 *
 	 * @return The maximum number of resources supplied by this plant.
 	 */
-	UFUNCTION(BlueprintPure, Category = "Resources")
+	UFUNCTION(BlueprintPure, Category = "Plant|Resources")
 	FORCEINLINE int GetMaxProduction() const { return Cast<APlant>(GetClass()->GetDefaultObject())->Production; };
 
 	/**
@@ -329,7 +358,7 @@ public:
 	 * 
 	 * @return The resources supplied by this plant.
 	 */
-	UFUNCTION(BlueprintCallable, Category = "Resources")
+	UFUNCTION(BlueprintCallable, Category = "Plant|Resources")
 	TArray<UResource*> GetProducedResources() const;
 	
     /**
@@ -356,7 +385,7 @@ public:
 protected:
 	
 	//The number of resource this plant can produce. Should be an even number.
-	UPROPERTY(EditDefaultsOnly, Category = "Resources", Meta = (ClampMin = "0"))
+	UPROPERTY(EditDefaultsOnly, Category = "Plant|Resources", Meta = (ClampMin = "0"))
 	int Production = 2;
 
 private:
@@ -381,13 +410,13 @@ public:
 	 * 
 	 * @return The text to use when referring to a plant of this type.
 	 */
-	UFUNCTION(BlueprintPure, Category = "UI")
+	UFUNCTION(BlueprintPure, Category = "Plant|UI")
 	FORCEINLINE FText GetDisplayName() const { return DisplayName; };
 
 protected:
 
 	//The text to use when referring to a plant of this type.
-	UPROPERTY(EditDefaultsOnly, Category = "UI")
+	UPROPERTY(EditDefaultsOnly, Category = "Plant|UI")
 	FText DisplayName = FText();
 
 	/* /\ UI /\ *\

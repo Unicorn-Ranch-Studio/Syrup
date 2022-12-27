@@ -24,9 +24,24 @@ void APlant::BeginPlay()
 	Super::BeginPlay();
 
 	SubtileMesh->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
-	Health = 1;
-	Production = 0;
-	Range = 0;
+	if (bStartGrown)
+	{
+		int TrueRange = Range;
+		Range = 0;
+		SetRange(TrueRange);
+
+		int TrueProduction = Production;
+		Production = 0;
+		SetProduction(TrueProduction);
+	}
+	else
+	{
+		Health = 1;
+		Production = 0;
+		Range = 0;
+	}
+	bIsFinishedPlanting = true;
+	Grow();
 	bIsFinishedPlanting = ASyrupGameMode::IsPlayerTurn(this);
 
 	ASyrupGameMode::GetTileEffectTriggerDelegate(this).AddDynamic(this, &APlant::ReceiveEffectTrigger);
@@ -174,14 +189,17 @@ void APlant::Grow_Implementation()
 	if (bHealthGrowing)
 	{
 		SetHealth(GetHealth() + 1);
+		bHealthGrowing = false;
 	}
 	if (bRangeGrowing)
 	{
 		SetRange(GetRange() + 1);
+		bRangeGrowing = false;
 	}
-	if (bRangeGrowing)
+	if (bProductionGrowing)
 	{
 		SetProduction(GetProduction() + 2);
+		bProductionGrowing = false;
 	}
 }
 
@@ -311,6 +329,7 @@ bool APlant::GrowHealth(UResource* Resource)
 		return false;
 	}
 
+	Resource->Allocate(this, EResourceAllocationType::PlantHealth);
 	bHealthGrowing = true;
 	return true;
 }
@@ -329,6 +348,7 @@ bool APlant::GrowRange(UResource* Resource)
 		return false;
 	}
 
+	Resource->Allocate(this, EResourceAllocationType::PlantRange);
 	bRangeGrowing = true;
 	return true;
 }
@@ -347,6 +367,7 @@ bool APlant::GrowProduction(UResource* Resource)
 		return false;
 	}
 
+	Resource->Allocate(this, EResourceAllocationType::PlantProduction);
 	bProductionGrowing = true;
 	return true;
 }
