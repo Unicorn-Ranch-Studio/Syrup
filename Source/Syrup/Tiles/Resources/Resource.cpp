@@ -1,13 +1,11 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Resouce.h"
+#include "Resource.h"
 
 #include "ResourceSink.h"
 
-DEFINE_LOG_CATEGORY(LogResouce);
-
-
+DEFINE_LOG_CATEGORY(LogResource);
 
 /**
  * Allocates this resource.
@@ -17,17 +15,17 @@ DEFINE_LOG_CATEGORY(LogResouce);
  *
  * @return Whether this allocation was successful.
  */
-bool UResouce::Allocate(TScriptInterface<IResourceSink> LinkedSink, EResouceAllocationType Type)
+bool UResource::Allocate(TScriptInterface<IResourceSink> LinkedSink, EResourceAllocationType Type)
 {
 	if (!IsValid(LinkedSink.GetObject()))
 	{
-		UE_LOG(LogResouce, Error, TEXT("Invalid Sink"));
+		UE_LOG(LogResource, Error, TEXT("Invalid Sink"));
 		return false;
 	}
 
-	if (Type == EResouceAllocationType::NotAllocated)
+	if (Type == EResourceAllocationType::NotAllocated)
 	{
-		UE_LOG(LogResouce, Error, TEXT("Cannot allocate resource to NotAllocated. Use Free() to unallocated resources."));
+		UE_LOG(LogResource, Error, TEXT("Cannot allocate resource to NotAllocated. Use Free() to unallocated resources."));
 		return false;
 	}
 
@@ -39,12 +37,12 @@ bool UResouce::Allocate(TScriptInterface<IResourceSink> LinkedSink, EResouceAllo
 /**
  * Unallocates this resource.
  */
-void UResouce::Free()
+void UResource::Free()
 {
-	SinkAllocatedTo->ResouceFreed(AllocationType);
+	SinkAllocatedTo->ResourceFreed(AllocationType);
 
 	SinkAllocatedTo = nullptr;
-	AllocationType = EResouceAllocationType::NotAllocated;
+	AllocationType = EResourceAllocationType::NotAllocated;
 }
 
 /**
@@ -52,7 +50,7 @@ void UResouce::Free()
  *
  * @return Whether this resource is already allocated.
  */
-bool UResouce::IsAllocated() const
+bool UResource::IsAllocated() const
 {
 	return IsValid(SinkAllocatedTo.GetObject());
 }
@@ -62,7 +60,7 @@ bool UResouce::IsAllocated() const
  *
  * @param ReturnValue - The sink this is allocated to. Nullptr if unallocated.
  */
-void UResouce::GetLinkedSink(TScriptInterface<IResourceSink>& ReturnValue) const
+void UResource::GetLinkedSink(TScriptInterface<IResourceSink>& ReturnValue) const
 {
 	ReturnValue = SinkAllocatedTo;
 }
@@ -73,7 +71,7 @@ void UResouce::GetLinkedSink(TScriptInterface<IResourceSink>& ReturnValue) const
  *
  * @return The way this has been allocated.
  */
-EResouceAllocationType UResouce::GetAllocationType() const
+EResourceAllocationType UResource::GetAllocationType() const
 {
 	return AllocationType;
 }

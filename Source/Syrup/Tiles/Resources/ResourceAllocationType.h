@@ -4,17 +4,17 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
-#include "ResouceAllocationType.generated.h"
+#include "ResourceAllocationType.generated.h"
 
  /* \/ ====================== \/ *\
- |  \/ EResouceAllocationType \/  |
+ |  \/ EResourceAllocationType \/  |
  \* \/ ====================== \/ */
 
 /**
  * In what way a resource is allocated.
  */
 UENUM(BlueprintType)
-enum class EResouceAllocationType : uint8
+enum class EResourceAllocationType : uint8
 {
 	NotAllocated		UMETA(DisplayName = "Not Allocated"),
 	PlantHealth			UMETA(DisplayName = "Plant Health"),
@@ -25,5 +25,5 @@ enum class EResouceAllocationType : uint8
 	TrashCost			UMETA(DisplayName = "Trash Pickup Cost")
 };
 /* /\ ====================== /\ *\
-|  /\ EResouceAllocationType /\  |
+|  /\ EResourceAllocationType /\  |
 \* /\ ====================== /\ */

@@ -2,16 +2,16 @@
 
 #pragma once
 
-#include "ResouceAllocationType.h"
+#include "ResourceAllocationType.h"
 #include "ResourceSink.h"
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
-#include "Resouce.generated.h"
+#include "Resource.generated.h"
 
 class ATile;
 
-DECLARE_LOG_CATEGORY_EXTERN(LogResouce, Log, All);
+DECLARE_LOG_CATEGORY_EXTERN(LogResource, Log, All);
 
 /* \/ ======== \/ *\
 |  \/ Resource \/  |
@@ -20,7 +20,7 @@ DECLARE_LOG_CATEGORY_EXTERN(LogResouce, Log, All);
  * Represents a resource that can be linked to a tile to modify it.
  */
 UCLASS()
-class SYRUP_API UResouce : public UObject
+class SYRUP_API UResource : public UObject
 {
 	GENERATED_BODY()
 	
@@ -34,7 +34,7 @@ public:
 	 * @return Whether this allocation was successful.
 	 */
 	//UFUNCTION()
-	bool Allocate(TScriptInterface<IResourceSink> LinkedSink, EResouceAllocationType Type);
+	bool Allocate(TScriptInterface<IResourceSink> LinkedSink, EResourceAllocationType Type);
 
 	/**
 	 * Unallocates this resource.
@@ -65,7 +65,7 @@ public:
 	 * @return The way this has been allocated.
 	 */
 	UFUNCTION(BlueprintPure)
-	EResouceAllocationType GetAllocationType() const;
+	EResourceAllocationType GetAllocationType() const;
 
 private:
 	//The sink this is allocated to. Nullptr if unallocated.
@@ -74,7 +74,7 @@ private:
 
 	//The way this has been allocated.
 	UPROPERTY()
-	EResouceAllocationType AllocationType = EResouceAllocationType::NotAllocated;
+	EResourceAllocationType AllocationType = EResourceAllocationType::NotAllocated;
 };
 /* /\ ======== /\ *\
 |  /\ Resource /\  |

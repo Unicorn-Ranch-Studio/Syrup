@@ -4,6 +4,7 @@
 
 #include "Syrup/Systems/SyrupGameMode.h"
 #include "Effects/TileEffect.h"
+#include "Resources/Resource.h"
 #include "Components/InstancedStaticMeshComponent.h"
 
 DEFINE_LOG_CATEGORY(LogPlant);
@@ -23,10 +24,7 @@ void APlant::BeginPlay()
 	Super::BeginPlay();
 
 	SubtileMesh->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
-
-	TimeUntilGrown = FMath::RoundToInt(GetTimeUntilGrown() * (1 - InitialGrowthPercent)) + 1;
-	bIsFinishedPlanting = true;
-	Grow();
+	Health = 1;
 	bIsFinishedPlanting = ASyrupGameMode::IsPlayerTurn(this);
 
 	ASyrupGameMode::GetTileEffectTriggerDelegate(this).AddDynamic(this, &APlant::ReceiveEffectTrigger);
@@ -70,10 +68,9 @@ bool APlant::ReceiveDamage(int Amount, ATile* Cause)
 		return false;
 	}
 
-	int OldHealth = Health;
-	Health -= FMath::Max(0, Amount);
-	bool bDead = Health <= 0;
-	if (bDead && OldHealth > 0)
+	DamageTaken += FMath::Max(0, Amount);
+	bool bDead = Health <= DamageTaken;
+	if (bDead && DamageTaken - Amount < Health)
 	{
 		SubtileMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		ASyrupGameMode::GetTileEffectTriggerDelegate(GetWorld()).Broadcast(ETileEffectTriggerType::PlantKilled, this, GetSubTileLocations());
@@ -237,6 +234,69 @@ TSet<FIntPoint> APlant::GetEffectLocations() const
 
 /* /\ Effect /\ *\
 \* ------------ */
+
+
+
+/* -------------- *\
+\* \/ Resource \/ */
+
+/**
+ * Gets all the resources supplied by this plant.
+ *
+ * @return The resources supplied by this plant.
+ */
+TArray<UResource*> APlant::GetProducedResources() const
+{
+	return ProducedResources;
+}
+
+/**
+ * Undoes the effect of a resource that was sunk in this.
+ *
+ * @param FreedAllocation - What the freed resource's allocation was.
+ */
+void APlant::ResourceFreed(EResourceAllocationType FreedAllocation)
+{
+	switch (FreedAllocation)
+	{
+	case EResourceAllocationType::NotAllocated:
+		UE_LOG(LogResource, Warning, TEXT("Cant free unallocated resource on  %s"), *GetName());
+		return;
+	case EResourceAllocationType::PlantHealth:
+		return;
+	case EResourceAllocationType::PlantRadius:
+		return;
+	case EResourceAllocationType::PlantProduction:
+		return;
+	default:
+		UE_LOG(LogResource, Error, TEXT("Tried to free a resource of non-plant type allocation from plant: %s"), *GetName());
+		return;
+	}
+	return;
+}
+
+/**
+ * Gets the world location of the allocation.
+ *
+ * @return The world location of the allocation.
+ */
+FVector APlant::GetAllocationLocation(EResourceAllocationType Type) const
+{
+	return GetActorLocation();
+}
+
+/**
+ * Gets all the resources allocated to this.
+ *
+ * @return The resources allocated to this.
+ */
+TArray<UResource*> APlant::GetAllocatedResources() const
+{
+	return AllocatedResources;
+}
+
+/* /\ Resource /\ *\
+\* -------------- */
 
 /* /\ ====== /\ *\
 |  /\ APlant /\  |

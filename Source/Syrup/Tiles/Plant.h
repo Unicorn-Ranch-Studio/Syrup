@@ -5,8 +5,10 @@
 
 #include "CoreMinimal.h"
 #include "Tile.h"
+#include "Resources/ResourceSink.h"
 #include "Plant.generated.h"
 
+class UResource;
 class UApplyField;
 class UPreventTrashSpawn;
 
@@ -19,7 +21,7 @@ DECLARE_LOG_CATEGORY_EXTERN(LogPlant, Log, All);
  * A plant on the grid that grows, can take damage, and creates a protection radius.
  */
 UCLASS(Abstract, HideCategories = ("ActorTick", "Tile", "Replication", "Rendering", "Collision", "Actor", "Input", "HLOD", "WorldPartition", "Cooking", "DataLayers"))
-class SYRUP_API APlant : public ATile
+class SYRUP_API APlant : public ATile, public IResourceSink
 {
 	GENERATED_BODY()
 
@@ -79,6 +81,14 @@ public:
 	FORCEINLINE int GetHealth() const { return Health; };
 
 	/**
+	 * Gets the amount of damage this plant has taken.
+	 *
+	 * @return The amount of damage this plant has taken.
+	 */
+	UFUNCTION(BlueprintPure, Category = "Health")	
+	FORCEINLINE int GetDamageTaken() const { return DamageTaken; };
+
+	/**
 	 * Gets the max health of this plant type.
 	 * 
 	 * @return The number of damage points a plant of this type can take before dying.
@@ -91,6 +101,10 @@ protected:
 	//The health of this plant.
 	UPROPERTY(EditDefaultsOnly, Category = "Health", Meta = (ClampMin = "1"))
 	int Health = 1;
+
+	//The damage taken by this plant.
+	UPROPERTY(VisibleInstanceOnly)
+	int DamageTaken = 0;
 
 	/* /\ Health /\ *\
 	\* ------------ */
@@ -232,13 +246,44 @@ private:
 
 	/* -------------- *\
 	\* \/ Resource \/ */
-//public:
-//	UFUNCTION(BlueprintCallable)
-//	TArray<Resource*> GetResouces() const;
-//
-//private:
-//	UPROPERTY()
-//	TArray<Resource*> Resouces;
+public:
+	/**
+	 * Gets all the resources supplied by this plant.
+	 * 
+	 * @return The resources supplied by this plant.
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Resources")
+	TArray<UResource*> GetProducedResources() const;
+	
+    /**
+     * Undoes the effect of a resource that was sunk in this.
+     *
+     * @param FreedAllocation - What the freed resource's allocation was.
+     */
+    virtual void ResourceFreed(EResourceAllocationType FreedAllocation) override;
+
+	/**
+	 * Gets the world location of the allocation.
+	 *
+	 * @return The world location of the allocation.
+	 */
+	virtual FVector GetAllocationLocation(EResourceAllocationType Type) const override;
+
+	/**
+	 * Gets all the resources allocated to this.
+	 *
+	 * @return The resources allocated to this.
+	 */
+    virtual TArray<UResource*> GetAllocatedResources() const override;
+
+private:
+	//The resources produced by this.
+	UPROPERTY()
+	TArray<UResource*> ProducedResources;
+	
+	//The resources allocated to this.
+	UPROPERTY()
+	TArray<UResource*> AllocatedResources;
 
 	/* /\ Resource /\ *\
 	\* -------------- */
