@@ -4,6 +4,7 @@
 
 #include "ResourceAllocationType.h"
 #include "ResourceSink.h"
+#include "ResourceFaucet.h"
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
@@ -19,12 +20,22 @@ DECLARE_LOG_CATEGORY_EXTERN(LogResource, Log, All);
 /**
  * Represents a resource that can be linked to a tile to modify it.
  */
-UCLASS(BlueprintType)
+UCLASS(BlueprintType, CustomConstructor)
 class SYRUP_API UResource : public UObject
 {
 	GENERATED_BODY()
 	
 public:
+	/**
+	 * Creates a resource.
+	 * 
+	 * @param Faucet - The faucet that is suppling the sink. Must not be null.
+	 * 
+	 * @return The resource that was created.
+	 */
+	UFUNCTION(BlueprintCallable)
+	static UResource* Create(TScriptInterface<IResourceFaucet> Faucet);
+
 	/**
 	 * Allocates this resource.
 	 * 
@@ -33,13 +44,13 @@ public:
 	 * 
 	 * @return Whether this allocation was successful.
 	 */
-	//UFUNCTION()
+	UFUNCTION()
 	bool Allocate(TScriptInterface<IResourceSink> LinkedSink, EResourceAllocationType Type);
 
 	/**
 	 * Unallocates this resource.
 	 */
-	//UFUNCTION()
+	UFUNCTION()
 	void Free();
 
 	/**
@@ -51,13 +62,28 @@ public:
 	bool IsAllocated() const;
 
 	/**
+	 * Gets whether this can be allocated to the given sink.
+	 *
+	 * @return Whether this can be allocated to the given sink.
+	 */
+	UFUNCTION(BlueprintPure)
+	bool CanAllocateTo(TScriptInterface<IResourceSink> LinkedSink) const;
+
+	/**
 	 * Gets the sink this is allocated to.
 	 *
 	 * @param ReturnValue - The sink this is allocated to. Nullptr if unallocated.
 	 */
 	UFUNCTION(BlueprintPure)
 	void GetLinkedSink(TScriptInterface<IResourceSink>& ReturnValue) const;
-	
+
+	/**
+	 * Gets the faucet this is being supplied by.
+	 *
+	 * @param ReturnValue - The faucet this is being supplied by.
+	 */
+	UFUNCTION(BlueprintPure)
+	void GetLinkedFaucet(TScriptInterface<IResourceFaucet>& ReturnValue) const;
 
 	/**
 	 * Gets the way this has been allocated.
@@ -71,6 +97,10 @@ private:
 	//The sink this is allocated to. Nullptr if unallocated.
 	UPROPERTY()
 	TScriptInterface<IResourceSink> SinkAllocatedTo = nullptr;
+	
+	//The faucet this supplied by. Should never be null.
+	UPROPERTY()
+	TScriptInterface<IResourceFaucet> FaucetCreatedby = nullptr;
 
 	//The way this has been allocated.
 	UPROPERTY()

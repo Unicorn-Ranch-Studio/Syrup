@@ -4,7 +4,7 @@
 
 #include "ResourceAllocationType.h"
 
-#include "ResourceSink.generated.h"
+#include "ResourceFaucet.generated.h"
 
 class UResource;
 
@@ -15,39 +15,31 @@ class UResource;
  * Something that can consume resources. A sink handle when resources are allocated to itself.
  */
 UINTERFACE(MinimalAPI, BlueprintType, NotBlueprintable)
-class UResourceSink : public UInterface
+class UResourceFaucet : public UInterface
 {
     GENERATED_BODY()
 };
 
-class IResourceSink
+class IResourceFaucet
 {
     GENERATED_BODY()
 
 public:
-
     /**
-     * Gets the grid locations that this sink takes up.
+     * Gets the gets grid location locations that this faucet can allocate to.
      *
-     * @return The grid locations that this sink takes up
+     * @return The gets grid location locations that this faucet can allocate to.
      */
     UFUNCTION(BlueprintPure, Category = "Resources")
-    virtual TSet<FIntPoint> GetAllocationLocations() const = 0;
+    virtual TSet<FIntPoint> GetAllocatableLocations() const = 0;
 
     /**
-     * Gets all the resources allocated to this.
+     * Gets all the resources produced by this.
      *
-     * @return The resources allocated to this.
+     * @return The resources produced by this.
      */
     UFUNCTION(BlueprintPure, Category = "Resources")
-    virtual TArray<UResource*> GetAllocatedResources() const = 0;
-
-    /**
-     * Undoes the effect of a resource that was sunk in this.
-     *
-     * @param FreedResource - The resource that was freed.
-     */
-    virtual void ResourceFreed(UResource* FreedResource) = 0;
+    virtual TArray<UResource*> GetProducedResources() const = 0;
 };
 /* /\ ============ /\ *\
 |  /\ ResourceSink /\  |

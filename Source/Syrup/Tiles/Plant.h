@@ -5,6 +5,7 @@
 
 #include "CoreMinimal.h"
 #include "Tile.h"
+#include "Resources/ResourceFaucet.h"
 #include "Resources/ResourceSink.h"
 #include "Plant.generated.h"
 
@@ -21,7 +22,7 @@ DECLARE_LOG_CATEGORY_EXTERN(LogPlant, Log, All);
  * A plant on the grid that grows, can take damage, and creates a protection range.
  */
 UCLASS(Abstract, HideCategories = ("ActorTick", "Tile", "Replication", "Rendering", "Collision", "Actor", "Input", "HLOD", "WorldPartition", "Cooking", "DataLayers"))
-class SYRUP_API APlant : public ATile, public IResourceSink
+class SYRUP_API APlant : public ATile, public IResourceSink, public IResourceFaucet
 {
 	GENERATED_BODY()
 
@@ -354,33 +355,40 @@ public:
 	FORCEINLINE int GetMaxProduction() const { return Cast<APlant>(GetClass()->GetDefaultObject())->Production; };
 
 	/**
+	 * Gets the grid locations that this sink takes up.
+	 *
+	 * @return The grid locations that this sink takes up
+	 */
+	virtual FORCEINLINE TSet<FIntPoint> GetAllocationLocations() const override { return GetSubTileLocations(); };
+
+	/**
 	 * Gets all the resources supplied by this plant.
 	 * 
 	 * @return The resources supplied by this plant.
 	 */
-	UFUNCTION(BlueprintCallable, Category = "Plant|Resources")
-	TArray<UResource*> GetProducedResources() const;
-	
-    /**
-     * Undoes the effect of a resource that was sunk in this.
-     *
-     * @param FreedAllocation - What the freed resource's allocation was.
-     */
-    virtual void ResourceFreed(EResourceAllocationType FreedAllocation) override;
+	virtual FORCEINLINE TArray<UResource*> GetProducedResources() const override { return ProducedResources; };
 
 	/**
-	 * Gets the world location of the allocation.
+	 * Gets the grid locations that this sink takes up.
 	 *
-	 * @return The world location of the allocation.
+	 * @return The grid locations that this sink takes up
 	 */
-	virtual FVector GetAllocationLocation(EResourceAllocationType Type) const override;
+	UFUNCTION(BlueprintPure, Category = "Resources")
+	virtual FORCEINLINE TSet<FIntPoint> GetAllocatableLocations() const override { return GetEffectLocations(); };
 
 	/**
 	 * Gets all the resources allocated to this.
 	 *
 	 * @return The resources allocated to this.
 	 */
-    virtual TArray<UResource*> GetAllocatedResources() const override;
+	virtual FORCEINLINE TArray<UResource*> GetAllocatedResources() const override { return AllocatedResources; };
+
+	/**
+	 * Undoes the effect of a resource that was sunk in this.
+	 *
+	 * @param FreedResource - The resource that was freed.
+	 */
+	virtual void ResourceFreed(UResource* FreedResource) override;
 
 protected:
 	

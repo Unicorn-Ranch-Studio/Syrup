@@ -39,6 +39,7 @@ void APlant::BeginPlay()
 		Health = 1;
 		Production = 0;
 		Range = 0;
+		SetRange(1);
 	}
 	bIsFinishedPlanting = true;
 	Grow();
@@ -330,6 +331,7 @@ bool APlant::GrowHealth(UResource* Resource)
 	}
 
 	Resource->Allocate(this, EResourceAllocationType::PlantHealth);
+	AllocatedResources.Add(Resource);
 	bHealthGrowing = true;
 	return true;
 }
@@ -349,6 +351,7 @@ bool APlant::GrowRange(UResource* Resource)
 	}
 
 	Resource->Allocate(this, EResourceAllocationType::PlantRange);
+	AllocatedResources.Add(Resource);
 	bRangeGrowing = true;
 	return true;
 }
@@ -368,6 +371,7 @@ bool APlant::GrowProduction(UResource* Resource)
 	}
 
 	Resource->Allocate(this, EResourceAllocationType::PlantProduction);
+	AllocatedResources.Add(Resource);
 	bProductionGrowing = true;
 	return true;
 }
@@ -382,7 +386,7 @@ void APlant::SetProduction_Implementation(int NewProduction)
 	NewProduction = FMath::Max(0, NewProduction);
 	while (ProducedResources.Num() < NewProduction)
 	{
-		ProducedResources.Add(NewObject<UResource>());
+		ProducedResources.Add(UResource::Create(this));
 		Production++;
 	}
 
@@ -400,63 +404,32 @@ void APlant::SetProduction_Implementation(int NewProduction)
 		Production--;
 	}
 }
-
-/**
- * Gets all the resources supplied by this plant.
- *
- * @return The resources supplied by this plant.
- */
-TArray<UResource*> APlant::GetProducedResources() const
-{
-	return ProducedResources;
-}
-
 /**
  * Undoes the effect of a resource that was sunk in this.
  *
- * @param FreedAllocation - What the freed resource's allocation was.
+ * @param FreedResource - The resource that was freed.
  */
-void APlant::ResourceFreed(EResourceAllocationType FreedAllocation)
+void APlant::ResourceFreed(UResource* FreedResource)
 {
-	switch (FreedAllocation)
+	switch (FreedResource->GetAllocationType())
 	{
 	case EResourceAllocationType::NotAllocated:
 		UE_LOG(LogResource, Warning, TEXT("Cant free unallocated resource on  %s"), *GetName());
 		return;
 	case EResourceAllocationType::PlantHealth:
 		SetHealth(GetHealth() - 1);
-		return;
+		break;
 	case EResourceAllocationType::PlantRange:
 		SetRange(GetRange() - 1);
-		return;
+		break;
 	case EResourceAllocationType::PlantProduction:
 		SetProduction(GetProduction() - 2);
-		return;
+		break;
 	default:
 		UE_LOG(LogResource, Error, TEXT("Tried to free a resource of non-plant type allocation from plant: %s"), *GetName());
 		return;
 	}
-	return;
-}
-
-/**
- * Gets the world location of the allocation.
- *
- * @return The world location of the allocation.
- */
-FVector APlant::GetAllocationLocation(EResourceAllocationType Type) const
-{
-	return GetActorLocation();
-}
-
-/**
- * Gets all the resources allocated to this.
- *
- * @return The resources allocated to this.
- */
-TArray<UResource*> APlant::GetAllocatedResources() const
-{
-	return AllocatedResources;
+	AllocatedResources.RemoveSingle(FreedResource);
 }
 
 /* /\ Resource /\ *\
