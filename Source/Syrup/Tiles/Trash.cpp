@@ -6,6 +6,7 @@
 #include "Syrup/Systems/SyrupGameMode.h"
 #include "Effects/TileEffect.h"
 #include "Components/InstancedStaticMeshComponent.h"
+#include "Resources/Resource.h"
 
 /* \/ ====== \/ *\
 |  \/ ATrash \/  |
@@ -120,6 +121,11 @@ void ATrash::ReceiveEffectTrigger(const ETileEffectTriggerType TriggerType, cons
 {
 	if (bActive)
 	{
+		if (TriggerType == ETileEffectTriggerType::PlantsGrow)
+		{
+			Decay();
+		}
+
 		TSet<FIntPoint> EffectedLocations = GetEffectLocations();
 		TSet<FIntPoint> TriggeredLocations = LocationsToTrigger.IsEmpty() ? EffectedLocations : LocationsToTrigger.Intersect(EffectedLocations);
 
@@ -147,6 +153,168 @@ TSet<FIntPoint> ATrash::GetEffectLocations() const
 
 /* /\ Effect /\ *\
 \* ------------ */
+
+
+/* -------------- *\
+\* \/ Resource \/ */
+
+/**
+ * Gets whether or not this can lose more damage.
+ *
+ * @return Whether or not this can lose more damage.
+ */
+bool ATrash::CanDecayDamage() const
+{
+	return GetDamage() > 1 && !bDamageDecaying;
+}
+
+/**
+ * Gets whether or not this can lose more range.
+ *
+ * @return Whether or not this can lose more range.
+ */
+bool ATrash::CanDecayRange() const
+{
+	return GetRange() > 1 && !bRangeDecaying;
+}
+
+/**
+ * Gets whether or not this can lose more pickup cost.
+ *
+ * @return Whether or not this can lose more pickup cost.
+ */
+bool ATrash::CanDecayPickupCost() const
+{
+	return GetPickUpCost() > 1 && !bPickupCostDecaying;
+}
+
+/**
+ * Causes this trash to lose damage, and allocates the given resource.
+ *
+ * @param Resource - The resource used to decay this damage.
+ *
+ * @return Whether or not this was successful at decaying more damage.
+ */
+bool ATrash::DecayDamage(UResource* Resource)
+{
+	if (CanDecayDamage())
+	{
+		bDamageDecaying = true;
+		Resource->Allocate(this, EResourceAllocationType::TrashDamage);
+		return true;
+	}
+	return false;
+}
+
+/**
+ * Causes this trash to lose range, and allocates the given resource.
+ *
+ * @param Resource - The resource used to decay this range.
+ *
+ * @return Whether or not this was successful at decaying more range.
+ */
+bool ATrash::DecayRange(UResource* Resource)
+{
+	if (CanDecayRange())
+	{
+		bRangeDecaying = true;
+		Resource->Allocate(this, EResourceAllocationType::TrashRange);
+		return true;
+	}
+	return false;
+}
+
+/**
+ * Causes this trash to lose pickup cost, and allocates the given resource.
+ *
+ * @param Resource - The resource used to decay this pickup cost.
+ *
+ * @return Whether or not this was successful at decaying more pickup cost.
+ */
+bool ATrash::DecayPickupCost(UResource* Resource)
+{
+	if (CanDecayPickupCost())
+	{
+		bPickupCostDecaying = true;
+		Resource->Allocate(this, EResourceAllocationType::TrashCost);
+		return true;
+	}
+	return false;
+}
+
+/**
+ * Causes the effects of decaying.
+ */
+void ATrash::Decay_Implementation()
+{
+	if (bPickupCostDecaying)
+	{
+		PickUpCost -= 1;
+		bPickupCostDecaying = false;
+	}
+	if (bDamageDecaying)
+	{
+		SetDamage(GetDamage() - 1);
+		bDamageDecaying = false;
+	}
+	if (bRangeDecaying)
+	{
+		SetRange(GetRange() - 1);
+		bRangeDecaying = false;
+	}
+}
+
+/**
+ * Undoes the effect of a resource that was sunk in this.
+ *
+ * @param FreedResource - The resource that was freed.
+ */
+void ATrash::ResourceFreed(UResource* FreedResource)
+{
+	switch (FreedResource->GetAllocationType())
+	{
+	case EResourceAllocationType::NotAllocated:
+		UE_LOG(LogResource, Warning, TEXT("Cant free unallocated resource on  %s"), *GetName());
+		return;
+	case EResourceAllocationType::TrashCost:
+		if (bPickupCostDecaying)
+		{
+			bPickupCostDecaying = false;
+		}
+		else
+		{
+			PickUpCost += 1;
+		}
+		break;
+	case EResourceAllocationType::TrashDamage:
+		if (bDamageDecaying)
+		{
+			bDamageDecaying = false;
+		}
+		else
+		{
+			SetDamage(GetDamage() + 1);
+		}
+		break;
+	case EResourceAllocationType::TrashRange:
+		if (bRangeDecaying)
+		{
+			bRangeDecaying = false;
+		}
+		else
+		{
+			SetRange(GetRange() + 1);
+		}
+		break;
+	default:
+		UE_LOG(LogResource, Error, TEXT("Tried to free a resource of non-trash type allocation from trash: %s"), *GetName());
+		return;
+	}
+	AllocatedResources.RemoveSingle(FreedResource);
+}
+
+/* /\ Resource /\ *\
+\* -------------- */
 
 /* /\ ====== /\ *\
 |  /\ ATrash /\  |

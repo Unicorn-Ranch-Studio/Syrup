@@ -102,10 +102,14 @@ bool APlant::ReceiveDamage(int Amount, ATile* Cause)
  */
 void APlant::SetHealth_Implementation(int NewHealth)
 {
-	Health = NewHealth;
-	if (DamageTaken > NewHealth)
+	if (DamageTaken > NewHealth && Health > DamageTaken)
 	{
+		Health = NewHealth;
 		Die();
+	}
+	else
+	{
+		Health = NewHealth;
 	}
 }
 
@@ -114,6 +118,15 @@ void APlant::SetHealth_Implementation(int NewHealth)
  */
 void APlant::Die()
 {
+	for (UResource* EachAllocatedResource : AllocatedResources)
+	{
+		EachAllocatedResource->Free();
+	}
+	for (UResource* EachAllocatedResource : ProducedResources)
+	{
+		EachAllocatedResource->Free();
+	}
+
 	SubtileMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	ASyrupGameMode::GetTileEffectTriggerDelegate(GetWorld()).Broadcast(ETileEffectTriggerType::PlantKilled, this, GetSubTileLocations());
 	ReceiveEffectTrigger(ETileEffectTriggerType::OnDeactivated, nullptr, TSet<FIntPoint>());
@@ -392,11 +405,21 @@ void APlant::SetProduction_Implementation(int NewProduction)
 
 	while (ProducedResources.Num() > NewProduction)
 	{
-		UResource* ResourceToRemove = *ProducedResources.FindByPredicate([](UResource* EachLabel) { return !EachLabel->IsAllocated(); });
+		UResource* ResourceToRemove = nullptr;
+		for (UResource* EachProducedResource : ProducedResources)
+		{
+			if (!EachProducedResource->IsAllocated())
+			{
+				ResourceToRemove = EachProducedResource;
+				break;
+			}
+		}
+
 		if (!IsValid(ResourceToRemove))
 		{
 			ProducedResources[ProducedResources.Num() - 1]->Free();
 			ProducedResources.SetNum(ProducedResources.Num() - 1);
+			Production--;
 			return;
 		}
 		ResourceToRemove->Free();
@@ -417,19 +440,44 @@ void APlant::ResourceFreed(UResource* FreedResource)
 		UE_LOG(LogResource, Warning, TEXT("Cant free unallocated resource on  %s"), *GetName());
 		return;
 	case EResourceAllocationType::PlantHealth:
-		SetHealth(GetHealth() - 1);
+		if (bHealthGrowing)
+		{
+			bHealthGrowing = false;
+		}
+		else
+		{
+			SetHealth(GetHealth() - 1);
+		}
 		break;
 	case EResourceAllocationType::PlantRange:
-		SetRange(GetRange() - 1);
+		if (bRangeGrowing)
+		{
+			bRangeGrowing = false;
+		}
+		else
+		{
+			SetRange(GetRange() - 1);
+		}
 		break;
 	case EResourceAllocationType::PlantProduction:
-		SetProduction(GetProduction() - 2);
+		if (bProductionGrowing)
+		{
+			bProductionGrowing = false;
+		}
+		else
+		{
+			SetProduction(GetProduction() - 2);
+		}
 		break;
 	default:
 		UE_LOG(LogResource, Error, TEXT("Tried to free a resource of non-plant type allocation from plant: %s"), *GetName());
 		return;
 	}
-	AllocatedResources.RemoveSingle(FreedResource);
+
+	if (Health > DamageTaken)
+	{
+		AllocatedResources.RemoveSingle(FreedResource);
+	}
 }
 
 /* /\ Resource /\ *\

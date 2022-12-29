@@ -68,7 +68,10 @@ bool UResource::Allocate(TScriptInterface<IResourceSink> LinkedSink, EResourceAl
  */
 void UResource::Free()
 {
-	SinkAllocatedTo->ResourceFreed(this);
+	if (IsValid(SinkAllocatedTo.GetObject()))
+	{
+		SinkAllocatedTo->ResourceFreed(this);
+	}
 
 	SinkAllocatedTo = nullptr;
 	AllocationType = EResourceAllocationType::NotAllocated;

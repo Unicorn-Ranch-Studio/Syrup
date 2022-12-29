@@ -4,10 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "Tile.h"
+#include "Resources/ResourceSink.h"
 #include "Trash.generated.h"
 
 class UApplyField;
 class UDamagePlants;
+class UResource;
 
 /* \/ ====== \/ *\
 |  \/ ATrash \/  |
@@ -16,7 +18,7 @@ class UDamagePlants;
  * A piece of trash on the grid that can spread, cause damage, and be picked up
  */
 UCLASS(Abstract, HideCategories = ("ActorTick", "Tile", "Replication", "Rendering", "Collision", "Actor", "Input", "HLOD", "WorldPartition", "Cooking", "DataLayers"))
-class SYRUP_API ATrash : public ATile
+class SYRUP_API ATrash : public ATile, public IResourceSink
 {
 	GENERATED_BODY()
 
@@ -150,6 +152,141 @@ private:
 
 	/* /\ Effect /\ *\
 	\* ------------ */
+
+	
+	
+	/* -------------- *\
+	\* \/ Resource \/ */
+
+public:
+	/**
+	 * Gets whether or not this can lose more damage.
+	 * 
+	 * @return Whether or not this can lose more damage.
+	 */
+	UFUNCTION(BlueprintPure, Category = "Trash|Resource|Upgrades")
+	bool CanDecayDamage() const;
+
+	/**
+	 * Gets whether or not this can lose more range.
+	 *
+	 * @return Whether or not this can lose more range.
+	 */
+	UFUNCTION(BlueprintPure, Category = "Trash|Resource|Upgrades")
+	bool CanDecayRange() const;
+
+	/**
+	 * Gets whether or not this can lose more pickup cost.
+	 *
+	 * @return Whether or not this can lose more pickup cost.
+	 */
+	UFUNCTION(BlueprintPure, Category = "Trash|Resource|Upgrades")
+	bool CanDecayPickupCost() const;
+
+	/**
+	 * Causes this trash to lose damage, and allocates the given resource.
+	 * 
+	 * @param Resource - The resource used to decay this damage.
+	 * 
+	 * @return Whether or not this was successful at decaying more damage.
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Trash|Resource|Upgrades")
+	bool DecayDamage(UResource* Resource);
+
+	/**
+	 * Causes this trash to lose range, and allocates the given resource.
+	 *
+	 * @param Resource - The resource used to decay this range.
+	 *
+	 * @return Whether or not this was successful at decaying more range.
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Trash|Resource|Upgrades")
+	bool DecayRange(UResource* Resource);
+
+	/**
+	 * Causes this trash to lose pickup cost, and allocates the given resource.
+	 *
+	 * @param Resource - The resource used to decay this pickup cost.
+	 *
+	 * @return Whether or not this was successful at decaying more pickup cost.
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Trash|Resource|Upgrades")
+	bool DecayPickupCost(UResource* Resource);
+	
+	/**
+	 * Gets whether damage is due to decay.
+	 *
+	 * @return Whether damage is due to decay.
+	 */
+	UFUNCTION(BlueprintPure, Category = "Trash|Resource|Upgrades")
+	FORCEINLINE bool IsDamageDecaying() const { return bDamageDecaying; };
+
+	/**
+	 * Gets whether range is due to decay.
+	 *
+	 * @return Whether range is due to decay.
+	 */
+	UFUNCTION(BlueprintPure, Category = "Trash|Resource|Upgrades")
+	FORCEINLINE bool IsRangeDecaying() const { return bRangeDecaying; };
+
+	/**
+	 * Gets whether pickup cost is due to decay.
+	 * 
+	 * @return Whether pickup cost is due to decay.
+	 */
+	UFUNCTION(BlueprintPure, Category = "Trash|Resource|Upgrades")
+	FORCEINLINE bool IsPickupCostDecaying() const { return bPickupCostDecaying; };
+
+	/**
+     * Gets the grid locations that this sink takes up.
+     *
+     * @return The grid locations that this sink takes up
+     */
+	virtual FORCEINLINE TSet<FIntPoint> GetAllocationLocations() const override { return GetSubTileLocations(); };
+
+    /**
+     * Gets all the resources allocated to this.
+     *
+     * @return The resources allocated to this.
+     */
+	virtual FORCEINLINE TArray<UResource*> GetAllocatedResources() const override { return AllocatedResources; };
+
+    /**
+     * Undoes the effect of a resource that was sunk in this.
+     *
+     * @param FreedResource - The resource that was freed.
+     */
+    virtual void ResourceFreed(UResource* FreedResource) override;
+
+protected:
+	/**
+	 * Causes the effects of decaying.
+	 */
+	UFUNCTION(BlueprintNativeEvent)
+	void Decay();
+	void Decay_Implementation();
+
+private:
+	//Whether or not damage is in the process of decaying.
+	UPROPERTY()
+	bool bDamageDecaying = false;
+
+	//Whether or not range is in the process of decaying.
+	UPROPERTY()
+	bool bRangeDecaying = false;
+	
+	//Whether or not pickup cost is in the process of decaying.
+	UPROPERTY()
+	bool bPickupCostDecaying = false;
+
+	//The resources that have been allocated to this.
+	UPROPERTY()
+	TArray<UResource*> AllocatedResources;
+
+	/* /\ Resource /\ *\
+	\* -------------- */
+
+
 
 	/* -------- *\
 	\* \/ UI \/ */
