@@ -11,18 +11,23 @@ DEFINE_LOG_CATEGORY(LogResource);
  * Creates a resource.
  *
  * @param Faucet - The faucet that is suppling the sink. Must not be null.
+ * @param Class - The class of resource to create.
  *
  * @return The resource that was created.
  */
-UResource* UResource::Create(TScriptInterface<IResourceFaucet> Faucet)
+UResource* UResource::Create(TScriptInterface<IResourceFaucet> Faucet, TSubclassOf<UResource> Class)
 {
 	if (!IsValid(Faucet.GetObject())) {
 		return nullptr;
 	}
 
-	UResource* NewResouce = NewObject<UResource>();
+	UResource* NewResouce = NewObject<UResource>(Class);
 	NewResouce->FaucetCreatedby = Faucet;
 	return NewResouce;
+}
+UResource* UResource::Create(TScriptInterface<IResourceFaucet> Faucet)
+{
+	return Create(Faucet, UResource::StaticClass());
 }
 
 /**
@@ -60,6 +65,7 @@ bool UResource::Allocate(TScriptInterface<IResourceSink> LinkedSink, EResourceAl
 
 	SinkAllocatedTo = LinkedSink;
 	AllocationType = Type;
+	OnAllocated.Broadcast(this);
 	return true;
 }
 
@@ -75,6 +81,7 @@ void UResource::Free()
 
 	SinkAllocatedTo = nullptr;
 	AllocationType = EResourceAllocationType::NotAllocated;
+	OnFreed.Broadcast(this);
 }
 
 /**

@@ -14,6 +14,8 @@ class ATile;
 
 DECLARE_LOG_CATEGORY_EXTERN(LogResource, Log, All);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FResourceUpdate, UResource*, UpdatedResource);
+
 /* \/ ======== \/ *\
 |  \/ Resource \/  |
 \* \/ ======== \/ */
@@ -30,10 +32,12 @@ public:
 	 * Creates a resource.
 	 * 
 	 * @param Faucet - The faucet that is suppling the sink. Must not be null.
+	 * @param Class - The class of resource to create.
 	 * 
 	 * @return The resource that was created.
 	 */
 	UFUNCTION(BlueprintCallable)
+	static UResource* Create(TScriptInterface<IResourceFaucet> Faucet, TSubclassOf<UResource> Class);
 	static UResource* Create(TScriptInterface<IResourceFaucet> Faucet);
 
 	/**
@@ -92,6 +96,14 @@ public:
 	 */
 	UFUNCTION(BlueprintPure)
 	EResourceAllocationType GetAllocationType() const;
+
+	//Called when this is freed.
+	UPROPERTY(BlueprintAssignable)
+	FResourceUpdate OnFreed;
+
+	//Called when this is allocated.
+	UPROPERTY(BlueprintAssignable)
+	FResourceUpdate OnAllocated;
 
 private:
 	//The sink this is allocated to. Nullptr if unallocated.

@@ -8,13 +8,15 @@
 
 class UResource;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FFaucetUpdated);
+
  /* \/ ============ \/ *\
  |  \/ ResourceSink \/  |
  \* \/ ============ \/ */
 /**
  * Something that can consume resources. A sink handle when resources are allocated to itself.
  */
-UINTERFACE(MinimalAPI, BlueprintType, NotBlueprintable)
+UINTERFACE(BlueprintType, MinimalAPI, Meta = (CannotImplementInterfaceInBlueprint))
 class UResourceFaucet : public UInterface
 {
     GENERATED_BODY()
