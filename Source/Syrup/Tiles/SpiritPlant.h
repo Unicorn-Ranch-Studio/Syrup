@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "Effects/TileEffectTrigger.h"
+
 #include "CoreMinimal.h"
 #include "Tile.h"
 #include "Resources/ResourceFaucet.h"
@@ -54,11 +56,25 @@ private:
      */
     UFUNCTION()
     void ResourceAllocated(UResource* UpdatedResource);
+    
+	/**
+	 * Activates the appropriate effects given the trigger.
+	 * 
+	 * @param TriggerType - The of trigger that was activated.
+	 * @param Triggerer - The tile that triggered this effect.
+	 * @param LocationsToTrigger - The Locations where the trigger applies an effect. If this is empty all effect locations will be effected.
+	 */
+	UFUNCTION()
+	void ReceiveEffectTrigger(const ETileEffectTriggerType TriggerType, const ATile* Triggerer, const TSet<FIntPoint>& LocationsToTrigger);
 
     /**
      * Produces a new resource.
      */
     void ProduceResource();
+
+    //Whether or not another resource needs to be produced.
+    UPROPERTY()
+    bool bNeedsMoreResource = false;
 
     //The resources provided by this
     UPROPERTY()

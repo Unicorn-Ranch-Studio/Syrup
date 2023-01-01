@@ -316,7 +316,7 @@ bool APlant::CanGrowHealth() const
  */
 bool APlant::CanGrowRange() const
 {
-	return !bRangeGrowing && Health + 1 <= GetMaxRange();
+	return !bRangeGrowing && Range + 1 <= GetMaxRange();
 }
 
 /**

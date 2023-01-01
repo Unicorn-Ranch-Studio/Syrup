@@ -3,6 +3,7 @@
 
 #include "SpiritPlant.h"
 
+#include "Syrup/Systems/SyrupGameMode.h"
 #include "Resources/Resource.h"
 
 /**
@@ -14,6 +15,8 @@ void ASpiritPlant::BeginPlay()
 
 	ProduceResource();
 	OnProductionChanged.Broadcast();
+
+	ASyrupGameMode::GetTileEffectTriggerDelegate(this).AddDynamic(this, &ASpiritPlant::ReceiveEffectTrigger);
 }
 
 /**
@@ -23,7 +26,7 @@ void ASpiritPlant::BeginPlay()
  */
 TSet<FIntPoint> ASpiritPlant::GetAllocatableLocations() const
 {
-	return UGridLibrary::ScaleShapeUp(GetRelativeSubTileLocations(), 1);
+	return UGridLibrary::ScaleShapeUp(GetSubTileLocations(), 1);
 }
 
 /**
@@ -43,8 +46,15 @@ TArray<UResource*> ASpiritPlant::GetProducedResources() const
  */
 void ASpiritPlant::ResourceFreed(UResource* UpdatedResource)
 {
-	ProducedResources.Remove(UpdatedResource);
-	OnProductionChanged.Broadcast();
+	if (bNeedsMoreResource)
+	{
+		bNeedsMoreResource = false;
+	}
+	else
+	{
+		ProducedResources.Remove(UpdatedResource);
+		OnProductionChanged.Broadcast();
+	}
 }
 
 /**
@@ -54,7 +64,7 @@ void ASpiritPlant::ResourceFreed(UResource* UpdatedResource)
  */
 void ASpiritPlant::ResourceAllocated(UResource* UpdatedResource)
 {
-	ProduceResource();
+	bNeedsMoreResource = true;
 	OnProductionChanged.Broadcast();
 }
 
@@ -67,4 +77,20 @@ void ASpiritPlant::ProduceResource()
 	ProducedResources.Add(NewResource);
 	NewResource->OnFreed.AddDynamic(this, &ASpiritPlant::ResourceFreed);
 	NewResource->OnAllocated.AddDynamic(this, &ASpiritPlant::ResourceAllocated);
+}
+
+
+/**
+ * Activates the appropriate effects given the trigger.
+ *
+ * @param TriggerType - The of trigger that was activated.
+ * @param Triggerer - The tile that triggered this effect.
+ * @param LocationsToTrigger - The Locations where the trigger applies an effect. If this is empty all effect locations will be effected.
+ */
+void ASpiritPlant::ReceiveEffectTrigger(const ETileEffectTriggerType TriggerType, const ATile* Triggerer, const TSet<FIntPoint>& LocationsToTrigger)
+{
+	if (TriggerType == ETileEffectTriggerType::PlantsGrow && bNeedsMoreResource)
+	{
+		ProduceResource();
+	}
 }
