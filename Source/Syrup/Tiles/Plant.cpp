@@ -23,24 +23,27 @@ void APlant::BeginPlay()
 {
 	Super::BeginPlay();
 
-	SubtileMesh->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
 	if (bStartGrown)
 	{
-		int TrueRange = Range;
 		Range = 0;
-		SetRange(TrueRange);
+		SetRange(GetMaxRange());
 
-		int TrueProduction = Production;
 		Production = 0;
-		SetProduction(TrueProduction);
+		SetProduction(GetMaxProduction());
 	}
 	else
 	{
-		Health = 1;
-		Production = 0;
+		Health = InitialHealth;
+
 		Range = 0;
-		SetRange(1);
+		SetRange(InitialRange);
+
+		Production = 0;
+		SetProduction(InitialProduction);
 	}
+
+	SubtileMesh->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
+
 	bIsFinishedPlanting = true;
 	Grow();
 	bIsFinishedPlanting = ASyrupGameMode::IsPlayerTurn(this);
@@ -200,20 +203,20 @@ void APlant::Grow_Implementation()
 		return;
 	}
 
-	if (bHealthGrowing)
+	if (NumHealthGrowing)
 	{
-		SetHealth(GetHealth() + 1);
-		bHealthGrowing = false;
+		SetHealth(GetHealth() + NumHealthGrowing);
+		NumHealthGrowing = 0;
 	}
-	if (bRangeGrowing)
+	if (NumRangeGrowing)
 	{
-		SetRange(GetRange() + 1);
-		bRangeGrowing = false;
+		SetRange(GetRange() + NumRangeGrowing);
+		NumRangeGrowing = 0;
 	}
-	if (bProductionGrowing)
+	if (NumProductionGrowing)
 	{
-		SetProduction(GetProduction() + 2);
-		bProductionGrowing = false;
+		SetProduction(GetProduction() + NumProductionGrowing);
+		NumProductionGrowing = 0;
 	}
 }
 
@@ -306,7 +309,7 @@ TSet<FIntPoint> APlant::GetEffectLocations() const
  */
 bool APlant::CanGrowHealth() const
 {
-	return !bHealthGrowing && Health + 1 <= GetMaxHealth();
+	return NumHealthGrowing < HealthGrowthPerTurn && Health < GetMaxHealth();
 }
 
 /**
@@ -316,7 +319,7 @@ bool APlant::CanGrowHealth() const
  */
 bool APlant::CanGrowRange() const
 {
-	return !bRangeGrowing && Range + 1 <= GetMaxRange();
+	return NumRangeGrowing < RangeGrowthPerTurn && Range < GetMaxRange();
 }
 
 /**
@@ -326,7 +329,7 @@ bool APlant::CanGrowRange() const
  */
 bool APlant::CanGrowProduction() const
 {
-	return !bProductionGrowing && Production + 2 <= GetMaxProduction();
+	return NumProductionGrowing < ProductionGrowthPerTurn && Production < GetMaxProduction();
 }
 
 /**
@@ -345,7 +348,7 @@ bool APlant::GrowHealth(UResource* Resource)
 
 	Resource->Allocate(this, EResourceAllocationType::PlantHealth);
 	AllocatedResources.Add(Resource);
-	bHealthGrowing = true;
+	NumHealthGrowing = FMath::Min(NumHealthGrowing + HealthPerResource, HealthGrowthPerTurn * HealthPerResource);
 	return true;
 }
 
@@ -365,7 +368,7 @@ bool APlant::GrowRange(UResource* Resource)
 
 	Resource->Allocate(this, EResourceAllocationType::PlantRange);
 	AllocatedResources.Add(Resource);
-	bRangeGrowing = true;
+	NumRangeGrowing = FMath::Min(NumRangeGrowing + RangePerResource, RangeGrowthPerTurn * RangePerResource);
 	return true;
 }
 
@@ -385,7 +388,7 @@ bool APlant::GrowProduction(UResource* Resource)
 
 	Resource->Allocate(this, EResourceAllocationType::PlantProduction);
 	AllocatedResources.Add(Resource);
-	bProductionGrowing = true;
+	NumProductionGrowing = FMath::Min(NumProductionGrowing + ProductionPerResource, ProductionGrowthPerTurn * ProductionPerResource);
 	return true;
 }
 
@@ -440,33 +443,33 @@ void APlant::ResourceFreed(UResource* FreedResource)
 		UE_LOG(LogResource, Warning, TEXT("Cant free unallocated resource on  %s"), *GetName());
 		return;
 	case EResourceAllocationType::PlantHealth:
-		if (bHealthGrowing)
+		if (NumHealthGrowing)
 		{
-			bHealthGrowing = false;
+			NumHealthGrowing -= HealthPerResource;
 		}
 		else
 		{
-			SetHealth(GetHealth() - 1);
+			SetHealth(GetHealth() - HealthPerResource);
 		}
 		break;
 	case EResourceAllocationType::PlantRange:
-		if (bRangeGrowing)
+		if (NumRangeGrowing)
 		{
-			bRangeGrowing = false;
+			NumRangeGrowing -= RangePerResource;
 		}
 		else
 		{
-			SetRange(GetRange() - 1);
+			SetRange(GetRange() - RangePerResource);
 		}
 		break;
 	case EResourceAllocationType::PlantProduction:
-		if (bProductionGrowing)
+		if (NumProductionGrowing)
 		{
-			bProductionGrowing = false;
+			NumProductionGrowing = ProductionPerResource;
 		}
 		else
 		{
-			SetProduction(GetProduction() - 2);
+			SetProduction(GetProduction() - ProductionPerResource);
 		}
 		break;
 	default:

@@ -113,9 +113,21 @@ public:
 
 protected:
 
-	//The health of this plant.
+	//The maximum health of this plant.
 	UPROPERTY(EditDefaultsOnly, Category = "Plant|Health", Meta = (ClampMin = "1"))
 	int Health = 1;
+
+	//The health this plant starts with.
+	UPROPERTY(EditDefaultsOnly, Category = "Plant|Health", Meta = (ClampMin = "1"))
+	int InitialHealth = 1;
+
+	//The health gained per resource allocation.
+	UPROPERTY(EditDefaultsOnly, Category = "Plant|Health", Meta = (ClampMin = "1"))
+	int HealthPerResource = 1;
+
+	//The number of times health can be grown per turn.
+	UPROPERTY(EditDefaultsOnly, Category = "Plant|Health", Meta = (ClampMin = "1"))
+	int HealthGrowthPerTurn = 1;
 
 	//The damage taken by this plant.
 	UPROPERTY(VisibleInstanceOnly)
@@ -204,7 +216,7 @@ public:
 	 * @return Whether health is due to grow.
 	 */
 	UFUNCTION(BlueprintPure, Category = "Plant|Growth|Upgrades")
-	FORCEINLINE bool IsHealthGrowing() const { return bHealthGrowing; };
+	FORCEINLINE int GetNumHealthGrowing() const { return NumHealthGrowing; };
 
 	/**
 	 * Gets whether range is due to grow.
@@ -212,7 +224,7 @@ public:
 	 * @return Whether range is due to grow.
 	 */
 	UFUNCTION(BlueprintPure, Category = "Plant|Growth|Upgrades")
-	FORCEINLINE bool IsRangeGrowing() const { return bRangeGrowing; };
+	FORCEINLINE int GetNumRangeGrowing() const { return NumRangeGrowing; };
 
 	/**
 	 * Gets whether production is due to grow.
@@ -220,7 +232,7 @@ public:
 	 * @return Whether production is due to grow.
 	 */
 	UFUNCTION(BlueprintPure, Category = "Plant|Growth|Upgrades")
-	FORCEINLINE bool IsProductionGrowing() const { return bProductionGrowing; };
+	FORCEINLINE int GetNumProductionGrowing() const { return NumProductionGrowing; };
 
 	/**
 	 * Gets cost to plant this plant type.
@@ -256,14 +268,17 @@ protected:
 	bool bIsFinishedPlanting = false;
 
 private:
+	//The number of health points that are currently growing.
 	UPROPERTY()
-	bool bHealthGrowing = false;
-	
+	int NumHealthGrowing = 0;
+
+	//The number of range points that are currently growing.
 	UPROPERTY()
-	bool bRangeGrowing = false;
-	
+	int NumRangeGrowing = 0;
+
+	//The number of production points that are currently growing.
 	UPROPERTY()
-	bool bProductionGrowing = false;
+	int NumProductionGrowing = 0;
 
 	/* /\ Growth /\ *\
 	\* ------------ */
@@ -301,6 +316,18 @@ protected:
 	//The scale applied to the shape of this plant type to get all effected locations of this plant type's effects.
 	UPROPERTY(EditDefaultsOnly, Category = "Plant|Effect", Meta = (ClampMin = "0"))
 	int Range = 1;
+
+	//The range this plant starts with.
+	UPROPERTY(EditDefaultsOnly, Category = "Plant|Effect", Meta = (ClampMin = "0"))
+	int InitialRange = 1;
+
+	//The range gained per resource allocation.
+	UPROPERTY(EditDefaultsOnly, Category = "Plant|Effect", Meta = (ClampMin = "1"))
+	int RangePerResource = 1;
+
+	//The number of times range can be grown per turn.
+	UPROPERTY(EditDefaultsOnly, Category = "Plant|Effect", Meta = (ClampMin = "1"))
+	int RangeGrowthPerTurn = 1;
 
 private:
 
@@ -395,6 +422,18 @@ protected:
 	//The number of resource this plant can produce. Should be an even number.
 	UPROPERTY(EditDefaultsOnly, Category = "Plant|Resources", Meta = (ClampMin = "0"))
 	int Production = 2;
+
+	//The range this plant starts with.
+	UPROPERTY(EditDefaultsOnly, Category = "Plant|Resources", Meta = (ClampMin = "0"))
+	int InitialProduction = 0;
+
+	//The range gained per resource allocation.
+	UPROPERTY(EditDefaultsOnly, Category = "Plant|Resources", Meta = (ClampMin = "1"))
+	int ProductionPerResource = 2;
+
+	//The number of times range can be grown per turn.
+	UPROPERTY(EditDefaultsOnly, Category = "Plant|Resources", Meta = (ClampMin = "1"))
+	int ProductionGrowthPerTurn = 1;
 
 private:
 	//The resources produced by this.
