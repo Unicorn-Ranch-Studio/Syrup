@@ -46,7 +46,7 @@ void ATrash::OnConstruction(const FTransform& Transform)
 
 	SubtileMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
 
-	Range = GetRange();
+	SetDamage(Damage);
 	RelativeSubTileLocations.Add(FIntPoint::ZeroValue);
 }
 
@@ -165,7 +165,7 @@ TSet<FIntPoint> ATrash::GetEffectLocations() const
  */
 bool ATrash::CanDecayDamage() const
 {
-	return GetDamage() > 1 && !bDamageDecaying;
+	return GetDamage() > MinDamage && NumDamageDecaying < DamageDecayPerTurn * DamagePerResource;
 }
 
 /**
@@ -175,7 +175,7 @@ bool ATrash::CanDecayDamage() const
  */
 bool ATrash::CanDecayRange() const
 {
-	return GetRange() > 1 && !bRangeDecaying;
+	return GetRange() > MinRange && NumRangeDecaying < RangeDecayPerTurn * RangePerResource;
 }
 
 /**
@@ -185,7 +185,7 @@ bool ATrash::CanDecayRange() const
  */
 bool ATrash::CanDecayPickupCost() const
 {
-	return GetPickUpCost() > 1 && !bPickupCostDecaying;
+	return GetPickUpCost() > MinPickUpCost && NumPickupCostDecaying < PickUpCostDecayPerTurn * PickUpCostPerResource;
 }
 
 /**
@@ -199,7 +199,7 @@ bool ATrash::DecayDamage(UResource* Resource)
 {
 	if (CanDecayDamage())
 	{
-		bDamageDecaying = true;
+		NumDamageDecaying = FMath::Min(NumDamageDecaying + DamagePerResource, Damage - MinDamage);
 		Resource->Allocate(this, EResourceAllocationType::TrashDamage);
 		return true;
 	}
@@ -217,7 +217,7 @@ bool ATrash::DecayRange(UResource* Resource)
 {
 	if (CanDecayRange())
 	{
-		bRangeDecaying = true;
+		NumRangeDecaying = FMath::Min(NumRangeDecaying + RangePerResource, Range - MinRange);
 		Resource->Allocate(this, EResourceAllocationType::TrashRange);
 		return true;
 	}
@@ -235,7 +235,7 @@ bool ATrash::DecayPickupCost(UResource* Resource)
 {
 	if (CanDecayPickupCost())
 	{
-		bPickupCostDecaying = true;
+		NumPickupCostDecaying = FMath::Min(NumPickupCostDecaying + PickUpCostPerResource, PickUpCost - MinPickUpCost);
 		Resource->Allocate(this, EResourceAllocationType::TrashCost);
 		return true;
 	}
@@ -247,20 +247,20 @@ bool ATrash::DecayPickupCost(UResource* Resource)
  */
 void ATrash::Decay_Implementation()
 {
-	if (bPickupCostDecaying)
+	if (NumDamageDecaying)
 	{
-		PickUpCost -= 1;
-		bPickupCostDecaying = false;
+		SetDamage(GetDamage() - NumDamageDecaying);
+		NumDamageDecaying = 0;
 	}
-	if (bDamageDecaying)
+	if (NumRangeDecaying)
 	{
-		SetDamage(GetDamage() - 1);
-		bDamageDecaying = false;
+		SetRange(GetRange() - NumRangeDecaying);
+		NumRangeDecaying = 0;
 	}
-	if (bRangeDecaying)
+	if (NumPickupCostDecaying)
 	{
-		SetRange(GetRange() - 1);
-		bRangeDecaying = false;
+		PickUpCost -= NumPickupCostDecaying;
+		NumPickupCostDecaying = 0;
 	}
 }
 
@@ -277,33 +277,33 @@ void ATrash::ResourceFreed(UResource* FreedResource)
 		UE_LOG(LogResource, Warning, TEXT("Cant free unallocated resource on  %s"), *GetName());
 		return;
 	case EResourceAllocationType::TrashCost:
-		if (bPickupCostDecaying)
+		if (NumPickupCostDecaying)
 		{
-			bPickupCostDecaying = false;
+			NumPickupCostDecaying -= PickUpCostPerResource;
 		}
 		else
 		{
-			PickUpCost += 1;
+			PickUpCost += PickUpCostPerResource;
 		}
 		break;
 	case EResourceAllocationType::TrashDamage:
-		if (bDamageDecaying)
+		if (NumDamageDecaying)
 		{
-			bDamageDecaying = false;
+			NumDamageDecaying -= DamagePerResource;
 		}
 		else
 		{
-			SetDamage(GetDamage() + 1);
+			SetDamage(GetDamage() + DamagePerResource);
 		}
 		break;
 	case EResourceAllocationType::TrashRange:
-		if (bRangeDecaying)
+		if (NumRangeDecaying)
 		{
-			bRangeDecaying = false;
+			NumRangeDecaying -= RangePerResource;
 		}
 		else
 		{
-			SetRange(GetRange() + 1);
+			SetRange(GetRange() + RangePerResource);
 		}
 		break;
 	default:

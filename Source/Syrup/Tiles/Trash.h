@@ -62,7 +62,7 @@ public:
 	 * @param EnergyReserve - The energy reserve of the thing trying to pick this up. Will have PickupCost subtracted from it.
 	 * @return Whether or not this was picked up,
 	 */
-	UFUNCTION(BlueprintCallable, Category = "Pick Up")
+	UFUNCTION(BlueprintCallable, Category = "Trash|Pick Up")
 	bool PickUp(UPARAM(Ref) int& EnergyReserve);
 
 	/**
@@ -70,14 +70,28 @@ public:
 	 * 
 	 * @return The number of energy points required to pickup this trash.
 	 */
-	UFUNCTION(BlueprintPure, Category = "Pick Up")
+	UFUNCTION(BlueprintPure, Category = "Trash|Pick Up")
 	FORCEINLINE int GetPickUpCost() const { return PickUpCost; };
 
 protected:
 
 	//The number of energy points required to pickup this trash.
-	UPROPERTY(EditDefaultsOnly, Category = "Pick Up", Meta = (ClampMin = "0"))
+	UPROPERTY(EditDefaultsOnly, Category = "Trash|Pick Up", Meta = (ClampMin = "0"))
 	int PickUpCost = 1;
+	
+	//The minimum number of energy points required to pickup this trash after it has been fully decayed.
+	UPROPERTY(EditDefaultsOnly, Category = "Trash|Pick Up", Meta = (ClampMin = "0"))
+	int MinPickUpCost = 1;
+	
+	//The number of energy points removed from the trash per decay.
+	UPROPERTY(EditDefaultsOnly, Category = "Trash|Pick Up", Meta = (ClampMin = "1"))
+	int PickUpCostPerResource = 2;
+
+	
+	//The number of times pickup cost can be decayed per turn.
+	UPROPERTY(EditDefaultsOnly, Category = "Trash|Pick Up", Meta = (ClampMin = "1"))
+	int PickUpCostDecayPerTurn = 1;
+
 
 	/* /\ Pick Up /\ *\
 	\* ------------- */
@@ -94,7 +108,7 @@ public:
 	 *
 	 * @param NewRange - The value to set the range to. Will be clamped >= 0.
 	 */
-	UFUNCTION(BlueprintCallable, Category = "Effect")
+	UFUNCTION(BlueprintCallable, Category = "Trash|Effect")
 	void SetRange(const int NewRange);
 
 	/**
@@ -102,7 +116,7 @@ public:
 	 * 
 	 * @return The scale applied to the shape of this trash to get all effected locations of this trash's effects.
 	 */
-	UFUNCTION(BlueprintPure, Category = "Effect")
+	UFUNCTION(BlueprintPure, Category = "Trash|Effect")
 	FORCEINLINE int GetRange() const { return Range; };
 
 	/**
@@ -110,7 +124,7 @@ public:
 	 *
 	 * @param NewDamage - The value to set the damage to.
 	 */
-	UFUNCTION(BlueprintImplementableEvent, Category = "Effect")
+	UFUNCTION(BlueprintImplementableEvent, Category = "Trash|Effect")
 	void SetDamage(const int NewDamage);
 
 	/**
@@ -118,7 +132,7 @@ public:
 	 * 
 	 * @return The damage this trash will deal to plants within its effect area every turn.
 	 */
-	UFUNCTION(BlueprintPure, BlueprintImplementableEvent, Category = "Effect")
+	UFUNCTION(BlueprintPure, BlueprintImplementableEvent, Category = "Trash|Effect")
 	int GetDamage() const;
 
 	/**
@@ -126,7 +140,7 @@ public:
 	 * 
 	 * @return A set of all locations where the effects of this plant will apply.
 	 */
-	UFUNCTION(BlueprintPure, Category = "Effect")
+	UFUNCTION(BlueprintPure, Category = "Trash|Effect")
 	TSet<FIntPoint> GetEffectLocations() const;
 
 protected:
@@ -135,8 +149,38 @@ protected:
 	bool bActive = false;
 
 	//The scale applied to the shape of this trash to get all effected locations of this trash's effects.
-	UPROPERTY(EditDefaultsOnly, Category = "Effect", Meta = (ClampMin = "0"))
+	UPROPERTY(EditDefaultsOnly, Category = "Trash|Effect", Meta = (ClampMin = "0"))
 	int Range = 1;
+	
+	//The minimum range after this has been fully decayed.
+	UPROPERTY(EditDefaultsOnly, Category = "Trash|Effect", Meta = (ClampMin = "0"))
+	int MinRange = 1;
+	
+	//The number of range removed from the trash per decay.
+	UPROPERTY(EditDefaultsOnly, Category = "Trash|Effect", Meta = (ClampMin = "1"))
+	int RangePerResource = 1;
+
+	
+	//The amount of range can be decayed per turn.
+	UPROPERTY(EditDefaultsOnly, Category = "Trash|Effect", Meta = (ClampMin = "1"))
+	int RangeDecayPerTurn = 1;
+
+	//The number of hp points dealt to trash in range.
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Trash|Damage", Meta = (ClampMin = "0"))
+	int Damage = 1;
+	
+	//The minimum damage after this has been fully decayed.
+	UPROPERTY(EditDefaultsOnly, Category = "Trash|Damage", Meta = (ClampMin = "0"))
+	int MinDamage = 1;
+	
+	//The number of damage removed from the trash per decay.
+	UPROPERTY(EditDefaultsOnly, Category = "Trash|Damage", Meta = (ClampMin = "1"))
+	int DamagePerResource = 1;
+
+	
+	//The amount of damage can be decayed per turn.
+	UPROPERTY(EditDefaultsOnly, Category = "Trash|Damage", Meta = (ClampMin = "1"))
+	int DamageDecayPerTurn = 1;
 
 private:
 
@@ -219,7 +263,7 @@ public:
 	 * @return Whether damage is due to decay.
 	 */
 	UFUNCTION(BlueprintPure, Category = "Trash|Resource|Upgrades")
-	FORCEINLINE bool IsDamageDecaying() const { return bDamageDecaying; };
+	FORCEINLINE int GetNumDamageDecaying() const { return NumDamageDecaying; };
 
 	/**
 	 * Gets whether range is due to decay.
@@ -227,7 +271,7 @@ public:
 	 * @return Whether range is due to decay.
 	 */
 	UFUNCTION(BlueprintPure, Category = "Trash|Resource|Upgrades")
-	FORCEINLINE bool IsRangeDecaying() const { return bRangeDecaying; };
+	FORCEINLINE int GetNumRangeDecaying() const { return NumRangeDecaying; };
 
 	/**
 	 * Gets whether pickup cost is due to decay.
@@ -235,7 +279,7 @@ public:
 	 * @return Whether pickup cost is due to decay.
 	 */
 	UFUNCTION(BlueprintPure, Category = "Trash|Resource|Upgrades")
-	FORCEINLINE bool IsPickupCostDecaying() const { return bPickupCostDecaying; };
+	FORCEINLINE int GetNumPickupCostDecaying() const { return NumPickupCostDecaying; };
 
 	/**
      * Gets the grid locations that this sink takes up.
@@ -269,15 +313,15 @@ protected:
 private:
 	//Whether or not damage is in the process of decaying.
 	UPROPERTY()
-	bool bDamageDecaying = false;
+	int NumDamageDecaying = 0;
 
 	//Whether or not range is in the process of decaying.
 	UPROPERTY()
-	bool bRangeDecaying = false;
+	int NumRangeDecaying = 0;
 	
 	//Whether or not pickup cost is in the process of decaying.
 	UPROPERTY()
-	bool bPickupCostDecaying = false;
+	int NumPickupCostDecaying = 0;
 
 	//The resources that have been allocated to this.
 	UPROPERTY()
@@ -298,13 +342,13 @@ public:
 	 * 
 	 * @return The text to use when referring to a trash of this.
 	 */
-	UFUNCTION(BlueprintPure, Category = "UI")
+	UFUNCTION(BlueprintPure, Category = "Trash|UI")
 	FORCEINLINE FText GetDisplayName() const { return DisplayName; };
 
 protected:
 
 	//The text to use when referring to a trash of this.
-	UPROPERTY(EditDefaultsOnly, Category = "UI")
+	UPROPERTY(EditDefaultsOnly, Category = "Trash|UI")
 	FText DisplayName = FText();
 
 	/* /\ UI /\ *\
