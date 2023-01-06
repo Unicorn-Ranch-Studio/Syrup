@@ -309,7 +309,7 @@ TSet<FIntPoint> APlant::GetEffectLocations() const
  */
 bool APlant::CanGrowHealth() const
 {
-	return NumHealthGrowing < HealthGrowthPerTurn && Health < GetMaxHealth();
+	return NumHealthGrowing < HealthGrowthPerTurn * HealthPerResource && Health + NumHealthGrowing < GetMaxHealth();
 }
 
 /**
@@ -319,7 +319,7 @@ bool APlant::CanGrowHealth() const
  */
 bool APlant::CanGrowRange() const
 {
-	return NumRangeGrowing < RangeGrowthPerTurn && Range < GetMaxRange();
+	return NumRangeGrowing < RangeGrowthPerTurn * RangePerResource && Range + NumRangeGrowing < GetMaxRange();
 }
 
 /**
@@ -329,7 +329,7 @@ bool APlant::CanGrowRange() const
  */
 bool APlant::CanGrowProduction() const
 {
-	return NumProductionGrowing < ProductionGrowthPerTurn && Production < GetMaxProduction();
+	return NumProductionGrowing < ProductionGrowthPerTurn * ProductionPerResource && Production + NumProductionGrowing < GetMaxProduction();
 }
 
 /**

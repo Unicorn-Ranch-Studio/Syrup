@@ -165,7 +165,7 @@ TSet<FIntPoint> ATrash::GetEffectLocations() const
  */
 bool ATrash::CanDecayDamage() const
 {
-	return GetDamage() > MinDamage && NumDamageDecaying < DamageDecayPerTurn * DamagePerResource;
+	return GetDamage() - NumDamageDecaying > MinDamage && NumDamageDecaying < DamageDecayPerTurn * DamagePerResource;
 }
 
 /**
@@ -175,7 +175,7 @@ bool ATrash::CanDecayDamage() const
  */
 bool ATrash::CanDecayRange() const
 {
-	return GetRange() > MinRange && NumRangeDecaying < RangeDecayPerTurn * RangePerResource;
+	return GetRange() - NumRangeDecaying > MinRange && NumRangeDecaying < RangeDecayPerTurn * RangePerResource;
 }
 
 /**
@@ -185,7 +185,7 @@ bool ATrash::CanDecayRange() const
  */
 bool ATrash::CanDecayPickupCost() const
 {
-	return GetPickUpCost() > MinPickUpCost && NumPickupCostDecaying < PickUpCostDecayPerTurn * PickUpCostPerResource;
+	return GetPickUpCost() - NumPickupCostDecaying > MinPickUpCost && NumPickupCostDecaying < PickUpCostDecayPerTurn * PickUpCostPerResource;
 }
 
 /**
