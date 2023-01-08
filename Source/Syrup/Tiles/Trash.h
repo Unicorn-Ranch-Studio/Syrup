@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "Resources/ResourceType.h"
+
 #include "CoreMinimal.h"
 #include "Tile.h"
 #include "Resources/ResourceSink.h"
@@ -73,6 +75,38 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Trash|Pick Up")
 	FORCEINLINE int GetPickUpCost() const { return PickUpCost; };
 
+	/**
+	 * Gets the minimum cost to pickup this piece of trash.
+	 * 
+	 * @return The minimum cost to pickup this piece of trash when it is fully decayed.
+	 */
+	UFUNCTION(BlueprintPure, Category = "Trash|Pick Up")
+	FORCEINLINE int GetMinPickUpCost() const { return MinPickUpCost; };	
+	
+	/**
+	 * Gets the pickup cost lost per allocated resource.
+	 * 
+	 * @return The pickup cost lost per allocated resource.
+	 */
+	UFUNCTION(BlueprintPure, Category = "Trash|Pick Up")
+	FORCEINLINE int GetPickUpCostPerResource() const { return PickUpCostPerResource; };
+	
+	/**
+	 * Gets the number of times pickup cost can be decayed per turn.
+	 * 
+	 * @return The number of times pickup cost can be decayed per turn.
+	 */
+	UFUNCTION(BlueprintPure, Category = "Trash|Pick Up")
+	FORCEINLINE int GetPickUpCostDecayPerTurn() const { return PickUpCostDecayPerTurn; };
+	
+	/**
+	 * Gets the type of resource needed to decay pickup cost.
+	 * 
+	 * @return The type of resource needed to decay pickup cost.
+	 */
+	UFUNCTION(BlueprintPure, Category = "Trash|Pick Up")
+	FORCEINLINE EResourceType GetPickUpCostDecayResource() const { return PickUpCostDecayResource; };
+
 protected:
 
 	//The number of energy points required to pickup this trash.
@@ -86,11 +120,14 @@ protected:
 	//The number of energy points removed from the trash per decay.
 	UPROPERTY(EditDefaultsOnly, Category = "Trash|Pick Up", Meta = (ClampMin = "1"))
 	int PickUpCostPerResource = 2;
-
 	
 	//The number of times pickup cost can be decayed per turn.
 	UPROPERTY(EditDefaultsOnly, Category = "Trash|Pick Up", Meta = (ClampMin = "1"))
 	int PickUpCostDecayPerTurn = 1;
+
+	//The type of resource needed to decay pickup cost.
+	UPROPERTY(EditDefaultsOnly, Category = "Trash|Pick Up")
+	EResourceType PickUpCostDecayResource = EResourceType::Any;
 
 
 	/* /\ Pick Up /\ *\
@@ -120,6 +157,38 @@ public:
 	FORCEINLINE int GetRange() const { return Range; };
 
 	/**
+	 * Gets the minimum range of this trash.
+	 * 
+	 * @return The minimum range of this trash when it is fully decayed.
+	 */
+	UFUNCTION(BlueprintPure, Category = "Trash|Effect")
+	FORCEINLINE int GetMinRange() const { return MinRange; };	
+	
+	/**
+	 * Gets the range lost per allocated resource.
+	 * 
+	 * @return The range lost  per allocated resource.
+	 */
+	UFUNCTION(BlueprintPure, Category = "Trash|Effect")
+	FORCEINLINE int GetRangePerResource() const { return RangePerResource; };
+	
+	/**
+	 * Gets the number of times range can be decayed per turn.
+	 * 
+	 * @return The number of times range can be decayed per turn.
+	 */
+	UFUNCTION(BlueprintPure, Category = "Trash|Effect")
+	FORCEINLINE int GetRangeDecayPerTurn() const { return RangeDecayPerTurn; };
+	
+	/**
+	 * Gets the type of resource needed to decay range.
+	 * 
+	 * @return The type of resource needed to decay range.
+	 */
+	UFUNCTION(BlueprintPure, Category = "Trash|Effect")
+	FORCEINLINE EResourceType GetRangeDecayResource() const { return RangeDecayResource; };
+
+	/**
 	 * Sets the damage of this trash.
 	 *
 	 * @param NewDamage - The value to set the damage to.
@@ -134,6 +203,38 @@ public:
 	 */
 	UFUNCTION(BlueprintPure, BlueprintImplementableEvent, Category = "Trash|Effect")
 	int GetDamage() const;
+
+	/**
+	 * Gets the minimum damage of this trash.
+	 * 
+	 * @return The minimum damage of this trash when it is fully decayed.
+	 */
+	UFUNCTION(BlueprintPure, Category = "Trash|Effect")
+	FORCEINLINE int GetMinDamage() const { return MinDamage; };	
+	
+	/**
+	 * Gets the damage lost per allocated resource.
+	 * 
+	 * @return The damage lost  per allocated resource.
+	 */
+	UFUNCTION(BlueprintPure, Category = "Trash|Effect")
+	FORCEINLINE int GetDamagePerResource() const { return DamagePerResource; };
+	
+	/**
+	 * Gets the number of times damage can be decayed per turn.
+	 * 
+	 * @return The number of times damage can be decayed per turn.
+	 */
+	UFUNCTION(BlueprintPure, Category = "Trash|Effect")
+	FORCEINLINE int GetDamageDecayPerTurn() const { return DamageDecayPerTurn; };
+	
+	/**
+	 * Gets the type of resource needed to decay damage.
+	 * 
+	 * @return The type of resource needed to decay damage.
+	 */
+	UFUNCTION(BlueprintPure, Category = "Trash|Effect")
+	FORCEINLINE EResourceType GetDamageDecayResource() const { return DamageDecayResource; };
 
 	/**
 	 * Gets the locations where the effects of this plant will apply.
@@ -160,10 +261,13 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Trash|Effect", Meta = (ClampMin = "1"))
 	int RangePerResource = 1;
 
-	
 	//The amount of range can be decayed per turn.
 	UPROPERTY(EditDefaultsOnly, Category = "Trash|Effect", Meta = (ClampMin = "1"))
 	int RangeDecayPerTurn = 1;
+	
+	//The type of resource needed to decay range.
+	UPROPERTY(EditDefaultsOnly, Category = "Trash|Effect")
+	EResourceType RangeDecayResource = EResourceType::Any;
 
 	//The number of hp points dealt to trash in range.
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Trash|Damage", Meta = (ClampMin = "0"))
@@ -176,7 +280,10 @@ protected:
 	//The number of damage removed from the trash per decay.
 	UPROPERTY(EditDefaultsOnly, Category = "Trash|Damage", Meta = (ClampMin = "1"))
 	int DamagePerResource = 1;
-
+	
+	//The type of resource needed to decay damage.
+	UPROPERTY(EditDefaultsOnly, Category = "Trash|Effect")
+	EResourceType DamageDecayResource = EResourceType::Any;
 	
 	//The amount of damage can be decayed per turn.
 	UPROPERTY(EditDefaultsOnly, Category = "Trash|Damage", Meta = (ClampMin = "1"))
@@ -205,27 +312,33 @@ private:
 public:
 	/**
 	 * Gets whether or not this can lose more damage.
+	 *
+	 * @param Resource - The resource that would be allocated.
 	 * 
 	 * @return Whether or not this can lose more damage.
 	 */
 	UFUNCTION(BlueprintPure, Category = "Trash|Resource|Upgrades")
-	bool CanDecayDamage() const;
+	bool CanDecayDamage(UResource* Resource) const;
 
 	/**
 	 * Gets whether or not this can lose more range.
 	 *
+	 * @param Resource - The resource that would be allocated.	
+	 *
 	 * @return Whether or not this can lose more range.
 	 */
 	UFUNCTION(BlueprintPure, Category = "Trash|Resource|Upgrades")
-	bool CanDecayRange() const;
+	bool CanDecayRange(UResource* Resource) const;
 
 	/**
 	 * Gets whether or not this can lose more pickup cost.
 	 *
+	 * @param Resource - The resource that would be allocated.	
+	 *
 	 * @return Whether or not this can lose more pickup cost.
 	 */
 	UFUNCTION(BlueprintPure, Category = "Trash|Resource|Upgrades")
-	bool CanDecayPickupCost() const;
+	bool CanDecayPickupCost(UResource* Resource) const;
 
 	/**
 	 * Causes this trash to lose damage, and allocates the given resource.

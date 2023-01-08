@@ -73,7 +73,7 @@ void ASpiritPlant::ResourceAllocated(UResource* UpdatedResource)
  */
 void ASpiritPlant::ProduceResource()
 {
-	UResource* NewResource = UResource::Create(this);
+	UResource* NewResource = UResource::Create(ProductionType, this);
 	ProducedResources.Add(NewResource);
 	NewResource->OnFreed.AddDynamic(this, &ASpiritPlant::ResourceFreed);
 	NewResource->OnAllocated.AddDynamic(this, &ASpiritPlant::ResourceAllocated);

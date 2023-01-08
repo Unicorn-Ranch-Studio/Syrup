@@ -3,6 +3,7 @@
 #pragma once
 
 #include "Effects/TileEffectTrigger.h"
+#include "Resources/ResourceType.h"
 
 #include "CoreMinimal.h"
 #include "Tile.h"
@@ -16,7 +17,13 @@ UCLASS()
 class SYRUP_API ASpiritPlant : public ATile, public IResourceFaucet
 {
 	GENERATED_BODY()
-	
+
+protected:
+    //The type of resource produced by this.
+    UPROPERTY(EditAnywhere, BlueprintReadOnly)
+    EResourceType ProductionType = EResourceType::Any;
+
+private:
     /**
      * Creates a resource.
      */
@@ -40,7 +47,6 @@ class SYRUP_API ASpiritPlant : public ATile, public IResourceFaucet
     UPROPERTY(BlueprintAssignable)
     FFaucetUpdated OnProductionChanged;
 
-private:
     /**
      * Destroys the freed resource.
      * 

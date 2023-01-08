@@ -305,31 +305,46 @@ TSet<FIntPoint> APlant::GetEffectLocations() const
 /**
  * Gets whether or not this can grow more health.
  *
+ * @param Resource - The resource that would be allocated.
+ *
  * @return Whether or not this can grow more health.
  */
-bool APlant::CanGrowHealth() const
+bool APlant::CanGrowHealth(UResource* Resource) const
 {
-	return NumHealthGrowing < HealthGrowthPerTurn * HealthPerResource && Health + NumHealthGrowing < GetMaxHealth();
+	return IsValid(Resource)
+		&& (HealthGrowthResource == Resource->GetType() || HealthGrowthResource == EResourceType::Any || Resource->GetType() == EResourceType::Any) 
+		&& NumHealthGrowing < HealthGrowthPerTurn * HealthPerResource 
+		&& Health + NumHealthGrowing < GetMaxHealth();
 }
 
 /**
  * Gets whether or not this can grow more range.
  *
+ * @param Resource - The resource that would be allocated.
+ *
  * @return Whether or not this can grow more range.
  */
-bool APlant::CanGrowRange() const
+bool APlant::CanGrowRange(UResource* Resource) const
 {
-	return NumRangeGrowing < RangeGrowthPerTurn * RangePerResource && Range + NumRangeGrowing < GetMaxRange();
+	return IsValid(Resource)
+		&& (RangeGrowthResource == Resource->GetType() || RangeGrowthResource == EResourceType::Any || Resource->GetType() == EResourceType::Any)
+		&& NumRangeGrowing < RangeGrowthPerTurn * RangePerResource 
+		&& Range + NumRangeGrowing < GetMaxRange();
 }
 
 /**
  * Gets whether or not this can grow more production.
  *
+ * @param Resource - The resource that would be allocated.
+ * 
  * @return Whether or not this can grow more production.
  */
-bool APlant::CanGrowProduction() const
+bool APlant::CanGrowProduction(UResource* Resource) const
 {
-	return NumProductionGrowing < ProductionGrowthPerTurn * ProductionPerResource && Production + NumProductionGrowing < GetMaxProduction();
+	return IsValid(Resource)
+		&& (ProductionGrowthResource == Resource->GetType() || ProductionGrowthResource == EResourceType::Any || Resource->GetType() == EResourceType::Any)
+		&& NumProductionGrowing < ProductionGrowthPerTurn * ProductionPerResource 
+		&& Production + NumProductionGrowing < GetMaxProduction();
 }
 
 /**
@@ -341,7 +356,7 @@ bool APlant::CanGrowProduction() const
  */
 bool APlant::GrowHealth(UResource* Resource)
 {
-	if (!CanGrowHealth())
+	if (!CanGrowHealth(Resource))
 	{
 		return false;
 	}
@@ -361,7 +376,7 @@ bool APlant::GrowHealth(UResource* Resource)
  */
 bool APlant::GrowRange(UResource* Resource)
 {
-	if (!CanGrowRange())
+	if (!CanGrowRange(Resource))
 	{
 		return false;
 	}
@@ -381,7 +396,7 @@ bool APlant::GrowRange(UResource* Resource)
  */
 bool APlant::GrowProduction(UResource* Resource)
 {
-	if (!CanGrowProduction())
+	if (!CanGrowProduction(Resource))
 	{
 		return false;
 	}
@@ -402,7 +417,7 @@ void APlant::SetProduction_Implementation(int NewProduction)
 	NewProduction = FMath::Max(0, NewProduction);
 	while (ProducedResources.Num() < NewProduction)
 	{
-		ProducedResources.Add(UResource::Create(this));
+		ProducedResources.Add(UResource::Create(ProductionType, this));
 		Production++;
 	}
 

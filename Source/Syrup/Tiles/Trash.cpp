@@ -161,31 +161,46 @@ TSet<FIntPoint> ATrash::GetEffectLocations() const
 /**
  * Gets whether or not this can lose more damage.
  *
+ * @param Resource - The resource that would be allocated.
+ *
  * @return Whether or not this can lose more damage.
  */
-bool ATrash::CanDecayDamage() const
+bool ATrash::CanDecayDamage(UResource* Resource) const
 {
-	return GetDamage() - NumDamageDecaying > MinDamage && NumDamageDecaying < DamageDecayPerTurn * DamagePerResource;
+	return IsValid(Resource)
+		&& (DamageDecayResource == Resource->GetType() || DamageDecayResource == EResourceType::Any || Resource->GetType() == EResourceType::Any)
+		&& GetDamage() - NumDamageDecaying > MinDamage 
+		&& NumDamageDecaying < DamageDecayPerTurn * DamagePerResource;
 }
 
 /**
  * Gets whether or not this can lose more range.
  *
+ * @param Resource - The resource that would be allocated.
+ *
  * @return Whether or not this can lose more range.
  */
-bool ATrash::CanDecayRange() const
+bool ATrash::CanDecayRange(UResource* Resource) const
 {
-	return GetRange() - NumRangeDecaying > MinRange && NumRangeDecaying < RangeDecayPerTurn * RangePerResource;
+	return IsValid(Resource)
+		&& (RangeDecayResource == Resource->GetType() || RangeDecayResource == EResourceType::Any || Resource->GetType() == EResourceType::Any)
+		&& GetRange() - NumRangeDecaying > MinRange 
+		&& NumRangeDecaying < RangeDecayPerTurn * RangePerResource;
 }
 
 /**
  * Gets whether or not this can lose more pickup cost.
  *
+ * @param Resource - The resource that would be allocated.
+ *
  * @return Whether or not this can lose more pickup cost.
  */
-bool ATrash::CanDecayPickupCost() const
+bool ATrash::CanDecayPickupCost(UResource* Resource) const
 {
-	return GetPickUpCost() - NumPickupCostDecaying > MinPickUpCost && NumPickupCostDecaying < PickUpCostDecayPerTurn * PickUpCostPerResource;
+	return IsValid(Resource)
+		&& (PickUpCostDecayResource == Resource->GetType() || PickUpCostDecayResource == EResourceType::Any || Resource->GetType() == EResourceType::Any)
+		&& GetPickUpCost() - NumPickupCostDecaying > MinPickUpCost 
+		&& NumPickupCostDecaying < PickUpCostDecayPerTurn * PickUpCostPerResource;
 }
 
 /**
@@ -197,7 +212,7 @@ bool ATrash::CanDecayPickupCost() const
  */
 bool ATrash::DecayDamage(UResource* Resource)
 {
-	if (CanDecayDamage())
+	if (CanDecayDamage(Resource))
 	{
 		NumDamageDecaying = FMath::Min(NumDamageDecaying + DamagePerResource, Damage - MinDamage);
 		Resource->Allocate(this, EResourceAllocationType::TrashDamage);
@@ -215,7 +230,7 @@ bool ATrash::DecayDamage(UResource* Resource)
  */
 bool ATrash::DecayRange(UResource* Resource)
 {
-	if (CanDecayRange())
+	if (CanDecayRange(Resource))
 	{
 		NumRangeDecaying = FMath::Min(NumRangeDecaying + RangePerResource, Range - MinRange);
 		Resource->Allocate(this, EResourceAllocationType::TrashRange);
@@ -233,7 +248,7 @@ bool ATrash::DecayRange(UResource* Resource)
  */
 bool ATrash::DecayPickupCost(UResource* Resource)
 {
-	if (CanDecayPickupCost())
+	if (CanDecayPickupCost(Resource))
 	{
 		NumPickupCostDecaying = FMath::Min(NumPickupCostDecaying + PickUpCostPerResource, PickUpCost - MinPickUpCost);
 		Resource->Allocate(this, EResourceAllocationType::TrashCost);

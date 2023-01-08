@@ -15,30 +15,31 @@ DEFINE_LOG_CATEGORY(LogResource);
  *
  * @return The resource that was created.
  */
-UResource* UResource::Create(TScriptInterface<IResourceFaucet> Faucet, TSubclassOf<UResource> Class)
+UResource* UResource::Create(EResourceType ResourceType, TScriptInterface<IResourceFaucet> Faucet, TSubclassOf<UResource> Class)
 {
 	if (!IsValid(Faucet.GetObject())) {
 		return nullptr;
 	}
 
-	UResource* NewResouce = NewObject<UResource>(Class);
-	NewResouce->FaucetCreatedby = Faucet;
-	return NewResouce;
+	UResource* NewResource = NewObject<UResource>(Class);
+	NewResource->FaucetCreatedby = Faucet;
+	NewResource->Type = ResourceType;
+	return NewResource;
 }
-UResource* UResource::Create(TScriptInterface<IResourceFaucet> Faucet)
+UResource* UResource::Create(EResourceType ResourceType, TScriptInterface<IResourceFaucet> Faucet)
 {
-	return Create(Faucet, UResource::StaticClass());
+	return Create(ResourceType, Faucet, UResource::StaticClass());
 }
 
 /**
  * Allocates this resource.
  *
  * @param LinedSink - The sink to allocate this to.
- * @param Type - The kind of allocation this was.
+ * @param TypeOfAllocation - The kind of allocation this was.
  *
  * @return Whether this allocation was successful.
  */
-bool UResource::Allocate(TScriptInterface<IResourceSink> LinkedSink, EResourceAllocationType Type)
+bool UResource::Allocate(TScriptInterface<IResourceSink> LinkedSink, EResourceAllocationType TypeOfAllocation)
 {
 	if (!IsValid(FaucetCreatedby.GetObject()))
 	{
@@ -52,7 +53,7 @@ bool UResource::Allocate(TScriptInterface<IResourceSink> LinkedSink, EResourceAl
 		return false;
 	}
 
-	if (Type == EResourceAllocationType::NotAllocated)
+	if (TypeOfAllocation == EResourceAllocationType::NotAllocated)
 	{
 		UE_LOG(LogResource, Error, TEXT("Cannot allocate resource to NotAllocated. Use Free() to unallocated resources."));
 		return false;
@@ -64,7 +65,7 @@ bool UResource::Allocate(TScriptInterface<IResourceSink> LinkedSink, EResourceAl
 	}
 
 	SinkAllocatedTo = LinkedSink;
-	AllocationType = Type;
+	AllocationType = TypeOfAllocation;
 	OnAllocated.Broadcast(this);
 	return true;
 }

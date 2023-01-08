@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "ResourceType.h"
 #include "ResourceAllocationType.h"
 #include "ResourceSink.h"
 #include "ResourceFaucet.h"
@@ -31,25 +32,26 @@ public:
 	/**
 	 * Creates a resource.
 	 * 
+	 * @param ResourceType - The type of resource to create.
 	 * @param Faucet - The faucet that is suppling the sink. Must not be null.
 	 * @param Class - The class of resource to create.
 	 * 
 	 * @return The resource that was created.
 	 */
 	UFUNCTION(BlueprintCallable)
-	static UResource* Create(TScriptInterface<IResourceFaucet> Faucet, TSubclassOf<UResource> Class);
-	static UResource* Create(TScriptInterface<IResourceFaucet> Faucet);
+	static UResource* Create(EResourceType ResourceType, TScriptInterface<IResourceFaucet> Faucet, TSubclassOf<UResource> Class);
+	static UResource* Create(EResourceType ResourceType, TScriptInterface<IResourceFaucet> Faucet);
 
 	/**
 	 * Allocates this resource.
 	 * 
 	 * @param LinedSink - The sink to allocate this to.
-	 * @param Type - The kind of allocation this was.
+	 * @param TypeOfAllocation - The kind of allocation this was.
 	 * 
 	 * @return Whether this allocation was successful.
 	 */
 	UFUNCTION()
-	bool Allocate(TScriptInterface<IResourceSink> LinkedSink, EResourceAllocationType Type);
+	bool Allocate(TScriptInterface<IResourceSink> LinkedSink, EResourceAllocationType TypeOfAllocation);
 
 	/**
 	 * Unallocates this resource.
@@ -97,6 +99,14 @@ public:
 	UFUNCTION(BlueprintPure)
 	EResourceAllocationType GetAllocationType() const;
 
+	/**
+	 * Gets type of resource that this is.
+	 *
+	 * @return The type of resource that this is.
+	 */
+	UFUNCTION(BlueprintPure)
+	FORCEINLINE EResourceType GetType() const { return Type; };
+
 	//Called when this is freed.
 	UPROPERTY(BlueprintAssignable)
 	FResourceUpdate OnFreed;
@@ -117,6 +127,10 @@ private:
 	//The way this has been allocated.
 	UPROPERTY()
 	EResourceAllocationType AllocationType = EResourceAllocationType::NotAllocated;
+
+	//The type of this resource
+	UPROPERTY()
+	EResourceType Type = EResourceType::Any;
 };
 /* /\ ======== /\ *\
 |  /\ Resource /\  |

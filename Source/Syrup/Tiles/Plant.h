@@ -6,6 +6,7 @@
 #include "CoreMinimal.h"
 #include "Tile.h"
 #include "Resources/ResourceFaucet.h"
+#include "Resources/ResourceType.h"
 #include "Resources/ResourceSink.h"
 #include "Plant.generated.h"
 
@@ -105,6 +106,30 @@ public:
 	 */
 	UFUNCTION(BlueprintPure, Category = "Plant|Health")
 	FORCEINLINE int GetMaxHealth() const { return Cast<APlant>(GetClass()->GetDefaultObject())->Health; };
+	
+	/**
+	 * Gets the health gained per allocated resource.
+	 * 
+	 * @return The health gained per allocated resource.
+	 */
+	UFUNCTION(BlueprintPure, Category = "Plant|Health")
+	FORCEINLINE int GetHealthPerResource() const { return HealthPerResource; };
+	
+	/**
+	 * Gets the number of times health can be grown per turn.
+	 * 
+	 * @return The number of times health can be grown per turn.
+	 */
+	UFUNCTION(BlueprintPure, Category = "Plant|Health")
+	FORCEINLINE int GetHealthGrowthPerTurn() const { return HealthGrowthPerTurn; };
+	
+	/**
+	 * Gets the type of resource needed to grow health.
+	 * 
+	 * @return The type of resource needed to grow health.
+	 */
+	UFUNCTION(BlueprintPure, Category = "Plant|Health")
+	FORCEINLINE EResourceType GetHealthGrowthResource() const { return HealthGrowthResource; };
 
 	/**
 	 * Causes the effects of this plants death.
@@ -128,6 +153,10 @@ protected:
 	//The number of times health can be grown per turn.
 	UPROPERTY(EditDefaultsOnly, Category = "Plant|Health", Meta = (ClampMin = "1"))
 	int HealthGrowthPerTurn = 1;
+
+	//The type of resource needed to grow health.
+	UPROPERTY(EditDefaultsOnly, Category = "Plant|Health")
+	EResourceType HealthGrowthResource = EResourceType::Any;
 
 	//The damage taken by this plant.
 	UPROPERTY(VisibleInstanceOnly)
@@ -158,27 +187,33 @@ public:
 
 	/**
 	 * Gets whether or not this can grow more health.
+	 *
+	 * @param Resource - The resource that would be allocated.	
 	 * 
 	 * @return Whether or not this can grow more health.
 	 */
 	UFUNCTION(BlueprintPure, Category = "Plant|Growth|Upgrades")
-	bool CanGrowHealth() const;
+	bool CanGrowHealth(UResource* Resource) const;
 
 	/**
 	 * Gets whether or not this can grow more range.
 	 *
+	 * @param Resource - The resource that would be allocated.	
+	 *
 	 * @return Whether or not this can grow more range.
 	 */
 	UFUNCTION(BlueprintPure, Category = "Plant|Growth|Upgrades")
-	bool CanGrowRange() const;
+	bool CanGrowRange(UResource* Resource) const;
 
 	/**
 	 * Gets whether or not this can grow more production.
 	 *
+	 * @param Resource - The resource that would be allocated.	
+	 *
 	 * @return Whether or not this can grow more production.
 	 */
 	UFUNCTION(BlueprintPure, Category = "Plant|Growth|Upgrades")
-	bool CanGrowProduction() const;
+	bool CanGrowProduction(UResource* Resource) const;
 
 	/**
 	 * Causes this plant to grow more health, and allocates the given resource.
@@ -310,6 +345,30 @@ public:
 	 */
 	UFUNCTION(BlueprintPure, Category = "Plant|Effect")
 	FORCEINLINE int GetMaxRange() const { return Cast<APlant>(GetClass()->GetDefaultObject())->Range; };
+	
+	/**
+	 * Gets the range gained per allocated resource.
+	 * 
+	 * @return The range gained per allocated resource.
+	 */
+	UFUNCTION(BlueprintPure, Category = "Plant|Effect")
+	FORCEINLINE int GetRangePerResource() const { return RangePerResource; };
+	
+	/**
+	 * Gets the number of times range can be grown per turn.
+	 * 
+	 * @return The number of times range can be grown per turn.
+	 */
+	UFUNCTION(BlueprintPure, Category = "Plant|Effect")
+	FORCEINLINE int GetRangeGrowthPerTurn() const { return RangeGrowthPerTurn; };
+	
+	/**
+	 * Gets the type of resource needed to grow range.
+	 * 
+	 * @return The type of resource needed to grow range.
+	 */
+	UFUNCTION(BlueprintPure, Category = "Plant|Effect")
+	FORCEINLINE EResourceType GetRangeGrowthResource() const { return RangeGrowthResource; };
 
 protected:
 
@@ -328,6 +387,10 @@ protected:
 	//The number of times range can be grown per turn.
 	UPROPERTY(EditDefaultsOnly, Category = "Plant|Effect", Meta = (ClampMin = "1"))
 	int RangeGrowthPerTurn = 1;
+
+	//The type of resource needed to grow Range.
+	UPROPERTY(EditDefaultsOnly, Category = "Plant|Effect")
+	EResourceType RangeGrowthResource = EResourceType::Any;
 
 private:
 
@@ -380,6 +443,38 @@ public:
 	 */
 	UFUNCTION(BlueprintPure, Category = "Plant|Resources")
 	FORCEINLINE int GetMaxProduction() const { return Cast<APlant>(GetClass()->GetDefaultObject())->Production; };
+	
+	/**
+	 * Gets the production gained per allocated resource.
+	 * 
+	 * @return The production gained per allocated resource.
+	 */
+	UFUNCTION(BlueprintPure, Category = "Plant|Resources")
+	FORCEINLINE int GetProductionPerResource() const { return ProductionPerResource; };
+	
+	/**
+	 * Gets the number of times production can be grown per turn.
+	 * 
+	 * @return The number of times production can be grown per turn.
+	 */
+	UFUNCTION(BlueprintPure, Category = "Plant|Resources")
+	FORCEINLINE int GetProductionGrowthPerTurn() const { return ProductionGrowthPerTurn; };
+	
+	/**
+	 * Gets the type of resource needed to grow production.
+	 * 
+	 * @return The type of resource needed to grow production.
+	 */
+	UFUNCTION(BlueprintPure, Category = "Plant|Resources")
+	FORCEINLINE EResourceType GetProductionGrowthResource() const { return ProductionGrowthResource; };
+
+	/**
+	 * Gets the type of resource produced by this plant.
+	 * 
+	 * @return The type  of resource produced by this plant.
+	 */
+	UFUNCTION(BlueprintPure, Category = "Plant|Resources")
+	FORCEINLINE EResourceType GetProductionType() const { return ProductionType; };
 
 	/**
 	 * Gets the grid locations that this sink takes up.
@@ -423,17 +518,25 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Plant|Resources", Meta = (ClampMin = "0"))
 	int Production = 2;
 
-	//The range this plant starts with.
+	//The production this plant starts with.
 	UPROPERTY(EditDefaultsOnly, Category = "Plant|Resources", Meta = (ClampMin = "0"))
 	int InitialProduction = 0;
 
-	//The range gained per resource allocation.
+	//The production gained per resource allocation.
 	UPROPERTY(EditDefaultsOnly, Category = "Plant|Resources", Meta = (ClampMin = "1"))
 	int ProductionPerResource = 2;
 
-	//The number of times range can be grown per turn.
+	//The number of times production can be grown per turn.
 	UPROPERTY(EditDefaultsOnly, Category = "Plant|Resources", Meta = (ClampMin = "1"))
 	int ProductionGrowthPerTurn = 1;
+
+	//The type of resource needed to grow production.
+	UPROPERTY(EditDefaultsOnly, Category = "Plant|Resources")
+	EResourceType ProductionGrowthResource = EResourceType::Any;
+
+	//The type of resource produced by this.
+	UPROPERTY(EditDefaultsOnly, Category = "Plant|Resources")
+	EResourceType ProductionType = EResourceType::Any;
 
 private:
 	//The resources produced by this.
