@@ -51,7 +51,7 @@ public:
 	 * @return Whether this allocation was successful.
 	 */
 	UFUNCTION()
-	bool Allocate(TScriptInterface<IResourceSink> LinkedSink, EResourceAllocationType TypeOfAllocation);
+	bool Allocate(UResourceSink* LinkedSink, EResourceAllocationType TypeOfAllocation);
 
 	/**
 	 * Unallocates this resource.
@@ -73,7 +73,7 @@ public:
 	 * @return Whether this can be allocated to the given sink.
 	 */
 	UFUNCTION(BlueprintPure)
-	bool CanAllocateTo(TScriptInterface<IResourceSink> LinkedSink) const;
+	bool CanAllocateTo(UResourceSink* LinkedSink) const;
 
 	/**
 	 * Gets the sink this is allocated to.
@@ -81,7 +81,7 @@ public:
 	 * @param ReturnValue - The sink this is allocated to. Nullptr if unallocated.
 	 */
 	UFUNCTION(BlueprintPure)
-	void GetLinkedSink(TScriptInterface<IResourceSink>& ReturnValue) const;
+	UResourceSink* GetLinkedSink() const;
 
 	/**
 	 * Gets the faucet this is being supplied by.
@@ -118,7 +118,7 @@ public:
 private:
 	//The sink this is allocated to. Nullptr if unallocated.
 	UPROPERTY()
-	TScriptInterface<IResourceSink> SinkAllocatedTo = nullptr;
+	UResourceSink* SinkAllocatedTo = nullptr;
 	
 	//The faucet this supplied by. Should never be null.
 	UPROPERTY()

@@ -361,7 +361,7 @@ bool APlant::GrowHealth(UResource* Resource)
 		return false;
 	}
 
-	Resource->Allocate(this, EResourceAllocationType::PlantHealth);
+//	Resource->Allocate(this, EResourceAllocationType::PlantHealth);
 	AllocatedResources.Add(Resource);
 	NumHealthGrowing = FMath::Min(NumHealthGrowing + HealthPerResource, HealthGrowthPerTurn * HealthPerResource);
 	return true;
@@ -381,7 +381,7 @@ bool APlant::GrowRange(UResource* Resource)
 		return false;
 	}
 
-	Resource->Allocate(this, EResourceAllocationType::PlantRange);
+//	Resource->Allocate(this, EResourceAllocationType::PlantRange);
 	AllocatedResources.Add(Resource);
 	NumRangeGrowing = FMath::Min(NumRangeGrowing + RangePerResource, RangeGrowthPerTurn * RangePerResource);
 	return true;
@@ -401,7 +401,7 @@ bool APlant::GrowProduction(UResource* Resource)
 		return false;
 	}
 
-	Resource->Allocate(this, EResourceAllocationType::PlantProduction);
+//	Resource->Allocate(this, EResourceAllocationType::PlantProduction);
 	AllocatedResources.Add(Resource);
 	NumProductionGrowing = FMath::Min(NumProductionGrowing + ProductionPerResource, ProductionGrowthPerTurn * ProductionPerResource);
 	return true;

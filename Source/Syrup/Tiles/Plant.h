@@ -23,7 +23,7 @@ DECLARE_LOG_CATEGORY_EXTERN(LogPlant, Log, All);
  * A plant on the grid that grows, can take damage, and creates a protection range.
  */
 UCLASS(Abstract, HideCategories = ("ActorTick", "Tile", "Replication", "Rendering", "Collision", "Actor", "Input", "HLOD", "WorldPartition", "Cooking", "DataLayers"))
-class SYRUP_API APlant : public ATile, public IResourceSink, public IResourceFaucet
+class SYRUP_API APlant : public ATile, public IResourceFaucet
 {
 	GENERATED_BODY()
 
@@ -479,9 +479,9 @@ public:
 	/**
 	 * Gets the grid locations that this sink takes up.
 	 *
-	 * @return The grid locations that this sink takes up
+	 * @return The grid locations that this sink takes up///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	 */
-	virtual FORCEINLINE TSet<FIntPoint> GetAllocationLocations() const override { return GetSubTileLocations(); };
+	virtual FORCEINLINE TSet<FIntPoint> GetAllocationLocations() const { return GetSubTileLocations(); };
 
 	/**
 	 * Gets all the resources supplied by this plant.
@@ -501,16 +501,16 @@ public:
 	/**
 	 * Gets all the resources allocated to this.
 	 *
-	 * @return The resources allocated to this.
+	 * @return The resources allocated to this.///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	 */
-	virtual FORCEINLINE TArray<UResource*> GetAllocatedResources() const override { return AllocatedResources; };
+	virtual FORCEINLINE TArray<UResource*> GetAllocatedResources() const { return AllocatedResources; };
 
 	/**
 	 * Undoes the effect of a resource that was sunk in this.
 	 *
-	 * @param FreedResource - The resource that was freed.
+	 * @param FreedResource - The resource that was freed.///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	 */
-	virtual void ResourceFreed(UResource* FreedResource) override;
+	virtual void ResourceFreed(UResource* FreedResource);
 
 protected:
 	

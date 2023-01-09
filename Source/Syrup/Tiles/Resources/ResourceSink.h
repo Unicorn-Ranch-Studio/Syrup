@@ -2,11 +2,19 @@
 
 #pragma once
 
-#include "ResourceAllocationType.h"
+#include "ResourceSinkAmountData.h"
 
 #include "ResourceSink.generated.h"
 
 class UResource;
+
+UDELEGATE(BlueprintPure)
+DECLARE_DYNAMIC_DELEGATE_RetVal(TSet<FIntPoint>, FSinkLocationsDelegate);
+
+UDELEGATE(BlueprintPure)
+DECLARE_DYNAMIC_DELEGATE_RetVal(int, FSinkAmountDelegate);
+
+DECLARE_DYNAMIC_DELEGATE_OneParam(FSinkAmountUpdateDelegate, int, NewAmount);
 
  /* \/ ============ \/ *\
  |  \/ ResourceSink \/  |
@@ -14,25 +22,14 @@ class UResource;
 /**
  * Something that can consume resources. A sink handle when resources are allocated to itself.
  */
-UINTERFACE(BlueprintType, MinimalAPI, Meta = (CannotImplementInterfaceInBlueprint))
-class UResourceSink : public UInterface
-{
-    GENERATED_BODY()
-};
-
-class IResourceSink
+UCLASS(BlueprintType, CustomConstructor)
+class UResourceSink : public UActorComponent
 {
     GENERATED_BODY()
 
 public:
-
-    /**
-     * Gets the grid locations that this sink takes up.
-     *
-     * @return The grid locations that this sink takes up
-     */
-    UFUNCTION(BlueprintPure, Category = "Resources")
-    virtual TSet<FIntPoint> GetAllocationLocations() const = 0;
+    UFUNCTION(BlueprintCallable)
+    static UResourceSink* AddResourceSinkComponent(AActor* Owner, FResourceSinkAmountData SinkAmountData, const FSinkAmountUpdateDelegate& UpdateCallback, const FSinkLocationsDelegate& GetLocations, const FSinkAmountDelegate& GetAmount);
 
     /**
      * Gets all the resources allocated to this.
@@ -40,14 +37,38 @@ public:
      * @return The resources allocated to this.
      */
     UFUNCTION(BlueprintPure, Category = "Resources")
-    virtual TArray<UResource*> GetAllocatedResources() const = 0;
+    virtual FORCEINLINE TArray<UResource*> GetAllocatedResources() const { return AllocatedResources; };
+    
+    /**
+     * Undoes the effect of a resource that was sunk in this.
+     *
+     * @param FreedResource - The resource that was freed.
+     */
+    UFUNCTION(BlueprintCallable, Category = "Resources")
+    virtual void AllocateResource(UResource* FreedResource);
 
     /**
      * Undoes the effect of a resource that was sunk in this.
      *
      * @param FreedResource - The resource that was freed.
      */
-    virtual void ResourceFreed(UResource* FreedResource) = 0;
+    UFUNCTION(BlueprintCallable, Category = "Resources")
+    virtual void FreeResource(UResource* FreedResource);
+
+    UPROPERTY()
+    FSinkLocationsDelegate GetAllocationLocations;
+
+    UPROPERTY()
+    FSinkAmountDelegate GetAllocatedAmount;
+
+private:
+    TArray<UResource*> AllocatedResources;
+
+    UPROPERTY()
+    FSinkAmountUpdateDelegate OnAmountChanged;
+
+    UPROPERTY()
+    FResourceSinkAmountData AmountData;
 };
 /* /\ ============ /\ *\
 |  /\ ResourceSink /\  |

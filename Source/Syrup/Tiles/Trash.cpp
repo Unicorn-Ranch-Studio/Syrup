@@ -215,7 +215,7 @@ bool ATrash::DecayDamage(UResource* Resource)
 	if (CanDecayDamage(Resource))
 	{
 		NumDamageDecaying = FMath::Min(NumDamageDecaying + DamagePerResource, Damage - MinDamage);
-		Resource->Allocate(this, EResourceAllocationType::TrashDamage);
+		//Resource->Allocate(this, EResourceAllocationType::TrashDamage);
 		return true;
 	}
 	return false;
@@ -233,7 +233,7 @@ bool ATrash::DecayRange(UResource* Resource)
 	if (CanDecayRange(Resource))
 	{
 		NumRangeDecaying = FMath::Min(NumRangeDecaying + RangePerResource, Range - MinRange);
-		Resource->Allocate(this, EResourceAllocationType::TrashRange);
+		//Resource->Allocate(this, EResourceAllocationType::TrashRange);
 		return true;
 	}
 	return false;
@@ -251,7 +251,7 @@ bool ATrash::DecayPickupCost(UResource* Resource)
 	if (CanDecayPickupCost(Resource))
 	{
 		NumPickupCostDecaying = FMath::Min(NumPickupCostDecaying + PickUpCostPerResource, PickUpCost - MinPickUpCost);
-		Resource->Allocate(this, EResourceAllocationType::TrashCost);
+		//Resource->Allocate(this, EResourceAllocationType::TrashCost);
 		return true;
 	}
 	return false;

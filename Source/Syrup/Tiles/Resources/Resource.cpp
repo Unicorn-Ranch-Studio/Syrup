@@ -39,7 +39,7 @@ UResource* UResource::Create(EResourceType ResourceType, TScriptInterface<IResou
  *
  * @return Whether this allocation was successful.
  */
-bool UResource::Allocate(TScriptInterface<IResourceSink> LinkedSink, EResourceAllocationType TypeOfAllocation)
+bool UResource::Allocate(UResourceSink* LinkedSink, EResourceAllocationType TypeOfAllocation)
 {
 	if (!IsValid(FaucetCreatedby.GetObject()))
 	{
@@ -47,7 +47,7 @@ bool UResource::Allocate(TScriptInterface<IResourceSink> LinkedSink, EResourceAl
 		return false;
 	}
 
-	if (!IsValid(LinkedSink.GetObject()))
+	if (!IsValid(LinkedSink))
 	{
 		UE_LOG(LogResource, Error, TEXT("Invalid Sink"));
 		return false;
@@ -75,9 +75,9 @@ bool UResource::Allocate(TScriptInterface<IResourceSink> LinkedSink, EResourceAl
  */
 void UResource::Free()
 {
-	if (IsValid(SinkAllocatedTo.GetObject()))
+	if (IsValid(SinkAllocatedTo))
 	{
-		SinkAllocatedTo->ResourceFreed(this);
+		SinkAllocatedTo->FreeResource(this);
 	}
 
 	SinkAllocatedTo = nullptr;
@@ -92,7 +92,7 @@ void UResource::Free()
  */
 bool UResource::IsAllocated() const
 {
-	return IsValid(SinkAllocatedTo.GetObject());
+	return IsValid(SinkAllocatedTo);
 }
 
 /**
@@ -100,14 +100,14 @@ bool UResource::IsAllocated() const
  *
  * @return Whether this can be allocated to the given sink.
  */
-bool UResource::CanAllocateTo(TScriptInterface<IResourceSink> LinkedSink) const
+bool UResource::CanAllocateTo(UResourceSink* LinkedSink) const
 {
-	if (IsAllocated() || !IsValid(FaucetCreatedby.GetObject()) || !IsValid(LinkedSink.GetObject()) || LinkedSink.GetObject() == FaucetCreatedby.GetObject())
+	if (IsAllocated() || !IsValid(FaucetCreatedby.GetObject()) || !IsValid(LinkedSink) || LinkedSink->GetOwner() == FaucetCreatedby.GetObject())
 	{
 		return false;
 	}
 
-	for (FIntPoint EachAllocationLocation : LinkedSink->GetAllocationLocations())
+	for (FIntPoint EachAllocationLocation : LinkedSink->GetAllocationLocations.Execute())
 	{
 		if (FaucetCreatedby->GetAllocatableLocations().Contains(EachAllocationLocation))
 		{
@@ -123,9 +123,9 @@ bool UResource::CanAllocateTo(TScriptInterface<IResourceSink> LinkedSink) const
  *
  * @param ReturnValue - The sink this is allocated to. Nullptr if unallocated.
  */
-void UResource::GetLinkedSink(TScriptInterface<IResourceSink>& ReturnValue) const
+UResourceSink* UResource::GetLinkedSink() const
 {
-	ReturnValue = SinkAllocatedTo;
+	return SinkAllocatedTo;
 }
 
 
