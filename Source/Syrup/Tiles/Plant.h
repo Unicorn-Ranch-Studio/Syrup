@@ -99,37 +99,37 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Plant|Health")	
 	FORCEINLINE int GetDamageTaken() const { return DamageTaken; };
 
-	/**
-	 * Gets the max health of this plant type.
-	 * 
-	 * @return The number of damage points a plant of this type can take before dying.
-	 */
-	UFUNCTION(BlueprintPure, Category = "Plant|Health")
-	FORCEINLINE int GetMaxHealth() const { return Cast<APlant>(GetClass()->GetDefaultObject())->Health; };
-	
-	/**
-	 * Gets the health gained per allocated resource.
-	 * 
-	 * @return The health gained per allocated resource.
-	 */
-	UFUNCTION(BlueprintPure, Category = "Plant|Health")
-	FORCEINLINE int GetHealthPerResource() const { return HealthPerResource; };
-	
-	/**
-	 * Gets the number of times health can be grown per turn.
-	 * 
-	 * @return The number of times health can be grown per turn.
-	 */
-	UFUNCTION(BlueprintPure, Category = "Plant|Health")
-	FORCEINLINE int GetHealthGrowthPerTurn() const { return HealthGrowthPerTurn; };
-	
-	/**
-	 * Gets the type of resource needed to grow health.
-	 * 
-	 * @return The type of resource needed to grow health.
-	 */
-	UFUNCTION(BlueprintPure, Category = "Plant|Health")
-	FORCEINLINE EResourceType GetHealthGrowthResource() const { return HealthGrowthResource; };
+	///**
+	// * Gets the max health of this plant type.
+	// * 
+	// * @return The number of damage points a plant of this type can take before dying.
+	// */
+	//UFUNCTION(BlueprintPure, Category = "Plant|Health")
+	//FORCEINLINE int GetMaxHealth() const { return Cast<APlant>(GetClass()->GetDefaultObject())->Health; };
+	//
+	///**
+	// * Gets the health gained per allocated resource.
+	// * 
+	// * @return The health gained per allocated resource.
+	// */
+	//UFUNCTION(BlueprintPure, Category = "Plant|Health")
+	//FORCEINLINE int GetHealthPerResource() const { return HealthPerResource; };
+	//
+	///**
+	// * Gets the number of times health can be grown per turn.
+	// * 
+	// * @return The number of times health can be grown per turn.
+	// */
+	//UFUNCTION(BlueprintPure, Category = "Plant|Health")
+	//FORCEINLINE int GetHealthGrowthPerTurn() const { return HealthGrowthPerTurn; };
+	//
+	///**
+	// * Gets the type of resource needed to grow health.
+	// * 
+	// * @return The type of resource needed to grow health.
+	// */
+	//UFUNCTION(BlueprintPure, Category = "Plant|Health")
+	//FORCEINLINE EResourceType GetHealthGrowthResource() const { return HealthGrowthResource; };
 
 	/**
 	 * Causes the effects of this plants death.
@@ -137,26 +137,15 @@ public:
 	void Die();
 
 protected:
-
-	//The maximum health of this plant.
-	UPROPERTY(EditDefaultsOnly, Category = "Plant|Health", Meta = (ClampMin = "1"))
-	int Health = 1;
-
-	//The health this plant starts with.
-	UPROPERTY(EditDefaultsOnly, Category = "Plant|Health", Meta = (ClampMin = "1"))
-	int InitialHealth = 1;
-
-	//The health gained per resource allocation.
-	UPROPERTY(EditDefaultsOnly, Category = "Plant|Health", Meta = (ClampMin = "1"))
-	int HealthPerResource = 1;
-
-	//The number of times health can be grown per turn.
-	UPROPERTY(EditDefaultsOnly, Category = "Plant|Health", Meta = (ClampMin = "1"))
-	int HealthGrowthPerTurn = 1;
-
-	//The type of resource needed to grow health.
+	//The various properties of the health of this plant.
 	UPROPERTY(EditDefaultsOnly, Category = "Plant|Health")
-	EResourceType HealthGrowthResource = EResourceType::Any;
+	FResourceSinkData HealthData;
+
+private:
+	//The current maximum health of this plant.
+	UPROPERTY(VisibleInstanceOnly, Category = "Plant|Health")
+	int Health = 0;
+
 
 	//The damage taken by this plant.
 	UPROPERTY(VisibleInstanceOnly)
@@ -185,15 +174,15 @@ public:
 	static bool SowPlant(UObject* WorldContextObject, TSubclassOf<APlant> PlantClass, FTransform Transform);
 	static bool SowPlant(UObject* WorldContextObject, TSubclassOf<APlant> PlantClass, FGridTransform Transform);
 
-	/**
-	 * Gets whether or not this can grow more health.
-	 *
-	 * @param Resource - The resource that would be allocated.	
-	 * 
-	 * @return Whether or not this can grow more health.
-	 */
-	UFUNCTION(BlueprintPure, Category = "Plant|Growth|Upgrades")
-	bool CanGrowHealth(UResource* Resource) const;
+	///**
+	// * Gets whether or not this can grow more health.
+	// *
+	// * @param Resource - The resource that would be allocated.	
+	// * 
+	// * @return Whether or not this can grow more health.
+	// */
+	//UFUNCTION(BlueprintPure, Category = "Plant|Growth|Upgrades")
+	//bool CanGrowHealth(UResource* Resource) const;
 
 	/**
 	 * Gets whether or not this can grow more range.
@@ -215,15 +204,15 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Plant|Growth|Upgrades")
 	bool CanGrowProduction(UResource* Resource) const;
 
-	/**
-	 * Causes this plant to grow more health, and allocates the given resource.
-	 * 
-	 * @param Resource - The resource used to grow this health.
-	 * 
-	 * @return Whether or not this was successful at growing more health.
-	 */
-	UFUNCTION(BlueprintCallable, Category = "Plant|Growth|Upgrades")
-	bool GrowHealth(UResource* Resource);
+	///**
+	// * Causes this plant to grow more health, and allocates the given resource.
+	// * 
+	// * @param Resource - The resource used to grow this health.
+	// * 
+	// * @return Whether or not this was successful at growing more health.
+	// */
+	//UFUNCTION(BlueprintCallable, Category = "Plant|Growth|Upgrades")
+	//bool GrowHealth(UResource* Resource);
 
 	/**
 	 * Causes this plant to grow more range, and allocates the given resource.

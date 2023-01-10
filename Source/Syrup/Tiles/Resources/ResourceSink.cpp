@@ -1,29 +1,68 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
+#include "Resource.h"
+#include "Syrup/Tiles/Effects/TileEffectTrigger.h"
+#include "Syrup/Systems/SyrupGameMode.h"
+
 #include "ResourceSink.h"
 
  /* \/ ============ \/ *\
  |  \/ ResourceSink \/  |
  \* \/ ============ \/ */
 
-UResourceSink* UResourceSink::AddResourceSinkComponent(AActor* Owner, FResourceSinkAmountData SinkAmountData, const FSinkAmountUpdateDelegate& UpdateCallback, const FSinkLocationsDelegate& GetLocations, const FSinkAmountDelegate& GetAmount)
+UResourceSink* UResourceSink::AddResourceSinkComponent(AActor* Owner, FResourceSinkData SinkData, const FSinkAmountUpdateDelegate& UpdateCallback, const FSinkLocationsDelegate& GetLocations, const FSinkAmountDelegate& GetAmount)
 {
 	UResourceSink* NewSink = Cast<UResourceSink>(Owner->AddComponentByClass(StaticClass(), false, FTransform(), false));
-	NewSink->AmountData = SinkAmountData;
+	NewSink->Data = SinkData;
 	NewSink->OnAmountChanged = UpdateCallback;
-	NewSink->GetAllocationLocations = GetLocations;
-	NewSink->GetAllocatedAmount = GetAmount;
+	NewSink->AllocationLocationsGetter = GetLocations;
+	NewSink->AllocatedAmountGetter = GetAmount;
+	
+	ASyrupGameMode::GetTileEffectTriggerDelegate(Owner).AddDynamic(NewSink, &UResourceSink::ReceiveEffectTrigger);
+	NewSink->OnAmountChanged.Execute(SinkData.IntialValue);
 
 	return NewSink;
 }
+
+/**
+ * Gets whether it is possible to allocate a resource to this.
+ *
+ * @param FreedResource - The resource to test.
+ *
+ * @return Whether it is possible to allocate the resource to this.
+ */
+bool UResourceSink::CanAllocateResource(UResource* FreedResource) const
+{
+	return IsValid(FreedResource) //Check validity
+		&& (!Data.bHasMaxIncrement || AllocatedResources.Num() < Data.MaxIncrements) //Check max increment
+		&& (!Data.bHasMaxIncrementmentsPerTurn || IncrementsThisTurn < Data.MaxIncrementmentsPerTurn) //Check per turn increment
+		&& (FreedResource->GetType() == Data.RequiredResourceType || FreedResource->GetType() == EResourceType::Any || Data.RequiredResourceType == EResourceType::Any); //Check resource type
+}
+
 /**
  * Undoes the effect of a resource that was sunk in this.
  *
- * @param FreedResource - The resource that was freed.
+ * @param ResourceToAllocate - The resource that was freed.
+ * 
+ * @return Whether or not the allocation was successful.
  */
-void UResourceSink::AllocateResource(UResource* FreedResource)
+bool UResourceSink::AllocateResource(UResource* ResourceToAllocate)
 {
+	if (!CanAllocateResource(ResourceToAllocate))
+	{
+		return false;
+	}
 
+	ResourceToAllocate->Allocate(this, Data.AllocationType);
+	if (Data.bDeferredIncrement)
+	{
+		IncrementsThisTurn++;
+	}
+	else
+	{
+		OnAmountChanged.Execute(GetAllocationAmount() + IncrementsThisTurn * Data.IncrementPerResource);
+	}
+	return true;
 }
 
 /**
@@ -33,7 +72,30 @@ void UResourceSink::AllocateResource(UResource* FreedResource)
  */
 void UResourceSink::FreeResource(UResource* FreedResource)
 {
+	FreedResource->Free();
+	if (IncrementsThisTurn)
+	{
+		IncrementsThisTurn--;
+	}
+	else
+	{
+		OnAmountChanged.Execute(GetAllocationAmount() - Data.IncrementPerResource);
+	}
+}
 
+/**
+ * Activates the appropriate effects given the trigger.
+ *
+ * @param TriggerType - The type of trigger that was activated.
+ * @param Triggerer - The tile that triggered this effect.
+ * @param LocationsToTrigger - The Locations where the trigger applies an effect. If this is empty all effect locations will be effected.
+ */
+void UResourceSink::ReceiveEffectTrigger(const ETileEffectTriggerType TriggerType, const ATile* Triggerer, const TSet<FIntPoint>& LocationsToTrigger)
+{
+	if (Data.bDeferredIncrement && TriggerType == Data.IncrementTrigger)
+	{
+		OnAmountChanged.Execute(GetAllocationAmount() + IncrementsThisTurn * Data.IncrementPerResource);
+	}
 }
 
 /* /\ ============ /\ *\

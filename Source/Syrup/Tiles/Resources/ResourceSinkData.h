@@ -3,9 +3,10 @@
 #pragma once
 
 #include "ResourceAllocationType.h"
+#include "Syrup/Tiles/Effects/TileEffectTrigger.h"
 #include "ResourceType.h"
 
-#include "ResourceSinkAmountData.generated.h"
+#include "ResourceSinkData.generated.h"
 
  /* \/ ====================== \/ *\
  |  \/ ResourceSinkAmountData \/  |
@@ -14,7 +15,7 @@
  * Something that can consume resources. A sink handle when resources are allocated to itself.
  */
 USTRUCT(BlueprintType)
-struct SYRUP_API FResourceSinkAmountData
+struct SYRUP_API FResourceSinkData
 {
     GENERATED_BODY()
 
@@ -29,7 +30,7 @@ struct SYRUP_API FResourceSinkAmountData
 
     //The type of resource needed to increment this.
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    EResourceType RequiredResource = EResourceType::Any;
+    EResourceType RequiredResourceType = EResourceType::Any;
 
     //Whether or not there is a maximum number of times this sink can be allocated to.
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (InlineEditConditionToggle))
@@ -46,6 +47,14 @@ struct SYRUP_API FResourceSinkAmountData
     //The number of times this can receive a resource per turn.
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (EditCondition = "bHasMaxIncrementmentsPerTurn"))
     int32 MaxIncrementmentsPerTurn = 1;
+
+    //Whether or not incrementing the amount of this sink should be deferred.
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (InlineEditConditionToggle))
+    bool bDeferredIncrement = true;
+
+    //When to cause the increment to occur.
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (EditCondition = "bDeferredIncrement"))
+    ETileEffectTriggerType IncrementTrigger = ETileEffectTriggerType::PlantsGrow;
 
     //The type to assign resources allocated to this. Can not be not allocated.
     UPROPERTY(EditAnywhere, BlueprintReadWrite)

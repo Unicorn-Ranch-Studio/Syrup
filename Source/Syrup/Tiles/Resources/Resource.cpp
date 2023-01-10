@@ -107,7 +107,7 @@ bool UResource::CanAllocateTo(UResourceSink* LinkedSink) const
 		return false;
 	}
 
-	for (FIntPoint EachAllocationLocation : LinkedSink->GetAllocationLocations.Execute())
+	for (FIntPoint EachAllocationLocation : LinkedSink->GetAllocationLocations())
 	{
 		if (FaucetCreatedby->GetAllocatableLocations().Contains(EachAllocationLocation))
 		{

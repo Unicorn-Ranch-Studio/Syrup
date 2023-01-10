@@ -33,13 +33,26 @@ void APlant::BeginPlay()
 	}
 	else
 	{
-		Health = InitialHealth;
-
 		Range = 0;
 		SetRange(InitialRange);
 
 		Production = 0;
 		SetProduction(InitialProduction);
+
+		FSinkAmountUpdateDelegate AmountSetter;
+		AmountSetter.BindUFunction(this, FName("SetHealth"));
+		FSinkLocationsDelegate LocationGetter;
+		LocationGetter.BindUFunction(this, FName("GetSubTileLocations"));
+		FSinkAmountDelegate AmountGetter;
+		AmountGetter.BindUFunction(this, FName("GetHealth"));
+
+		UResourceSink::AddResourceSinkComponent(this, HealthData, AmountSetter, LocationGetter, AmountGetter);
+		//AmountSetter.BindUFunction(this, FName("SetRange"));
+		//AmountGetter.BindUFunction(this, FName("GetRange"));
+		//UResourceSink::AddResourceSinkComponent(this, FResourceSinkData(), AmountSetter, LocationGetter, AmountGetter);
+		//AmountSetter.BindUFunction(this, FName("SetProduction"));
+		//AmountGetter.BindUFunction(this, FName("GetProduction"));
+		//UResourceSink::AddResourceSinkComponent(this, FResourceSinkData(), AmountSetter, LocationGetter, AmountGetter);
 	}
 
 	SubtileMesh->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
@@ -61,6 +74,7 @@ void APlant::OnConstruction(const FTransform& Transform)
 {
 	Super::OnConstruction(Transform);
 
+	Health = 0;
 	SubtileMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
 }
 
@@ -302,20 +316,20 @@ TSet<FIntPoint> APlant::GetEffectLocations() const
 /* -------------- *\
 \* \/ Resource \/ */
 
-/**
- * Gets whether or not this can grow more health.
- *
- * @param Resource - The resource that would be allocated.
- *
- * @return Whether or not this can grow more health.
- */
-bool APlant::CanGrowHealth(UResource* Resource) const
-{
-	return IsValid(Resource)
-		&& (HealthGrowthResource == Resource->GetType() || HealthGrowthResource == EResourceType::Any || Resource->GetType() == EResourceType::Any) 
-		&& NumHealthGrowing < HealthGrowthPerTurn * HealthPerResource 
-		&& Health + NumHealthGrowing < GetMaxHealth();
-}
+///**
+// * Gets whether or not this can grow more health.
+// *
+// * @param Resource - The resource that would be allocated.
+// *
+// * @return Whether or not this can grow more health.
+// */
+//bool APlant::CanGrowHealth(UResource* Resource) const
+//{
+//	return IsValid(Resource)
+//		&& (HealthGrowthResource == Resource->GetType() || HealthGrowthResource == EResourceType::Any || Resource->GetType() == EResourceType::Any) 
+//		&& NumHealthGrowing < HealthGrowthPerTurn * HealthPerResource 
+//		&& Health + NumHealthGrowing < GetMaxHealth();
+//}
 
 /**
  * Gets whether or not this can grow more range.
@@ -347,25 +361,25 @@ bool APlant::CanGrowProduction(UResource* Resource) const
 		&& Production + NumProductionGrowing < GetMaxProduction();
 }
 
-/**
- * Causes this plant to grow more health, and allocates the given resource.
- *
- * @param Resource - The resource used to grow this health.
- *
- * @return Whether or not this was successful at growing more health.
- */
-bool APlant::GrowHealth(UResource* Resource)
-{
-	if (!CanGrowHealth(Resource))
-	{
-		return false;
-	}
-
-//	Resource->Allocate(this, EResourceAllocationType::PlantHealth);
-	AllocatedResources.Add(Resource);
-	NumHealthGrowing = FMath::Min(NumHealthGrowing + HealthPerResource, HealthGrowthPerTurn * HealthPerResource);
-	return true;
-}
+///**
+// * Causes this plant to grow more health, and allocates the given resource.
+// *
+// * @param Resource - The resource used to grow this health.
+// *
+// * @return Whether or not this was successful at growing more health.
+// */
+//bool APlant::GrowHealth(UResource* Resource)
+//{
+//	if (!CanGrowHealth(Resource))
+//	{
+//		return false;
+//	}
+//
+////	Resource->Allocate(this, EResourceAllocationType::PlantHealth);
+//	AllocatedResources.Add(Resource);
+//	NumHealthGrowing = FMath::Min(NumHealthGrowing + HealthPerResource, HealthGrowthPerTurn * HealthPerResource);
+//	return true;
+//}
 
 /**
  * Causes this plant to grow more range, and allocates the given resource.
@@ -458,15 +472,15 @@ void APlant::ResourceFreed(UResource* FreedResource)
 		UE_LOG(LogResource, Warning, TEXT("Cant free unallocated resource on  %s"), *GetName());
 		return;
 	case EResourceAllocationType::PlantHealth:
-		if (NumHealthGrowing)
-		{
-			NumHealthGrowing -= HealthPerResource;
-		}
-		else
-		{
-			SetHealth(GetHealth() - HealthPerResource);
-		}
-		break;
+		//if (NumHealthGrowing)
+		//{
+		//	NumHealthGrowing -= HealthPerResource;
+		//}
+		//else
+		//{
+		//	SetHealth(GetHealth() - HealthPerResource);
+		//}
+		//break;
 	case EResourceAllocationType::PlantRange:
 		if (NumRangeGrowing)
 		{
