@@ -57,10 +57,13 @@ bool UResourceSink::AllocateResource(UResource* ResourceToAllocate)
 	if (Data.bDeferredIncrement)
 	{
 		IncrementsThisTurn++;
+		EventOnAmountChanged.Broadcast(GetAllocationAmount());
 	}
 	else
 	{
-		OnAmountChanged.Execute(GetAllocationAmount() + IncrementsThisTurn * Data.IncrementPerResource);
+		int NewAmount = GetAllocationAmount() + IncrementsThisTurn * Data.IncrementPerResource;
+		OnAmountChanged.Execute(NewAmount);
+		EventOnAmountChanged.Broadcast(NewAmount);
 	}
 	return true;
 }
@@ -76,10 +79,13 @@ void UResourceSink::FreeResource(UResource* FreedResource)
 	if (IncrementsThisTurn)
 	{
 		IncrementsThisTurn--;
+		EventOnAmountChanged.Broadcast(GetAllocationAmount());
 	}
 	else
 	{
-		OnAmountChanged.Execute(GetAllocationAmount() - Data.IncrementPerResource);
+		int NewAmount = GetAllocationAmount() - Data.IncrementPerResource;
+		OnAmountChanged.Execute(NewAmount);
+		EventOnAmountChanged.Broadcast(NewAmount);
 	}
 }
 
@@ -94,7 +100,10 @@ void UResourceSink::ReceiveEffectTrigger(const ETileEffectTriggerType TriggerTyp
 {
 	if (Data.bDeferredIncrement && TriggerType == Data.IncrementTrigger)
 	{
-		OnAmountChanged.Execute(GetAllocationAmount() + IncrementsThisTurn * Data.IncrementPerResource);
+		int NewAmount = GetAllocationAmount() + IncrementsThisTurn * Data.IncrementPerResource;
+		IncrementsThisTurn = 0;
+		OnAmountChanged.Execute(NewAmount);
+		EventOnAmountChanged.Broadcast(NewAmount);
 	}
 }
 

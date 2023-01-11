@@ -16,6 +16,8 @@ DECLARE_DYNAMIC_DELEGATE_RetVal(int, FSinkAmountDelegate);
 
 DECLARE_DYNAMIC_DELEGATE_OneParam(FSinkAmountUpdateDelegate, int, NewAmount);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FBlueprintSinkAmountUpdateDelegate, int, NewAmount);
+
  /* \/ ============ \/ *\
  |  \/ ResourceSink \/  |
  \* \/ ============ \/ */
@@ -37,7 +39,7 @@ public:
      * @return The grid locations that this sink takes up.
      */
     UFUNCTION(BlueprintPure, Category = "Resources")
-    virtual TSet<FIntPoint> GetAllocationLocations() const { return AllocationLocationsGetter.Execute(); };
+    TSet<FIntPoint> GetAllocationLocations() const { return AllocationLocationsGetter.Execute(); };
     
     /**
      * Gets the amount stored in this sink (not to be confused with the number of resources allocated to this).
@@ -45,7 +47,7 @@ public:
      * @return The amount stored in this sink.
      */
     UFUNCTION(BlueprintPure, Category = "Resources")
-    virtual int GetAllocationAmount() const { return AllocatedAmountGetter.Execute(); };
+    int GetAllocationAmount() const { return AllocatedAmountGetter.Execute(); };
 
     /**
      * Gets all the resources allocated to this.
@@ -53,7 +55,23 @@ public:
      * @return The resources allocated to this.
      */
     UFUNCTION(BlueprintPure, Category = "Resources")
-    virtual FORCEINLINE TArray<UResource*> GetAllocatedResources() const { return AllocatedResources; };
+    FORCEINLINE TArray<UResource*> GetAllocatedResources() const { return AllocatedResources; };
+    
+    /**
+     * Gets how many times this was allocated to this turn.
+     *
+     * @return How many times this was allocated to this turn.
+     */
+    UFUNCTION(BlueprintPure, Category = "Resources")
+    FORCEINLINE int GetIncrementsThisTurn() const { return IncrementsThisTurn; };
+
+    /**
+     * Gets the data for relating to allocation for this sink.
+     *
+     * @return The data for relating to allocation for this sink.
+     */
+    UFUNCTION(BlueprintPure, Category = "Resources")
+    FORCEINLINE FResourceSinkData GetSinkData() const { return Data; };
 
     /**
      * Gets whether it is possible to allocate a resource to this.
@@ -82,6 +100,10 @@ public:
      */
     UFUNCTION(BlueprintCallable, Category = "Resources")
     void FreeResource(UResource* FreedResource);
+
+    //Called when the amount in the sink changes.
+    UPROPERTY(BlueprintAssignable)
+    FBlueprintSinkAmountUpdateDelegate EventOnAmountChanged;
 
 private:
 	/**
