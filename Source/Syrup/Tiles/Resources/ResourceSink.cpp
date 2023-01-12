@@ -10,18 +10,58 @@
  |  \/ ResourceSink \/  |
  \* \/ ============ \/ */
 
+ /**
+  * Adds a default resource sink to an actor. Use only in the constructor.
+  *
+  * @param Owner - The actor to add the sink to.
+  * @param UpdateCallback - The function that should be called when the amount produced by this sink changes.
+  * @param GetLocations - The function that should be called to find out what grid locations are occupied by this sink.
+  * @param GetAmount - The function that should be called to find out the amount produced by this sink.
+  *
+  * @return The sink that was created.
+  */
+UResourceSink* UResourceSink::CreateDefaultResourceSinkComponent(AActor* Owner, const FSinkAmountUpdateDelegate& UpdateCallback, const FSinkLocationsDelegate& GetLocations, const FSinkAmountDelegate& GetAmount)
+{
+	UResourceSink* NewSink = Owner->CreateDefaultSubobject<UResourceSink>(FName(UpdateCallback.GetFunctionName().ToString() + "_Sink"));
+	NewSink->OnAmountChanged = UpdateCallback;
+	NewSink->AllocationLocationsGetter = GetLocations;
+	NewSink->AllocatedAmountGetter = GetAmount;
+
+	return NewSink;
+}
+
+/**
+ * Adds a default resource sink to an actor. Use only in the constructor.
+ *
+ * @param Owner - The actor to add the sink to.
+ * @param SinkData - The stats of the sink to create.
+ * @param UpdateCallback - The function that should be called when the amount produced by this sink changes.
+ * @param GetLocations - The function that should be called to find out what grid locations are occupied by this sink.
+ * @param GetAmount - The function that should be called to find out the amount produced by this sink.
+ *
+ * @return The sink that was created.
+ */
 UResourceSink* UResourceSink::AddResourceSinkComponent(AActor* Owner, FResourceSinkData SinkData, const FSinkAmountUpdateDelegate& UpdateCallback, const FSinkLocationsDelegate& GetLocations, const FSinkAmountDelegate& GetAmount)
 {
-	UResourceSink* NewSink = Cast<UResourceSink>(Owner->AddComponentByClass(StaticClass(), false, FTransform(), false));
+	UResourceSink* NewSink = Cast<UResourceSink>(Owner->AddComponentByClass(StaticClass(), false, FTransform(), false));;
 	NewSink->Data = SinkData;
 	NewSink->OnAmountChanged = UpdateCallback;
 	NewSink->AllocationLocationsGetter = GetLocations;
 	NewSink->AllocatedAmountGetter = GetAmount;
-	
+
 	ASyrupGameMode::GetTileEffectTriggerDelegate(Owner).AddDynamic(NewSink, &UResourceSink::ReceiveEffectTrigger);
-	NewSink->OnAmountChanged.Execute(SinkData.IntialValue);
+	NewSink->OnAmountChanged.Execute(NewSink->Data.IntialValue);
 
 	return NewSink;
+}
+
+/**
+ * Binds appropriate delegates and sets up initial values.
+ */
+void UResourceSink::BeginPlay()
+{
+	ASyrupGameMode::GetTileEffectTriggerDelegate(this).AddDynamic(this, &UResourceSink::ReceiveEffectTrigger);
+	OnAmountChanged.Execute(Data.IntialValue);
 }
 
 /**

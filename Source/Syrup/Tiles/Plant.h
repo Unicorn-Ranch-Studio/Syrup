@@ -11,6 +11,7 @@
 #include "Plant.generated.h"
 
 class UResource;
+class UResourceSink;
 class UApplyField;
 class UPreventTrashSpawn;
 
@@ -29,6 +30,7 @@ class SYRUP_API APlant : public ATile, public IResourceFaucet
 
 	/* -------------------- *\
 	\* \/ Initialization \/ */
+	APlant();
 
 private:
 
@@ -99,38 +101,6 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Plant|Health")	
 	FORCEINLINE int GetDamageTaken() const { return DamageTaken; };
 
-	///**
-	// * Gets the max health of this plant type.
-	// * 
-	// * @return The number of damage points a plant of this type can take before dying.
-	// */
-	//UFUNCTION(BlueprintPure, Category = "Plant|Health")
-	//FORCEINLINE int GetMaxHealth() const { return Cast<APlant>(GetClass()->GetDefaultObject())->Health; };
-	//
-	///**
-	// * Gets the health gained per allocated resource.
-	// * 
-	// * @return The health gained per allocated resource.
-	// */
-	//UFUNCTION(BlueprintPure, Category = "Plant|Health")
-	//FORCEINLINE int GetHealthPerResource() const { return HealthPerResource; };
-	//
-	///**
-	// * Gets the number of times health can be grown per turn.
-	// * 
-	// * @return The number of times health can be grown per turn.
-	// */
-	//UFUNCTION(BlueprintPure, Category = "Plant|Health")
-	//FORCEINLINE int GetHealthGrowthPerTurn() const { return HealthGrowthPerTurn; };
-	//
-	///**
-	// * Gets the type of resource needed to grow health.
-	// * 
-	// * @return The type of resource needed to grow health.
-	// */
-	//UFUNCTION(BlueprintPure, Category = "Plant|Health")
-	//FORCEINLINE EResourceType GetHealthGrowthResource() const { return HealthGrowthResource; };
-
 	/**
 	 * Causes the effects of this plants death.
 	 */
@@ -138,8 +108,8 @@ public:
 
 protected:
 	//The various properties of the health of this plant.
-	UPROPERTY(EditDefaultsOnly, Category = "Plant|Health")
-	FResourceSinkData HealthData;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Plant|Health")
+	UResourceSink* HealthData;
 
 private:
 	//The current maximum health of this plant.
@@ -174,90 +144,6 @@ public:
 	static bool SowPlant(UObject* WorldContextObject, TSubclassOf<APlant> PlantClass, FTransform Transform);
 	static bool SowPlant(UObject* WorldContextObject, TSubclassOf<APlant> PlantClass, FGridTransform Transform);
 
-	///**
-	// * Gets whether or not this can grow more health.
-	// *
-	// * @param Resource - The resource that would be allocated.	
-	// * 
-	// * @return Whether or not this can grow more health.
-	// */
-	//UFUNCTION(BlueprintPure, Category = "Plant|Growth|Upgrades")
-	//bool CanGrowHealth(UResource* Resource) const;
-
-	/**
-	 * Gets whether or not this can grow more range.
-	 *
-	 * @param Resource - The resource that would be allocated.	
-	 *
-	 * @return Whether or not this can grow more range.
-	 */
-	UFUNCTION(BlueprintPure, Category = "Plant|Growth|Upgrades")
-	bool CanGrowRange(UResource* Resource) const;
-
-	/**
-	 * Gets whether or not this can grow more production.
-	 *
-	 * @param Resource - The resource that would be allocated.	
-	 *
-	 * @return Whether or not this can grow more production.
-	 */
-	UFUNCTION(BlueprintPure, Category = "Plant|Growth|Upgrades")
-	bool CanGrowProduction(UResource* Resource) const;
-
-	///**
-	// * Causes this plant to grow more health, and allocates the given resource.
-	// * 
-	// * @param Resource - The resource used to grow this health.
-	// * 
-	// * @return Whether or not this was successful at growing more health.
-	// */
-	//UFUNCTION(BlueprintCallable, Category = "Plant|Growth|Upgrades")
-	//bool GrowHealth(UResource* Resource);
-
-	/**
-	 * Causes this plant to grow more range, and allocates the given resource.
-	 *
-	 * @param Resource - The resource used to grow this range.
-	 *
-	 * @return Whether or not this was successful at growing more range.
-	 */
-	UFUNCTION(BlueprintCallable, Category = "Plant|Growth|Upgrades")
-	bool GrowRange(UResource* Resource);
-
-	/**
-	 * Causes this plant to grow more production, and allocates the given resource.
-	 *
-	 * @param Resource - The resource used to grow this production.
-	 *
-	 * @return Whether or not this was successful at growing more production.
-	 */
-	UFUNCTION(BlueprintCallable, Category = "Plant|Growth|Upgrades")
-	bool GrowProduction(UResource* Resource);
-	
-	/**
-	 * Gets whether health is due to grow.
-	 *
-	 * @return Whether health is due to grow.
-	 */
-	UFUNCTION(BlueprintPure, Category = "Plant|Growth|Upgrades")
-	FORCEINLINE int GetNumHealthGrowing() const { return NumHealthGrowing; };
-
-	/**
-	 * Gets whether range is due to grow.
-	 *
-	 * @return Whether range is due to grow.
-	 */
-	UFUNCTION(BlueprintPure, Category = "Plant|Growth|Upgrades")
-	FORCEINLINE int GetNumRangeGrowing() const { return NumRangeGrowing; };
-
-	/**
-	 * Gets whether production is due to grow.
-	 * 
-	 * @return Whether production is due to grow.
-	 */
-	UFUNCTION(BlueprintPure, Category = "Plant|Growth|Upgrades")
-	FORCEINLINE int GetNumProductionGrowing() const { return NumProductionGrowing; };
-
 	/**
 	 * Gets cost to plant this plant type.
 	 * 
@@ -291,19 +177,6 @@ protected:
 	UPROPERTY(BlueprintReadOnly, Category = "Plant|Growth")
 	bool bIsFinishedPlanting = false;
 
-private:
-	//The number of health points that are currently growing.
-	UPROPERTY()
-	int NumHealthGrowing = 0;
-
-	//The number of range points that are currently growing.
-	UPROPERTY()
-	int NumRangeGrowing = 0;
-
-	//The number of production points that are currently growing.
-	UPROPERTY()
-	int NumProductionGrowing = 0;
-
 	/* /\ Growth /\ *\
 	\* ------------ */
 
@@ -327,59 +200,15 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Plant|Effect")
 	FORCEINLINE int GetRange() const { return Range; };
 
-	/**
-	 * Gets the maximum range of this plant type's effects.
-	 * 
-	 * @return The scale applied to the shape of this plant type to get all effected locations of this plant type's effects when fully upgraded.
-	 */
-	UFUNCTION(BlueprintPure, Category = "Plant|Effect")
-	FORCEINLINE int GetMaxRange() const { return Cast<APlant>(GetClass()->GetDefaultObject())->Range; };
-	
-	/**
-	 * Gets the range gained per allocated resource.
-	 * 
-	 * @return The range gained per allocated resource.
-	 */
-	UFUNCTION(BlueprintPure, Category = "Plant|Effect")
-	FORCEINLINE int GetRangePerResource() const { return RangePerResource; };
-	
-	/**
-	 * Gets the number of times range can be grown per turn.
-	 * 
-	 * @return The number of times range can be grown per turn.
-	 */
-	UFUNCTION(BlueprintPure, Category = "Plant|Effect")
-	FORCEINLINE int GetRangeGrowthPerTurn() const { return RangeGrowthPerTurn; };
-	
-	/**
-	 * Gets the type of resource needed to grow range.
-	 * 
-	 * @return The type of resource needed to grow range.
-	 */
-	UFUNCTION(BlueprintPure, Category = "Plant|Effect")
-	FORCEINLINE EResourceType GetRangeGrowthResource() const { return RangeGrowthResource; };
-
 protected:
+
+	//The relation of how resources are allocated to range and how that is displayed.
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Plant|Effect")
+	UResourceSink* RangeData;
 
 	//The scale applied to the shape of this plant type to get all effected locations of this plant type's effects.
 	UPROPERTY(EditDefaultsOnly, Category = "Plant|Effect", Meta = (ClampMin = "0"))
 	int Range = 1;
-
-	//The range this plant starts with.
-	UPROPERTY(EditDefaultsOnly, Category = "Plant|Effect", Meta = (ClampMin = "0"))
-	int InitialRange = 1;
-
-	//The range gained per resource allocation.
-	UPROPERTY(EditDefaultsOnly, Category = "Plant|Effect", Meta = (ClampMin = "1"))
-	int RangePerResource = 1;
-
-	//The number of times range can be grown per turn.
-	UPROPERTY(EditDefaultsOnly, Category = "Plant|Effect", Meta = (ClampMin = "1"))
-	int RangeGrowthPerTurn = 1;
-
-	//The type of resource needed to grow Range.
-	UPROPERTY(EditDefaultsOnly, Category = "Plant|Effect")
-	EResourceType RangeGrowthResource = EResourceType::Any;
 
 private:
 
@@ -426,51 +255,12 @@ public:
 	FORCEINLINE int GetProduction() const { return Production; };
 
 	/**
-	 * Gets the maximum number of resources supplied by this plant.
-	 *
-	 * @return The maximum number of resources supplied by this plant.
-	 */
-	UFUNCTION(BlueprintPure, Category = "Plant|Resources")
-	FORCEINLINE int GetMaxProduction() const { return Cast<APlant>(GetClass()->GetDefaultObject())->Production; };
-	
-	/**
-	 * Gets the production gained per allocated resource.
-	 * 
-	 * @return The production gained per allocated resource.
-	 */
-	UFUNCTION(BlueprintPure, Category = "Plant|Resources")
-	FORCEINLINE int GetProductionPerResource() const { return ProductionPerResource; };
-	
-	/**
-	 * Gets the number of times production can be grown per turn.
-	 * 
-	 * @return The number of times production can be grown per turn.
-	 */
-	UFUNCTION(BlueprintPure, Category = "Plant|Resources")
-	FORCEINLINE int GetProductionGrowthPerTurn() const { return ProductionGrowthPerTurn; };
-	
-	/**
-	 * Gets the type of resource needed to grow production.
-	 * 
-	 * @return The type of resource needed to grow production.
-	 */
-	UFUNCTION(BlueprintPure, Category = "Plant|Resources")
-	FORCEINLINE EResourceType GetProductionGrowthResource() const { return ProductionGrowthResource; };
-
-	/**
 	 * Gets the type of resource produced by this plant.
 	 * 
 	 * @return The type  of resource produced by this plant.
 	 */
 	UFUNCTION(BlueprintPure, Category = "Plant|Resources")
 	FORCEINLINE EResourceType GetProductionType() const { return ProductionType; };
-
-	/**
-	 * Gets the grid locations that this sink takes up.
-	 *
-	 * @return The grid locations that this sink takes up///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	 */
-	virtual FORCEINLINE TSet<FIntPoint> GetAllocationLocations() const { return GetSubTileLocations(); };
 
 	/**
 	 * Gets all the resources supplied by this plant.
@@ -487,41 +277,15 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Resources")
 	virtual FORCEINLINE TSet<FIntPoint> GetAllocatableLocations() const override { return GetEffectLocations(); };
 
-	/**
-	 * Gets all the resources allocated to this.
-	 *
-	 * @return The resources allocated to this.///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	 */
-	virtual FORCEINLINE TArray<UResource*> GetAllocatedResources() const { return AllocatedResources; };
-
-	/**
-	 * Undoes the effect of a resource that was sunk in this.
-	 *
-	 * @param FreedResource - The resource that was freed.///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	 */
-	virtual void ResourceFreed(UResource* FreedResource);
-
 protected:
-	
+
+	//The relation of how resources are allocated to production and how that is displayed.
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Plant|Resources")
+	UResourceSink* ProductionData;
+
 	//The number of resource this plant can produce. Should be an even number.
-	UPROPERTY(EditDefaultsOnly, Category = "Plant|Resources", Meta = (ClampMin = "0"))
+	UPROPERTY(VisibleInstanceOnly, Category = "Plant|Resources", Meta = (ClampMin = "0"))
 	int Production = 2;
-
-	//The production this plant starts with.
-	UPROPERTY(EditDefaultsOnly, Category = "Plant|Resources", Meta = (ClampMin = "0"))
-	int InitialProduction = 0;
-
-	//The production gained per resource allocation.
-	UPROPERTY(EditDefaultsOnly, Category = "Plant|Resources", Meta = (ClampMin = "1"))
-	int ProductionPerResource = 2;
-
-	//The number of times production can be grown per turn.
-	UPROPERTY(EditDefaultsOnly, Category = "Plant|Resources", Meta = (ClampMin = "1"))
-	int ProductionGrowthPerTurn = 1;
-
-	//The type of resource needed to grow production.
-	UPROPERTY(EditDefaultsOnly, Category = "Plant|Resources")
-	EResourceType ProductionGrowthResource = EResourceType::Any;
 
 	//The type of resource produced by this.
 	UPROPERTY(EditDefaultsOnly, Category = "Plant|Resources")

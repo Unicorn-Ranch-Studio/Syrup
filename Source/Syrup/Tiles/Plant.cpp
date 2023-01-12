@@ -15,6 +15,24 @@ DEFINE_LOG_CATEGORY(LogPlant);
 
 /* -------------------- *\
 \* \/ Initialization \/ */
+APlant::APlant()
+{
+	FSinkAmountUpdateDelegate AmountSetter;
+	AmountSetter.BindUFunction(this, FName("SetHealth"));
+	FSinkLocationsDelegate LocationGetter;
+	LocationGetter.BindUFunction(this, FName("GetSubTileLocations"));
+	FSinkAmountDelegate AmountGetter;
+	AmountGetter.BindUFunction(this, FName("GetHealth"));
+
+	HealthData = UResourceSink::CreateDefaultResourceSinkComponent(this, AmountSetter, LocationGetter, AmountGetter);
+	AmountSetter.BindUFunction(this, FName("SetRange"));
+	AmountGetter.BindUFunction(this, FName("GetRange"));
+	RangeData = UResourceSink::CreateDefaultResourceSinkComponent(this, AmountSetter, LocationGetter, AmountGetter);
+	AmountSetter.BindUFunction(this, FName("SetProduction"));
+	AmountGetter.BindUFunction(this, FName("GetProduction"));
+	ProductionData = UResourceSink::CreateDefaultResourceSinkComponent(this, AmountSetter, LocationGetter, AmountGetter);
+}
+
 
 /**
  * Binds effect triggers and initializes size.
@@ -22,38 +40,6 @@ DEFINE_LOG_CATEGORY(LogPlant);
 void APlant::BeginPlay()
 {
 	Super::BeginPlay();
-
-	if (bStartGrown)
-	{
-		Range = 0;
-		SetRange(GetMaxRange());
-
-		Production = 0;
-		SetProduction(GetMaxProduction());
-	}
-	else
-	{
-		Range = 0;
-		SetRange(InitialRange);
-
-		Production = 0;
-		SetProduction(InitialProduction);
-
-		FSinkAmountUpdateDelegate AmountSetter;
-		AmountSetter.BindUFunction(this, FName("SetHealth"));
-		FSinkLocationsDelegate LocationGetter;
-		LocationGetter.BindUFunction(this, FName("GetSubTileLocations"));
-		FSinkAmountDelegate AmountGetter;
-		AmountGetter.BindUFunction(this, FName("GetHealth"));
-
-		UResourceSink::AddResourceSinkComponent(this, HealthData, AmountSetter, LocationGetter, AmountGetter);
-		//AmountSetter.BindUFunction(this, FName("SetRange"));
-		//AmountGetter.BindUFunction(this, FName("GetRange"));
-		//UResourceSink::AddResourceSinkComponent(this, FResourceSinkData(), AmountSetter, LocationGetter, AmountGetter);
-		//AmountSetter.BindUFunction(this, FName("SetProduction"));
-		//AmountGetter.BindUFunction(this, FName("GetProduction"));
-		//UResourceSink::AddResourceSinkComponent(this, FResourceSinkData(), AmountSetter, LocationGetter, AmountGetter);
-	}
 
 	SubtileMesh->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
 
@@ -74,7 +60,6 @@ void APlant::OnConstruction(const FTransform& Transform)
 {
 	Super::OnConstruction(Transform);
 
-	Health = 0;
 	SubtileMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
 }
 
@@ -212,26 +197,7 @@ bool APlant::SowPlant(UObject* WorldContextObject, TSubclassOf<APlant> PlantClas
  */
 void APlant::Grow_Implementation()
 {
-	if (!bIsFinishedPlanting)
-	{
-		return;
-	}
-
-	if (NumHealthGrowing)
-	{
-		SetHealth(GetHealth() + NumHealthGrowing);
-		NumHealthGrowing = 0;
-	}
-	if (NumRangeGrowing)
-	{
-		SetRange(GetRange() + NumRangeGrowing);
-		NumRangeGrowing = 0;
-	}
-	if (NumProductionGrowing)
-	{
-		SetProduction(GetProduction() + NumProductionGrowing);
-		NumProductionGrowing = 0;
-	}
+	
 }
 
 /* /\ Growth /\ *\
@@ -316,111 +282,6 @@ TSet<FIntPoint> APlant::GetEffectLocations() const
 /* -------------- *\
 \* \/ Resource \/ */
 
-///**
-// * Gets whether or not this can grow more health.
-// *
-// * @param Resource - The resource that would be allocated.
-// *
-// * @return Whether or not this can grow more health.
-// */
-//bool APlant::CanGrowHealth(UResource* Resource) const
-//{
-//	return IsValid(Resource)
-//		&& (HealthGrowthResource == Resource->GetType() || HealthGrowthResource == EResourceType::Any || Resource->GetType() == EResourceType::Any) 
-//		&& NumHealthGrowing < HealthGrowthPerTurn * HealthPerResource 
-//		&& Health + NumHealthGrowing < GetMaxHealth();
-//}
-
-/**
- * Gets whether or not this can grow more range.
- *
- * @param Resource - The resource that would be allocated.
- *
- * @return Whether or not this can grow more range.
- */
-bool APlant::CanGrowRange(UResource* Resource) const
-{
-	return IsValid(Resource)
-		&& (RangeGrowthResource == Resource->GetType() || RangeGrowthResource == EResourceType::Any || Resource->GetType() == EResourceType::Any)
-		&& NumRangeGrowing < RangeGrowthPerTurn * RangePerResource 
-		&& Range + NumRangeGrowing < GetMaxRange();
-}
-
-/**
- * Gets whether or not this can grow more production.
- *
- * @param Resource - The resource that would be allocated.
- * 
- * @return Whether or not this can grow more production.
- */
-bool APlant::CanGrowProduction(UResource* Resource) const
-{
-	return IsValid(Resource)
-		&& (ProductionGrowthResource == Resource->GetType() || ProductionGrowthResource == EResourceType::Any || Resource->GetType() == EResourceType::Any)
-		&& NumProductionGrowing < ProductionGrowthPerTurn * ProductionPerResource 
-		&& Production + NumProductionGrowing < GetMaxProduction();
-}
-
-///**
-// * Causes this plant to grow more health, and allocates the given resource.
-// *
-// * @param Resource - The resource used to grow this health.
-// *
-// * @return Whether or not this was successful at growing more health.
-// */
-//bool APlant::GrowHealth(UResource* Resource)
-//{
-//	if (!CanGrowHealth(Resource))
-//	{
-//		return false;
-//	}
-//
-////	Resource->Allocate(this, EResourceAllocationType::PlantHealth);
-//	AllocatedResources.Add(Resource);
-//	NumHealthGrowing = FMath::Min(NumHealthGrowing + HealthPerResource, HealthGrowthPerTurn * HealthPerResource);
-//	return true;
-//}
-
-/**
- * Causes this plant to grow more range, and allocates the given resource.
- *
- * @param Resource - The resource used to grow this range.
- *
- * @return Whether or not this was successful at growing more range.
- */
-bool APlant::GrowRange(UResource* Resource)
-{
-	if (!CanGrowRange(Resource))
-	{
-		return false;
-	}
-
-//	Resource->Allocate(this, EResourceAllocationType::PlantRange);
-	AllocatedResources.Add(Resource);
-	NumRangeGrowing = FMath::Min(NumRangeGrowing + RangePerResource, RangeGrowthPerTurn * RangePerResource);
-	return true;
-}
-
-/**
- * Causes this plant to grow more production, and allocates the given resource.
- *
- * @param Resource - The resource used to grow this production.
- *
- * @return Whether or not this was successful at growing more production.
- */
-bool APlant::GrowProduction(UResource* Resource)
-{
-	if (!CanGrowProduction(Resource))
-	{
-		return false;
-	}
-
-//	Resource->Allocate(this, EResourceAllocationType::PlantProduction);
-	AllocatedResources.Add(Resource);
-	NumProductionGrowing = FMath::Min(NumProductionGrowing + ProductionPerResource, ProductionGrowthPerTurn * ProductionPerResource);
-	return true;
-}
-
 /**
  * Updates this plant to have the new amount of production.
  *
@@ -457,58 +318,6 @@ void APlant::SetProduction_Implementation(int NewProduction)
 		ResourceToRemove->Free();
 		ProducedResources.RemoveSingle(ResourceToRemove);
 		Production--;
-	}
-}
-/**
- * Undoes the effect of a resource that was sunk in this.
- *
- * @param FreedResource - The resource that was freed.
- */
-void APlant::ResourceFreed(UResource* FreedResource)
-{
-	switch (FreedResource->GetAllocationType())
-	{
-	case EResourceAllocationType::NotAllocated:
-		UE_LOG(LogResource, Warning, TEXT("Cant free unallocated resource on  %s"), *GetName());
-		return;
-	case EResourceAllocationType::PlantHealth:
-		//if (NumHealthGrowing)
-		//{
-		//	NumHealthGrowing -= HealthPerResource;
-		//}
-		//else
-		//{
-		//	SetHealth(GetHealth() - HealthPerResource);
-		//}
-		//break;
-	case EResourceAllocationType::PlantRange:
-		if (NumRangeGrowing)
-		{
-			NumRangeGrowing -= RangePerResource;
-		}
-		else
-		{
-			SetRange(GetRange() - RangePerResource);
-		}
-		break;
-	case EResourceAllocationType::PlantProduction:
-		if (NumProductionGrowing)
-		{
-			NumProductionGrowing = ProductionPerResource;
-		}
-		else
-		{
-			SetProduction(GetProduction() - ProductionPerResource);
-		}
-		break;
-	default:
-		UE_LOG(LogResource, Error, TEXT("Tried to free a resource of non-plant type allocation from plant: %s"), *GetName());
-		return;
-	}
-
-	if (Health > DamageTaken)
-	{
-		AllocatedResources.RemoveSingle(FreedResource);
 	}
 }
 

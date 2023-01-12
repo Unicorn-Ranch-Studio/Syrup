@@ -30,16 +30,46 @@ class UResourceSink : public UActorComponent
     GENERATED_BODY()
 
 public:
+    /**
+     * Adds a default resource sink to an actor. Use only in the constructor.
+     * 
+     * @param Owner - The actor to add the sink to.
+     * @param UpdateCallback - The function that should be called when the amount produced by this sink changes.
+     * @param GetLocations - The function that should be called to find out what grid locations are occupied by this sink.
+     * @param GetAmount - The function that should be called to find out the amount produced by this sink.
+     * 
+     * @return The sink that was created.
+     */
+    UFUNCTION()
+    static UResourceSink* CreateDefaultResourceSinkComponent(AActor* Owner, const FSinkAmountUpdateDelegate& UpdateCallback, const FSinkLocationsDelegate& GetLocations, const FSinkAmountDelegate& GetAmount);
+
+    /**
+     * Adds a default resource sink to an actor. Use only in the constructor.
+     *
+     * @param Owner - The actor to add the sink to.
+     * @param SinkData - The stats of the sink to create.
+     * @param UpdateCallback - The function that should be called when the amount produced by this sink changes.
+     * @param GetLocations - The function that should be called to find out what grid locations are occupied by this sink.
+     * @param GetAmount - The function that should be called to find out the amount produced by this sink.
+     * 
+     * @return The sink that was created.
+     */    
     UFUNCTION(BlueprintCallable)
     static UResourceSink* AddResourceSinkComponent(AActor* Owner, FResourceSinkData SinkData, const FSinkAmountUpdateDelegate& UpdateCallback, const FSinkLocationsDelegate& GetLocations, const FSinkAmountDelegate& GetAmount);
      
+
+    /**
+     * Binds appropriate delegates and sets up initial values.
+     */
+    virtual void BeginPlay() override;
+
     /**
      * Gets the grid locations that this sink takes up.
      *
      * @return The grid locations that this sink takes up.
      */
     UFUNCTION(BlueprintPure, Category = "Resources")
-    TSet<FIntPoint> GetAllocationLocations() const { return AllocationLocationsGetter.Execute(); };
+    FORCEINLINE TSet<FIntPoint> GetAllocationLocations() const { return AllocationLocationsGetter.Execute(); };
     
     /**
      * Gets the amount stored in this sink (not to be confused with the number of resources allocated to this).
@@ -47,7 +77,7 @@ public:
      * @return The amount stored in this sink.
      */
     UFUNCTION(BlueprintPure, Category = "Resources")
-    int GetAllocationAmount() const { return AllocatedAmountGetter.Execute(); };
+    FORCEINLINE int GetAllocationAmount() const { return AllocatedAmountGetter.Execute(); };
 
     /**
      * Gets all the resources allocated to this.
@@ -104,6 +134,10 @@ public:
     //Called when the amount in the sink changes.
     UPROPERTY(BlueprintAssignable)
     FBlueprintSinkAmountUpdateDelegate EventOnAmountChanged;
+    
+    //The data relating resource allocation to amount.
+    UPROPERTY(EditAnywhere, BlueprintReadOnly)
+    FResourceSinkData Data;
 
 private:
 	/**
@@ -131,10 +165,6 @@ private:
     //The resources that have been allocated to this.
     UPROPERTY()
     TArray<UResource*> AllocatedResources;
-
-    //The data relating resource allocation to amount.
-    UPROPERTY()
-    FResourceSinkData Data;
 
     //The number of times the amount is to be incremented this turn.
     UPROPERTY()
