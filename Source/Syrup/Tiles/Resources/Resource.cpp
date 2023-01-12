@@ -75,14 +75,16 @@ bool UResource::Allocate(UResourceSink* LinkedSink, EResourceAllocationType Type
  */
 void UResource::Free()
 {
-	if (IsValid(SinkAllocatedTo))
+	if (IsAllocated())
 	{
-		SinkAllocatedTo->FreeResource(this);
-	}
+		AllocationType = EResourceAllocationType::NotAllocated;
 
-	SinkAllocatedTo = nullptr;
-	AllocationType = EResourceAllocationType::NotAllocated;
-	OnFreed.Broadcast(this);
+		UResourceSink* OldSink = SinkAllocatedTo;
+		SinkAllocatedTo = nullptr;
+		OldSink->FreeResource(this);
+
+		OnFreed.Broadcast(this);
+	}
 }
 
 /**

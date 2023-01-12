@@ -24,7 +24,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FBlueprintSinkAmountUpdateDelegate, 
 /**
  * Something that can consume resources. A sink handle when resources are allocated to itself.
  */
-UCLASS(BlueprintType, CustomConstructor)
+UCLASS(BlueprintType, CustomConstructor, CollapseCategories)
 class UResourceSink : public UActorComponent
 {
     GENERATED_BODY()

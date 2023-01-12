@@ -207,7 +207,7 @@ protected:
 	UResourceSink* RangeData;
 
 	//The scale applied to the shape of this plant type to get all effected locations of this plant type's effects.
-	UPROPERTY(EditDefaultsOnly, Category = "Plant|Effect", Meta = (ClampMin = "0"))
+	UPROPERTY(VisibleInstanceOnly, Category = "Plant|Effect", Meta = (ClampMin = "0"))
 	int Range = 1;
 
 private:

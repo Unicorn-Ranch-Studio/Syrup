@@ -60,6 +60,8 @@ UResourceSink* UResourceSink::AddResourceSinkComponent(AActor* Owner, FResourceS
  */
 void UResourceSink::BeginPlay()
 {
+	Super::BeginPlay();
+
 	ASyrupGameMode::GetTileEffectTriggerDelegate(this).AddDynamic(this, &UResourceSink::ReceiveEffectTrigger);
 	OnAmountChanged.Execute(Data.IntialValue);
 }
@@ -116,16 +118,23 @@ bool UResourceSink::AllocateResource(UResource* ResourceToAllocate)
 void UResourceSink::FreeResource(UResource* FreedResource)
 {
 	FreedResource->Free();
-	if (IncrementsThisTurn)
+
+	if (IsValid(this))
 	{
-		IncrementsThisTurn--;
-		EventOnAmountChanged.Broadcast(GetAllocationAmount());
-	}
-	else
-	{
-		int NewAmount = GetAllocationAmount() - Data.IncrementPerResource;
-		OnAmountChanged.Execute(NewAmount);
-		EventOnAmountChanged.Broadcast(NewAmount);
+		if (IncrementsThisTurn)
+		{
+			IncrementsThisTurn--;
+			EventOnAmountChanged.Broadcast(GetAllocationAmount());
+		}
+		else
+		{
+			int NewAmount = GetAllocationAmount() - Data.IncrementPerResource;
+			if (IsValid(GetOwner()))
+			{
+				OnAmountChanged.Execute(NewAmount);
+			}
+			EventOnAmountChanged.Broadcast(NewAmount);
+		}
 	}
 }
 
