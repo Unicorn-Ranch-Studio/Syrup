@@ -24,13 +24,13 @@ APlant::APlant()
 	FSinkAmountDelegate AmountGetter;
 	AmountGetter.BindUFunction(this, FName("GetHealth"));
 
-	HealthData = UResourceSink::CreateDefaultResourceSinkComponent(this, AmountSetter, LocationGetter, AmountGetter);
+	HealthResourceSink = UResourceSink::CreateDefaultResourceSinkComponent(this, AmountSetter, LocationGetter, AmountGetter);
 	AmountSetter.BindUFunction(this, FName("SetRange"));
 	AmountGetter.BindUFunction(this, FName("GetRange"));
-	RangeData = UResourceSink::CreateDefaultResourceSinkComponent(this, AmountSetter, LocationGetter, AmountGetter);
+	RangeResourceSink = UResourceSink::CreateDefaultResourceSinkComponent(this, AmountSetter, LocationGetter, AmountGetter);
 	AmountSetter.BindUFunction(this, FName("SetProduction"));
 	AmountGetter.BindUFunction(this, FName("GetProduction"));
-	ProductionData = UResourceSink::CreateDefaultResourceSinkComponent(this, AmountSetter, LocationGetter, AmountGetter);
+	ProductionResourceSink = UResourceSink::CreateDefaultResourceSinkComponent(this, AmountSetter, LocationGetter, AmountGetter);
 }
 
 
@@ -43,8 +43,6 @@ void APlant::BeginPlay()
 
 	SubtileMesh->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
 
-	bIsFinishedPlanting = true;
-	Grow();
 	bIsFinishedPlanting = ASyrupGameMode::IsPlayerTurn(this);
 
 	ASyrupGameMode::GetTileEffectTriggerDelegate(this).AddDynamic(this, &APlant::ReceiveEffectTrigger);
@@ -196,14 +194,6 @@ bool APlant::SowPlant(UObject* WorldContextObject, TSubclassOf<APlant> PlantClas
 	return false;
 }
 
-/**
- * Updates the plants so that it is 1 turn closer to fully grown, and causes the effects of being fully grown if needed.
- */
-void APlant::Grow_Implementation()
-{
-	
-}
-
 /* /\ Growth /\ *\
 \* ------------ */
 
@@ -245,11 +235,7 @@ void APlant::SetRange(const int NewRange)
  */
 void APlant::ReceiveEffectTrigger(const ETileEffectTriggerType TriggerType, const ATile* Triggerer, const TSet<FIntPoint>& LocationsToTrigger)
 {
-	if(TriggerType == ETileEffectTriggerType::PlantsGrow)
-	{
-		Grow();
-	} 
-	else if (!bIsFinishedPlanting && TriggerType == ETileEffectTriggerType::PlayerTurn)
+	if (!bIsFinishedPlanting && TriggerType == ETileEffectTriggerType::PlayerTurn)
 	{
 		bIsFinishedPlanting = true;
 	}

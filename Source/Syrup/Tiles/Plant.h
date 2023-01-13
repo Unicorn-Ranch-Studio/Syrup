@@ -10,7 +10,6 @@
 #include "Resources/ResourceSink.h"
 #include "Plant.generated.h"
 
-class UResource;
 class UResourceSink;
 class UApplyField;
 class UPreventTrashSpawn;
@@ -109,7 +108,7 @@ public:
 protected:
 	//The various properties of the health of this plant.
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Plant|Health")
-	UResourceSink* HealthData;
+	UResourceSink* HealthResourceSink;
 
 private:
 	//The current maximum health of this plant.
@@ -153,21 +152,6 @@ public:
 	FORCEINLINE int GetPlantingCost() const { return PlantingCost; };
 
 protected:
-	/**
-	 * Updates the plants so that it is 1 turn closer to fully grown, and causes the effects of being fully grown if needed.
-	 */
-	UFUNCTION(BlueprintNativeEvent)
-	void Grow();
-
-	/**
-	 * Updates the plants so that it is 1 turn closer to fully grown, and causes the effects of being fully grown if needed.
-	 */
-	UFUNCTION()
-	void Grow_Implementation();
-
-	//DELETE THIS WHEN NPCs GIVE RESOURCE. 
-	UPROPERTY(EditInstanceOnly)
-	bool bStartGrown = false;
 
 	//The amount of energy required to plant a plant of this type.
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Plant|Growth", Meta = (ClampMin = "0"))
@@ -204,7 +188,7 @@ protected:
 
 	//The relation of how resources are allocated to range and how that is displayed.
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Plant|Effect")
-	UResourceSink* RangeData;
+	UResourceSink* RangeResourceSink;
 
 	//The scale applied to the shape of this plant type to get all effected locations of this plant type's effects.
 	UPROPERTY(VisibleInstanceOnly, Category = "Plant|Effect", Meta = (ClampMin = "0"))
@@ -281,7 +265,7 @@ protected:
 
 	//The relation of how resources are allocated to production and how that is displayed.
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Plant|Resources")
-	UResourceSink* ProductionData;
+	UResourceSink* ProductionResourceSink;
 
 	//The number of resource this plant can produce. Should be an even number.
 	UPROPERTY(VisibleInstanceOnly, Category = "Plant|Resources", Meta = (ClampMin = "0"))
