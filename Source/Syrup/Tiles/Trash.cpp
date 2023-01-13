@@ -16,6 +16,27 @@
 \* \/ Initialization \/ */
 
 /**
+ * Initializes sink components.
+ */
+ATrash::ATrash()
+{
+	FSinkAmountUpdateDelegate AmountSetter;
+	AmountSetter.BindUFunction(this, FName("SetDamage"));
+	FSinkLocationsDelegate LocationGetter;
+	LocationGetter.BindUFunction(this, FName("GetSubTileLocations"));
+	FSinkAmountDelegate AmountGetter;
+	AmountGetter.BindUFunction(this, FName("GetDamage"));
+
+	DamageResourceSink = UResourceSink::CreateDefaultResourceSinkComponent(this, AmountSetter, LocationGetter, AmountGetter);
+	AmountSetter.BindUFunction(this, FName("SetRange"));
+	AmountGetter.BindUFunction(this, FName("GetRange"));
+	RangeResourceSink = UResourceSink::CreateDefaultResourceSinkComponent(this, AmountSetter, LocationGetter, AmountGetter);
+	AmountSetter.BindUFunction(this, FName("SetPickUpCost"));
+	AmountGetter.BindUFunction(this, FName("GetPickUpCost"));
+	PickUpCostResourceSink = UResourceSink::CreateDefaultResourceSinkComponent(this, AmountSetter, LocationGetter, AmountGetter);
+}
+
+/**
  * Sets up this trash after it has fallen.
  */
 void ATrash::OnFinishedFalling()
@@ -121,11 +142,6 @@ void ATrash::ReceiveEffectTrigger(const ETileEffectTriggerType TriggerType, cons
 {
 	if (bActive)
 	{
-		if (TriggerType == ETileEffectTriggerType::PlantsGrow)
-		{
-			Decay();
-		}
-
 		TSet<FIntPoint> EffectedLocations = GetEffectLocations();
 		TSet<FIntPoint> TriggeredLocations = LocationsToTrigger.IsEmpty() ? EffectedLocations : LocationsToTrigger.Intersect(EffectedLocations);
 
@@ -154,182 +170,6 @@ TSet<FIntPoint> ATrash::GetEffectLocations() const
 /* /\ Effect /\ *\
 \* ------------ */
 
-
-/* -------------- *\
-\* \/ Resource \/ */
-
-/**
- * Gets whether or not this can lose more damage.
- *
- * @param Resource - The resource that would be allocated.
- *
- * @return Whether or not this can lose more damage.
- */
-bool ATrash::CanDecayDamage(UResource* Resource) const
-{
-	return IsValid(Resource)
-		&& (DamageDecayResource == Resource->GetType() || DamageDecayResource == EResourceType::Any || Resource->GetType() == EResourceType::Any)
-		&& GetDamage() - NumDamageDecaying > MinDamage 
-		&& NumDamageDecaying < DamageDecayPerTurn * DamagePerResource;
-}
-
-/**
- * Gets whether or not this can lose more range.
- *
- * @param Resource - The resource that would be allocated.
- *
- * @return Whether or not this can lose more range.
- */
-bool ATrash::CanDecayRange(UResource* Resource) const
-{
-	return IsValid(Resource)
-		&& (RangeDecayResource == Resource->GetType() || RangeDecayResource == EResourceType::Any || Resource->GetType() == EResourceType::Any)
-		&& GetRange() - NumRangeDecaying > MinRange 
-		&& NumRangeDecaying < RangeDecayPerTurn * RangePerResource;
-}
-
-/**
- * Gets whether or not this can lose more pickup cost.
- *
- * @param Resource - The resource that would be allocated.
- *
- * @return Whether or not this can lose more pickup cost.
- */
-bool ATrash::CanDecayPickupCost(UResource* Resource) const
-{
-	return IsValid(Resource)
-		&& (PickUpCostDecayResource == Resource->GetType() || PickUpCostDecayResource == EResourceType::Any || Resource->GetType() == EResourceType::Any)
-		&& GetPickUpCost() - NumPickupCostDecaying > MinPickUpCost 
-		&& NumPickupCostDecaying < PickUpCostDecayPerTurn * PickUpCostPerResource;
-}
-
-/**
- * Causes this trash to lose damage, and allocates the given resource.
- *
- * @param Resource - The resource used to decay this damage.
- *
- * @return Whether or not this was successful at decaying more damage.
- */
-bool ATrash::DecayDamage(UResource* Resource)
-{
-	if (CanDecayDamage(Resource))
-	{
-		NumDamageDecaying = FMath::Min(NumDamageDecaying + DamagePerResource, Damage - MinDamage);
-		//Resource->Allocate(this, EResourceAllocationType::TrashDamage);
-		return true;
-	}
-	return false;
-}
-
-/**
- * Causes this trash to lose range, and allocates the given resource.
- *
- * @param Resource - The resource used to decay this range.
- *
- * @return Whether or not this was successful at decaying more range.
- */
-bool ATrash::DecayRange(UResource* Resource)
-{
-	if (CanDecayRange(Resource))
-	{
-		NumRangeDecaying = FMath::Min(NumRangeDecaying + RangePerResource, Range - MinRange);
-		//Resource->Allocate(this, EResourceAllocationType::TrashRange);
-		return true;
-	}
-	return false;
-}
-
-/**
- * Causes this trash to lose pickup cost, and allocates the given resource.
- *
- * @param Resource - The resource used to decay this pickup cost.
- *
- * @return Whether or not this was successful at decaying more pickup cost.
- */
-bool ATrash::DecayPickupCost(UResource* Resource)
-{
-	if (CanDecayPickupCost(Resource))
-	{
-		NumPickupCostDecaying = FMath::Min(NumPickupCostDecaying + PickUpCostPerResource, PickUpCost - MinPickUpCost);
-		//Resource->Allocate(this, EResourceAllocationType::TrashCost);
-		return true;
-	}
-	return false;
-}
-
-/**
- * Causes the effects of decaying.
- */
-void ATrash::Decay_Implementation()
-{
-	if (NumDamageDecaying)
-	{
-		SetDamage(GetDamage() - NumDamageDecaying);
-		NumDamageDecaying = 0;
-	}
-	if (NumRangeDecaying)
-	{
-		SetRange(GetRange() - NumRangeDecaying);
-		NumRangeDecaying = 0;
-	}
-	if (NumPickupCostDecaying)
-	{
-		PickUpCost -= NumPickupCostDecaying;
-		NumPickupCostDecaying = 0;
-	}
-}
-
-/**
- * Undoes the effect of a resource that was sunk in this.
- *
- * @param FreedResource - The resource that was freed.
- */
-void ATrash::ResourceFreed(UResource* FreedResource)
-{
-	switch (FreedResource->GetAllocationType())
-	{
-	case EResourceAllocationType::NotAllocated:
-		UE_LOG(LogResource, Warning, TEXT("Cant free unallocated resource on  %s"), *GetName());
-		return;
-	case EResourceAllocationType::TrashCost:
-		if (NumPickupCostDecaying)
-		{
-			NumPickupCostDecaying -= PickUpCostPerResource;
-		}
-		else
-		{
-			PickUpCost += PickUpCostPerResource;
-		}
-		break;
-	case EResourceAllocationType::TrashDamage:
-		if (NumDamageDecaying)
-		{
-			NumDamageDecaying -= DamagePerResource;
-		}
-		else
-		{
-			SetDamage(GetDamage() + DamagePerResource);
-		}
-		break;
-	case EResourceAllocationType::TrashRange:
-		if (NumRangeDecaying)
-		{
-			NumRangeDecaying -= RangePerResource;
-		}
-		else
-		{
-			SetRange(GetRange() + RangePerResource);
-		}
-		break;
-	default:
-		UE_LOG(LogResource, Error, TEXT("Tried to free a resource of non-trash type allocation from trash: %s"), *GetName());
-		return;
-	}
-	AllocatedResources.RemoveSingle(FreedResource);
-}
-
-/* /\ Resource /\ *\
-\* -------------- */
 
 /* /\ ====== /\ *\
 |  /\ ATrash /\  |
