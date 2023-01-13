@@ -90,8 +90,8 @@ public:
 
 protected:
 
-	//The sink used to change the pickup cost though resouce allocation.
-	UPROPERTY(EditDefaultsOnly, Category = "Trash|Pick Up")
+	//The sink used to change the pickup cost though resource allocation.
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Trash|Pick Up")
 	UResourceSink* PickUpCostResourceSink;
 
 	//The number of energy points required to pickup this trash.
@@ -154,16 +154,16 @@ protected:
 	UPROPERTY()
 	bool bActive = false;
 	
-	//The sink used to change the pickup cost though resouce allocation.
-	UPROPERTY(EditDefaultsOnly, Category = "Trash|Effect")
+	//The sink used to change the pickup cost though resource allocation.
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Trash|Effect")
 	UResourceSink* RangeResourceSink;
 
 	//The scale applied to the shape of this trash to get all effected locations of this trash's effects.
 	UPROPERTY(VisibleInstanceOnly, Category = "Trash|Effect", Meta = (ClampMin = "0"))
 	int Range = 1;
 	
-	//The sink used to change the pickup cost though resouce allocation.
-	UPROPERTY(EditDefaultsOnly, Category = "Trash|Damage")
+	//The sink used to change the pickup cost though resource allocation.
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Trash|Damage")
 	UResourceSink* DamageResourceSink;
 
 	//The number of hp points dealt to trash in range.

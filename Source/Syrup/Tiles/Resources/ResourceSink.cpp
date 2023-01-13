@@ -96,6 +96,8 @@ bool UResourceSink::AllocateResource(UResource* ResourceToAllocate)
 	}
 
 	ResourceToAllocate->Allocate(this, Data.AllocationType);
+	AllocatedResources.Add(ResourceToAllocate);
+
 	if (Data.bDeferredIncrement)
 	{
 		IncrementsThisTurn++;
@@ -118,6 +120,7 @@ bool UResourceSink::AllocateResource(UResource* ResourceToAllocate)
 void UResourceSink::FreeResource(UResource* FreedResource)
 {
 	FreedResource->Free();
+	AllocatedResources.Remove(FreedResource);
 
 	if (IsValid(this))
 	{
