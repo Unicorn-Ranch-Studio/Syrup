@@ -17,12 +17,12 @@ UENUM(BlueprintType)
 enum class EResourceAllocationType : uint8
 {
 	NotAllocated		UMETA(DisplayName = "Not Allocated"),
-	PlantHealth			UMETA(DisplayName = "Plant Health"),
-	PlantRange			UMETA(DisplayName = "Plant Range"),
-	PlantProduction		UMETA(DisplayName = "Plant Production"),
-	TrashDamage			UMETA(DisplayName = "Trash Damage"),
-	TrashRange			UMETA(DisplayName = "Trash Range"),
-	TrashCost			UMETA(DisplayName = "Trash Pickup Cost")
+	PlantHealth			UMETA(DisplayName = "Max Health"),
+	PlantRange			UMETA(DisplayName = "Range"),
+	PlantProduction		UMETA(DisplayName = "Production"),
+	TrashDamage			UMETA(DisplayName = "Damage"),
+	TrashRange			UMETA(DisplayName = "Range"),
+	TrashCost			UMETA(DisplayName = "Pickup Cost")
 };
 /* /\ ====================== /\ *\
 |  /\ EResourceAllocationType /\  |
