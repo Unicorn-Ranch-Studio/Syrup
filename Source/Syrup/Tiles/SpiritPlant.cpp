@@ -78,6 +78,7 @@ void ASpiritPlant::ProduceResource()
 	NewResource->OnFreed.AddDynamic(this, &ASpiritPlant::ResourceFreed);
 	NewResource->OnAllocated.AddDynamic(this, &ASpiritPlant::ResourceAllocated);
 	bNeedsMoreResource = false;
+	OnProductionChanged.Broadcast();
 }
 
 
