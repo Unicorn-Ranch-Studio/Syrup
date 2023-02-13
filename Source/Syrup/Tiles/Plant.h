@@ -58,22 +58,18 @@ public:
 	 * 
 	 * @param Amount - The number of damage points to damage this plant by.
 	 * @param Cause - The tile that caused this damage.
-	 * 
-	 * @return Whether or not this plant was killed by the damage.
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Plant|Health")
-	bool ReceiveDamage(int Amount, ATile* Cause);
+	void NotifyIncomingDamage(int Amount, ATile* Cause);
 
 	/**
 	 * Causes the visual effects of this plant taking damage
 	 * 
 	 * @param Amount - The number of damage points to that were caused to this plant.
 	 * @param Cause - The tile that caused this damage.
-	 * @param bShouldDestroy - Whether or not the plant should be destroyed once the VFX has finished.
 	 */
-	UFUNCTION(BlueprintNativeEvent , Category = "Plant|Health")
-	void OnDamageRecived(int Amount, ATile* Cause, bool bShouldDestroy);
-	FORCEINLINE void OnDamageRecived_Implementation(int Amount, ATile* Cause, bool bShouldDestroy) { if (bShouldDestroy) { Destroy(); } };
+	UFUNCTION(BlueprintImplementableEvent , Category = "Plant|Health")
+	void OnIncomingDamageRecived(int Amount, ATile* Cause);
 	
 	/**
 	 * Updates this plant to have the new amount of health.
@@ -114,7 +110,10 @@ private:
 	//The current maximum health of this plant.
 	UPROPERTY(VisibleInstanceOnly, Category = "Plant|Health")
 	int Health = 0;
-
+	
+	//The damage going taken by this plant next turn.
+	UPROPERTY()
+	int IncomingDamage = 0;
 
 	//The damage taken by this plant.
 	UPROPERTY(VisibleInstanceOnly)

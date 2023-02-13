@@ -15,8 +15,8 @@
 
 ASyrupGameMode::ASyrupGameMode()
 {
-	static ConstructorHelpers::FClassFinder<UTileLabelContainer> MyWidgetClass(TEXT("/Game/UI/TileLabels/WBP_TileLabelContianer"));
-	TileLabelContainerClass = MyWidgetClass.Class;
+	//static ConstructorHelpers::FClassFinder<UTileLabelContainer> MyWidgetClass(TEXT("/Game/UI/TileLabels/WBP_TileLabelContianer"));
+	//TileLabelContainerClass = MyWidgetClass.Class;
 }
 
 /* ----------------- *\

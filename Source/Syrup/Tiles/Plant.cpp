@@ -74,28 +74,20 @@ void APlant::OnConstruction(const FTransform& Transform)
 \* \/ Health \/ */
 
 /**
- * Causes this plant to take damage.
+ * Causes this plant to take damage on the next trash damage cycle.
  *
  * @param Amount - The number of damage points to damage this plant by.
  * @param Cause - The tile that caused this damage.
- *
- * @return Whether or not this plant was killed by the damage.
  */
-bool APlant::ReceiveDamage(int Amount, ATile* Cause)
+void APlant::NotifyIncomingDamage(int Amount, ATile* Cause)
 {
 	if (!bIsFinishedPlanting)
 	{
-		return false;
+		return;
 	}
 
-	DamageTaken += FMath::Max(0, Amount);
-	bool bDead = Health <= DamageTaken;
-	if (bDead && DamageTaken - Amount < Health)
-	{
-		Die();
-	}
-	OnDamageRecived(Amount, Cause, bDead);
-	return bDead;
+	OnIncomingDamageRecived(Amount, Cause);
+	IncomingDamage += FMath::Max(0, Amount);
 }
 
 
@@ -240,7 +232,18 @@ void APlant::ReceiveEffectTrigger(const ETileEffectTriggerType TriggerType, cons
 		bIsFinishedPlanting = true;
 	}
 
-	if ((GetRange() >= 0 || TriggerType == ETileEffectTriggerType::PlantsGrow) && Health > 0)
+	if (bIsFinishedPlanting && TriggerType == ETileEffectTriggerType::TrashDamage)
+	{
+		DamageTaken += IncomingDamage;
+		bool bDead = Health <= DamageTaken;
+		if (bDead && DamageTaken - IncomingDamage < Health)
+		{
+			Die();
+		}
+		IncomingDamage = 0;
+	}
+
+	if (GetRange() >= 0 && Health > 0 && bIsFinishedPlanting)
 	{
 		TSet<FIntPoint> EffectedLocations = GetEffectLocations();
 		TSet<FIntPoint> TriggeredLocations = LocationsToTrigger.IsEmpty() ? EffectedLocations : LocationsToTrigger.Intersect(EffectedLocations);

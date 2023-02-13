@@ -14,7 +14,9 @@
  */
 UDamagePlants::UDamagePlants()
 {
-	AffectTriggers.Add(ETileEffectTriggerType::TrashDamage);
+	AffectTriggers.Add(ETileEffectTriggerType::PlantSpawned);
+	AffectTriggers.Add(ETileEffectTriggerType::OnActivated);
+	AffectTriggers.Add(ETileEffectTriggerType::TrashActive);
 	UnaffectTriggers.Add(ETileEffectTriggerType::OnDeactivated);
 }
 
@@ -33,7 +35,7 @@ void UDamagePlants::Affect(const TSet<FIntPoint>& Locations)
 		APlant* Plant = Cast<APlant>(EachEffectedTile);
 		if (IsValid(Plant))
 		{
-			Plant->ReceiveDamage(GetDamage(), Cast<ATile>(GetOwner()));
+			Plant->NotifyIncomingDamage(GetDamage(), Cast<ATile>(GetOwner()));
 		}
 	}
 
