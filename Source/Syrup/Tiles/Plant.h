@@ -106,14 +106,14 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Plant|Health")
 	UResourceSink* HealthResourceSink;
 
+	//The tiles damaging this plant next turn and by how much.
+	UPROPERTY(BlueprintReadOnly)
+	TMap<ATile*, int> TilesToIncomingDamages;
+
 private:
 	//The current maximum health of this plant.
 	UPROPERTY(VisibleInstanceOnly, Category = "Plant|Health")
 	int Health = 0;
-	
-	//The damage going taken by this plant next turn.
-	UPROPERTY()
-	int IncomingDamage = 0;
 
 	//The damage taken by this plant.
 	UPROPERTY(VisibleInstanceOnly)
@@ -156,9 +156,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Plant|Growth", Meta = (ClampMin = "0"))
 	int PlantingCost = 1;
 
-	//Whether or not this plant has finished being planted.
+	//Whether or not this plant has finished being planted. **may be cause of bugs**
 	UPROPERTY(BlueprintReadOnly, Category = "Plant|Growth")
-	bool bIsFinishedPlanting = false;
+	bool bIsFinishedPlanting = true;
 
 	/* /\ Growth /\ *\
 	\* ------------ */

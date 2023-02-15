@@ -82,12 +82,12 @@ protected:
 	 */
 	virtual FORCEINLINE TSet<FIntPoint> GetLabelLocations(const TSet<FIntPoint>& Locations, const bool bForUnregistration) { return Locations; };
 
-	/**
-	 * Called when a component is destroyed, and undoes this effect.
-	 *
-	 * @param	bDestroyingHierarchy  - True if the entire component hierarchy is being torn down, allows avoiding expensive operations
-	 */
-	virtual void OnComponentDestroyed(bool bDestroyingHierarchy) override;
+	///**
+	// * Called when a component is destroyed, and undoes this effect.
+	// *
+	// * @param	bDestroyingHierarchy  - True if the entire component hierarchy is being torn down, allows avoiding expensive operations
+	// */
+	//virtual void OnComponentDestroyed(bool bDestroyingHierarchy) override;
 
 	//The triggers that will activate this effect.
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)

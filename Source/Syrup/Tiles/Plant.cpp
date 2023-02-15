@@ -86,8 +86,14 @@ void APlant::NotifyIncomingDamage(int Amount, ATile* Cause)
 		return;
 	}
 
+	int IncomingAmount = Amount;
+	if(TilesToIncomingDamages.Contains(Cause))
+	{
+		IncomingAmount += TilesToIncomingDamages.FindRef(Cause);
+	}
+	IncomingAmount = FMath::Max(0, IncomingAmount);
+	TilesToIncomingDamages.Add(Cause, IncomingAmount);
 	OnIncomingDamageRecived(Amount, Cause);
-	IncomingDamage += FMath::Max(0, Amount);
 }
 
 
@@ -234,13 +240,18 @@ void APlant::ReceiveEffectTrigger(const ETileEffectTriggerType TriggerType, cons
 
 	if (bIsFinishedPlanting && TriggerType == ETileEffectTriggerType::TrashDamage)
 	{
+		int IncomingDamage = 0;
+		for (TPair<ATile*, int> TileToIncomingDamage : TilesToIncomingDamages)
+		{
+			IncomingDamage += TileToIncomingDamage.Value;
+		}
 		DamageTaken += IncomingDamage;
 		bool bDead = Health <= DamageTaken;
 		if (bDead && DamageTaken - IncomingDamage < Health)
 		{
 			Die();
 		}
-		IncomingDamage = 0;
+		TilesToIncomingDamages.Empty();
 	}
 
 	if (GetRange() >= 0 && Health > 0 && bIsFinishedPlanting)
@@ -264,7 +275,12 @@ void APlant::ReceiveEffectTrigger(const ETileEffectTriggerType TriggerType, cons
  */
 TSet<FIntPoint> APlant::GetEffectLocations() const
 {
-	return UGridLibrary::ScaleShapeUp(GetSubTileLocations(), Range);
+	if (Range > 0)
+	{
+		return UGridLibrary::ScaleShapeUp(GetSubTileLocations(), Range);
+	}
+	
+	return TSet<FIntPoint>();
 }
 
 /* /\ Effect /\ *\

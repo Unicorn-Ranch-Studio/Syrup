@@ -108,17 +108,17 @@ void UTileEffect::ActivateEffect(const ETileEffectTriggerType TriggerType, const
 		Unaffect(Locations);
 	}
 }
-
-/**
- * Called when a component is destroyed, and undoes this effect.
- *
- * @param	bDestroyingHierarchy  - True if the entire component hierarchy is being torn down, allows avoiding expensive operations
- */
-void UTileEffect::OnComponentDestroyed(bool bDestroyingHierarchy)
-{
-	Super::OnComponentDestroyed(bDestroyingHierarchy);
-	Unaffect(EffectedLocations);
-}
+//
+///**
+// * Called when a component is destroyed, and undoes this effect.
+// *
+// * @param	bDestroyingHierarchy  - True if the entire component hierarchy is being torn down, allows avoiding expensive operations
+// */
+//void UTileEffect::OnComponentDestroyed(bool bDestroyingHierarchy)
+//{
+//	Super::OnComponentDestroyed(bDestroyingHierarchy);
+//	Unaffect(EffectedLocations);
+//}
 
 /* /\ =========== /\ *\
 |  /\ UTileEffect /\  |

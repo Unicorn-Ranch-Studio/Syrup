@@ -42,6 +42,33 @@ void UDamagePlants::Affect(const TSet<FIntPoint>& Locations)
 	Super::Affect(Locations);
 }
 
+/*
+ * Undoes this effect.
+ *
+ * @param Locations - The locations undo the effect in.
+ */
+void UDamagePlants::Unaffect(const TSet<FIntPoint>& Locations)
+{
+	if (!IsValid(GetWorld()))
+	{
+		return;
+	}
+
+	TSet<ATile*> EffectTiles;
+	UGridLibrary::OverlapShape(GetWorld(), Locations, EffectTiles, TArray<AActor*>());
+
+	for (ATile* EachEffectedTile : EffectTiles)
+	{
+		APlant* Plant = Cast<APlant>(EachEffectedTile);
+		if (IsValid(Plant))
+		{
+			Plant->NotifyIncomingDamage(-GetDamage(), Cast<ATile>(GetOwner()));
+		}
+	}
+
+	Super::Affect(Locations);
+}
+
 /**
  * Gets the subset of the given locations that will be labeled.
  * 
