@@ -96,12 +96,21 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Plant|Health")	
 	FORCEINLINE int GetDamageTaken() const { return DamageTaken; };
 
+protected:
+	
 	/**
 	 * Causes the effects of this plants death.
 	 */
-	void Die();
+	UFUNCTION(BlueprintNativeEvent)
+	void Died();
+	void Died_Implementation();
 
-protected:
+	/**
+	 * Causes the effects of this plants death.
+	 */
+	UFUNCTION(BlueprintImplementableEvent)
+	void Damaged();
+	
 	//The various properties of the health of this plant.
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Plant|Health")
 	UResourceSink* HealthResourceSink;

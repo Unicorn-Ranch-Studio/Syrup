@@ -81,7 +81,7 @@ void APlant::OnConstruction(const FTransform& Transform)
  */
 void APlant::NotifyIncomingDamage(int Amount, ATile* Cause)
 {
-	if (!bIsFinishedPlanting)
+	if (!bIsFinishedPlanting || !IsValid(Cause))
 	{
 		return;
 	}
@@ -91,7 +91,10 @@ void APlant::NotifyIncomingDamage(int Amount, ATile* Cause)
 	{
 		IncomingAmount += TilesToIncomingDamages.FindRef(Cause);
 	}
-	IncomingAmount = FMath::Max(0, IncomingAmount);
+	if (IncomingAmount <= 0)
+	{
+		TilesToIncomingDamages.Remove(Cause);
+	}
 	TilesToIncomingDamages.Add(Cause, IncomingAmount);
 	OnIncomingDamageRecived(Amount, Cause);
 }
@@ -107,18 +110,26 @@ void APlant::SetHealth_Implementation(int NewHealth)
 	if (DamageTaken > NewHealth && Health > DamageTaken)
 	{
 		Health = NewHealth;
-		Die();
+		Died();
 	}
 	else
 	{
-		Health = NewHealth;
+		if (NewHealth < Health)
+		{
+			Health = NewHealth;
+			Damaged();
+		}
+		else
+		{
+			Health = NewHealth;
+		}
 	}
 }
 
 /**
  * Causes the effects of this plants death.
  */
-void APlant::Die()
+void APlant::Died_Implementation()
 {
 	if (!bHasDied)
 	{
@@ -252,7 +263,11 @@ void APlant::ReceiveEffectTrigger_Implementation(const ETileEffectTriggerType Tr
 		DamageTaken += IncomingDamage;
 		if (Health <= DamageTaken)
 		{
-			Die();
+			Died();
+		}
+		else
+		{
+			Damaged();
 		}
 		TilesToIncomingDamages.Empty();
 	}
