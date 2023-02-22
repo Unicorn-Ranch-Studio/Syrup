@@ -120,18 +120,22 @@ void APlant::SetHealth_Implementation(int NewHealth)
  */
 void APlant::Die()
 {
-	for (UResource* EachAllocatedResource : AllocatedResources)
+	if (!bHasDied)
 	{
-		EachAllocatedResource->Free();
-	}
-	for (UResource* EachAllocatedResource : ProducedResources)
-	{
-		EachAllocatedResource->Free();
-	}
+		bHasDied = true;
+		for (UResource* EachAllocatedResource : AllocatedResources)
+		{
+			EachAllocatedResource->Free();
+		}
+		for (UResource* EachAllocatedResource : ProducedResources)
+		{
+			EachAllocatedResource->Free();
+		}
 
-	SubtileMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	ASyrupGameMode::GetTileEffectTriggerDelegate(GetWorld()).Broadcast(ETileEffectTriggerType::PlantKilled, this, GetSubTileLocations());
-	ReceiveEffectTrigger(ETileEffectTriggerType::OnDeactivated, nullptr, TSet<FIntPoint>());
+		SubtileMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		ASyrupGameMode::GetTileEffectTriggerDelegate(GetWorld()).Broadcast(ETileEffectTriggerType::PlantKilled, this, GetSubTileLocations());
+		ReceiveEffectTrigger(ETileEffectTriggerType::OnDeactivated, nullptr, TSet<FIntPoint>());
+	}
 }
 
 /* /\ Health /\ *\
@@ -231,7 +235,7 @@ void APlant::SetRange(const int NewRange)
  * @param Triggerer - The tile that triggered this effect.
  * @param LocationsToTrigger - The Locations where the trigger applies an effect. If this is empty all effect locations will be effected.
  */
-void APlant::ReceiveEffectTrigger(const ETileEffectTriggerType TriggerType, const ATile* Triggerer, const TSet<FIntPoint>& LocationsToTrigger)
+void APlant::ReceiveEffectTrigger_Implementation(const ETileEffectTriggerType TriggerType, const ATile* Triggerer, const TSet<FIntPoint>& LocationsToTrigger)
 {
 	if (!bIsFinishedPlanting && TriggerType == ETileEffectTriggerType::PlayerTurn)
 	{
@@ -246,8 +250,7 @@ void APlant::ReceiveEffectTrigger(const ETileEffectTriggerType TriggerType, cons
 			IncomingDamage += TileToIncomingDamage.Value;
 		}
 		DamageTaken += IncomingDamage;
-		bool bDead = Health <= DamageTaken;
-		if (bDead && DamageTaken - IncomingDamage < Health)
+		if (Health <= DamageTaken)
 		{
 			Die();
 		}

@@ -109,7 +109,7 @@ bool UResource::CanAllocateTo(UResourceSink* LinkedSink) const
 		return false;
 	}
 
-	if (Type != EResourceType::Any && LinkedSink->GetSinkData().RequiredResourceType != EResourceType::Any && Type != LinkedSink->GetSinkData().RequiredResourceType)
+	if (Type != EResourceType::Any && LinkedSink->GetRequiredResourceType() != EResourceType::Any && Type != LinkedSink->GetRequiredResourceType())
 	{
 		return false;
 	}

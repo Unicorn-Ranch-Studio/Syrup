@@ -34,7 +34,7 @@ struct SYRUP_API FResourceSinkData
 
     //The type of resource needed to increment this.
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Allocation")
-    EResourceType RequiredResourceType = EResourceType::Any;
+    TArray<EResourceType> RequiredResourceTypes = TArray<EResourceType>();
 
     //Whether or not there is a maximum number of times this sink can be allocated to.
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Allocation", Meta = (InlineEditConditionToggle))

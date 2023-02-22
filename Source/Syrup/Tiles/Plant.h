@@ -105,6 +105,10 @@ protected:
 	//The various properties of the health of this plant.
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Plant|Health")
 	UResourceSink* HealthResourceSink;
+	
+	//Whether or not this plant has died.
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "Plant|Health")
+	bool bHasDied = false;
 
 	//The tiles damaging this plant next turn and by how much.
 	UPROPERTY(BlueprintReadOnly)
@@ -116,7 +120,7 @@ private:
 	int Health = 0;
 
 	//The damage taken by this plant.
-	UPROPERTY(VisibleInstanceOnly)
+	UPROPERTY(VisibleInstanceOnly, Category = "Plant|Health")
 	int DamageTaken = 0;
 
 	/* /\ Health /\ *\
@@ -184,6 +188,17 @@ public:
 	FORCEINLINE int GetRange() const { return Range; };
 
 protected:
+	
+	/**
+	 * Activates the appropriate effects given the trigger.
+	 * 
+	 * @param TriggerType - The type of trigger that was activated.
+	 * @param Triggerer - The tile that triggered this effect.
+	 * @param LocationsToTrigger - The Locations where the trigger applies an effect. If this is empty all effect locations will be effected.
+	 */
+	UFUNCTION(BlueprintNativeEvent)
+	void ReceiveEffectTrigger(const ETileEffectTriggerType TriggerType, const ATile* Triggerer, const TSet<FIntPoint>& LocationsToTrigger);
+	void ReceiveEffectTrigger_Implementation(const ETileEffectTriggerType TriggerType, const ATile* Triggerer, const TSet<FIntPoint>& LocationsToTrigger);
 
 	//The relation of how resources are allocated to range and how that is displayed.
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Plant|Effect")
@@ -194,16 +209,6 @@ protected:
 	int Range = 1;
 
 private:
-
-	/**
-	 * Activates the appropriate effects given the trigger.
-	 * 
-	 * @param TriggerType - The type of trigger that was activated.
-	 * @param Triggerer - The tile that triggered this effect.
-	 * @param LocationsToTrigger - The Locations where the trigger applies an effect. If this is empty all effect locations will be effected.
-	 */
-	UFUNCTION()
-	void ReceiveEffectTrigger(const ETileEffectTriggerType TriggerType, const ATile* Triggerer, const TSet<FIntPoint>& LocationsToTrigger);
 
 	/**
 	 * Gets the locations where the effects of this plant will apply.

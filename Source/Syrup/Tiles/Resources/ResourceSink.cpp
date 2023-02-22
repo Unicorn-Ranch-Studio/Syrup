@@ -1,10 +1,11 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
+
+#include "ResourceSink.h"
+
 #include "Resource.h"
 #include "Syrup/Tiles/Effects/TileEffectTrigger.h"
 #include "Syrup/Systems/SyrupGameMode.h"
-
-#include "ResourceSink.h"
 
  /* \/ ============ \/ *\
  |  \/ ResourceSink \/  |
@@ -78,7 +79,7 @@ bool UResourceSink::CanAllocateResource(UResource* FreedResource) const
 	return IsValid(FreedResource) //Check validity
 		&& (!Data.bHasMaxIncrement || AllocatedResources.Num() < Data.MaxIncrements) //Check max increment
 		&& (!Data.bHasMaxIncrementmentsPerTurn || IncrementsThisTurn < Data.MaxIncrementmentsPerTurn) //Check per turn increment
-		&& (FreedResource->GetType() == Data.RequiredResourceType || FreedResource->GetType() == EResourceType::Any || Data.RequiredResourceType == EResourceType::Any); //Check resource type
+		&& (FreedResource->GetType() == GetRequiredResourceType() || FreedResource->GetType() == EResourceType::Any || GetRequiredResourceType() == EResourceType::Any); //Check resource type
 }
 
 /**

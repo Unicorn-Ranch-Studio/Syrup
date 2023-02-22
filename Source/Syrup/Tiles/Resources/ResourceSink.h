@@ -102,6 +102,14 @@ public:
      */
     UFUNCTION(BlueprintPure, Category = "Resources")
     FORCEINLINE FResourceSinkData GetSinkData() const { return Data; };
+    
+    /**
+     * Gets gets the resource type needed for the next allocation.
+     *
+     * @return The data for relating to allocation for this sink.
+     */
+    UFUNCTION(BlueprintPure, Category = "Resources")
+    FORCEINLINE EResourceType GetRequiredResourceType() const { return (Data.RequiredResourceTypes.IsEmpty() ? EResourceType::Any : Data.RequiredResourceTypes[FMath::Min(AllocatedResources.Num(), Data.RequiredResourceTypes.Num()-1)]); };
 
     /**
      * Gets whether it is possible to allocate a resource to this.
