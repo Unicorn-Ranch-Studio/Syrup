@@ -4,8 +4,8 @@
 #include "SyrupSaveGame.h"
 
 #include "Kismet/GameplayStatics.h"
+#include "EngineUtils.h"
 #include "Syrup/Tiles/Plant.h"
-#include "Syrup/Tiles/SpiritPlant.h"
 #include "Syrup/Tiles/Trash.h"
 #include "Syrup/Tiles/Resources/ResourceFaucet.h"
 #include "Syrup/Tiles/Resources/Resource.h"
@@ -15,8 +15,9 @@
  * 
  * @param WorldContext - An object in the world to save.
  * @param SlotName - The name of the save slot to put the world in.
+ * @param DynamicTileClasses - The classes of tile that will be spawned or destroyed during runtime.
  */
-void USyrupSaveGame::SaveGame(const UObject* WorldContext, const FString& SlotName)
+void USyrupSaveGame::SaveGame(const UObject* WorldContext, const FString& SlotName, TArray<TSubclassOf<ATile>> DynamicTileClasses)
 {
 	if (!IsValid(WorldContext) || !IsValid(WorldContext->GetWorld()))
 	{
@@ -26,20 +27,28 @@ void USyrupSaveGame::SaveGame(const UObject* WorldContext, const FString& SlotNa
 	USyrupSaveGame* Save = NewObject<USyrupSaveGame>();
 	UWorld* World = WorldContext->GetWorld();
 
-	TArray<AActor*> SpiritPlants;
-	UGameplayStatics::GetAllActorsOfClass(WorldContext, ASpiritPlant::StaticClass(), SpiritPlants);
-	Save->StoreTiles(SpiritPlants);
+	for (TActorIterator<ATile> EachTile(World); EachTile; ++EachTile)
+	{
+		TSubclassOf<ATile> TileClass = EachTile->GetClass();
+		if (DynamicTileClasses.Contains(DynamicTileClasses))
+		{
+			Save->TileData.Add(FTileSaveData(EachTile->GetGridTransform(), TileClass));
+		}
 
-	TArray<AActor*> Plants;
-	UGameplayStatics::GetAllActorsOfClass(WorldContext, APlant::StaticClass(), Plants);
-	Save->StoreTiles(Plants);
+		if (IResourceFaucet* EachFaucet = Cast<IResourceFaucet>(*EachTile))
+		{
+			FFaucetSaveData DataToSave = FFaucetSaveData(EachTile->GetGridTransform().Location);
+			for (UResource* EachProducedResource : EachFaucet->GetProducedResources())
+			{
+				UResourceSink* LinkedSink = EachProducedResource->GetLinkedSink();
 
-	TArray<AActor*> Trash;
-	UGameplayStatics::GetAllActorsOfClass(WorldContext, ATrash::StaticClass(), Trash);
-	Save->StoreTiles(Trash);
+				DataToSave.TargetLocation = LinkedSink->GetOwner<ATile>()->GetGridTransform().Location;
+				DataToSave.SinkName = LinkedSink->GetFName();
 
-	bool bSuccess = UGameplayStatics::SaveGameToSlot(Save, SlotName, 0);
-	UE_LOG(LogTemp, Warning, TEXT("%s"), *FString(bSuccess ? "Saving Successful" : " * Saving FAILED * "))
+				Save->FaucetData.Add(DataToSave);
+			}
+		}
+	}
 }
 
 /**
@@ -47,8 +56,9 @@ void USyrupSaveGame::SaveGame(const UObject* WorldContext, const FString& SlotNa
  *
  * @param WorldContext - An object in the world to save.
  * @param SlotName - The name of the save slot to load the world from.
+ * @param DynamicTileClasses - The classes of tile that will be spawned or destroyed during runtime.
  */
-void USyrupSaveGame::LoadGame(const UObject* WorldContext, const FString& SlotName, const TSoftObjectPtr<UWorld> EmptyLevel)
+void USyrupSaveGame::LoadGame(const UObject* WorldContext, const FString& SlotName, TArray<TSubclassOf<ATile>> DynamicTileClasses)
 {
 	if (!IsValid(WorldContext) || !IsValid(WorldContext->GetWorld()))
 	{
@@ -63,59 +73,24 @@ void USyrupSaveGame::LoadGame(const UObject* WorldContext, const FString& SlotNa
 		return;
 	}
 
-	TArray<AActor*> ActorsToDestroy;
-	UGameplayStatics::GetAllActorsOfClass(WorldContext, ASpiritPlant::StaticClass(), ActorsToDestroy);
-	DestroyActors(ActorsToDestroy);
-	UGameplayStatics::GetAllActorsOfClass(WorldContext, APlant::StaticClass(), ActorsToDestroy);
-	DestroyActors(ActorsToDestroy);
-	UGameplayStatics::GetAllActorsOfClass(WorldContext, ATrash::StaticClass(), ActorsToDestroy);
-	DestroyActors(ActorsToDestroy);
-
-	for (FTileSaveData EachTileData : Save->TileData)
+	for (TActorIterator<ATile> EachTile(World); EachTile; ++EachTile)
 	{
-		FTransform ActorTranfrom = UGridLibrary::GridTransformToWorldTransform(EachTileData.TileTransfrom);
-		ATile* NewTile = World->SpawnActor<ATile>(EachTileData.TileClass, ActorTranfrom);
-	}
-}
-
-
-/**
- * Stores an array of tiles and their resource sinks.
- *
- * @param Tiles - The tiles to store
- */
-void USyrupSaveGame::StoreTiles(TArray<AActor*> Tiles)
-{
-	for (AActor* EachTile : Tiles)
-	{
-		ATile* Tile = Cast<ATile>(EachTile);
-		TArray<FSinkTargetSaveData> FaucetLinks = TArray<FSinkTargetSaveData>();
-		if (IResourceFaucet* Faucet = Cast<IResourceFaucet>(Tile))
+		TSubclassOf<ATile> TileClass = EachTile->GetClass();
+		if (DynamicTileClasses.Contains(DynamicTileClasses))
 		{
-			for (UResource* EachProducedResource : Faucet->GetProducedResources())
-			{
-				if (EachProducedResource->IsAllocated())
-				{
-					UResourceSink* LinkedSink = EachProducedResource->GetLinkedSink();
-					UE_LOG(LogTemp, Warning, TEXT("Name: %s"), *LinkedSink->GetFName().ToString());
-					FaucetLinks.Add(FSinkTargetSaveData(LinkedSink->GetOwner<ATile>()->GetGridTransform().Location, LinkedSink->GetFName()));
-				}
-			}
+			EachTile->Destroy();
 		}
-
-		TileData.Add(FTileSaveData(Tile->GetGridTransform(), Tile->GetClass(), FaucetLinks));
 	}
-}
 
-/**
- * Destroys all the actors.
- *
- * @param Actors - The actors to destroy.
- */
-void USyrupSaveGame::DestroyActors(TArray<AActor*> Actors)
-{
-	for (AActor* EachActor : Actors)
+	TMap<FIntPoint, ATile*> LocationsToTiles = TMap<FIntPoint, ATile*>();
+	for (FTileSaveData EachTileDataum : Save->TileData)
 	{
-		Actors->Destroy();
+		FTransform ActorTransfrom = UGridLibrary::GridTransformToWorldTransform(EachTileDataum.TileTransfrom);
+		LocationsToTiles.Add(EachTileDataum.TileTransfrom.Location, World->SpawnActor<ATile>(EachTileDataum.TileClass, ActorTransfrom));
+	}
+
+	for (FFaucetSaveData EachFaucetDataum : Save->FaucetData)
+	{
+		EachFaucetDataum.Location
 	}
 }

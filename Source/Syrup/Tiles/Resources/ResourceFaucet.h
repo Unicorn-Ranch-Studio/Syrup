@@ -42,6 +42,14 @@ public:
      */
     UFUNCTION(BlueprintPure, Category = "Resources")
     virtual TArray<UResource*> GetProducedResources() const = 0;
+
+    /**
+     * Adds a new resource to this Faucet.
+     *
+     * @param NewResource - The resource to consider as being produced by this.
+     */
+    UFUNCTION()
+    virtual void AddProducedResource(UResource* NewResource) const = 0;
 };
 /* /\ ============ /\ *\
 |  /\ ResourceSink /\  |
