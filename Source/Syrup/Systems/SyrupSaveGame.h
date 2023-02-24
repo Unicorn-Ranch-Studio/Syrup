@@ -11,6 +11,8 @@
 #include "GameFramework/SaveGame.h"
 #include "SyrupSaveGame.generated.h"
 
+DECLARE_LOG_CATEGORY_EXTERN(LogSaveGame, Log, All);
+
 /**
  * 
  */
@@ -79,7 +81,7 @@ private:
 	 * 
 	 * @param World - The world to destroy tiles in.
 	 */
-	void DestoryDynamicTiles(UWorld* World);
+	void DestoryDynamicTiles();
 
 	/**
 	 * Spawns the tiles from the data stored.
@@ -87,7 +89,7 @@ private:
 	 * @param World - The world to spawn the tiles in.
 	 * @param LocationsToTiles - Will be set to contain the locations of each tile.
 	 */
-	void SpawnTiles(UWorld* World, TMap<FIntPoint, ATile*>& LocationsToTiles);
+	void SpawnTiles(TMap<FIntPoint, ATile*>& LocationsToTiles);
 
 	/**
 	 * Sets the sink amounts from the data stored.
@@ -110,6 +112,14 @@ private:
 	 */
 	void AllocateResources(const TMap<FIntPoint, ATile*> LocationsToTiles = TMap<FIntPoint, ATile*>());
 
+	/**
+	 * Gets the tile at a given location.
+	 * 
+	 * @param WorldContext - An object in the world to query as a fallback.
+	 * @param LocationToSearch - The location to find the tile at.
+	 * @param LocationsToTiles - The locations of tiles, if LocationToSearch is not contained, the world will be queried.
+	 */
+	ATile* GetTileAtLocation(const FIntPoint LocationToSearch, const TMap<FIntPoint, ATile*> LocationsToTiles = TMap<FIntPoint, ATile*>());
 	/* /\ Loading Helpers /\ *\
 	\* --------------------- */
 
@@ -131,4 +141,7 @@ private:
 
 	//The classes to save the tile data for.
 	TArray<TSubclassOf<ATile>> DynamicTileClasses;
+
+	//The world being saved/loaded.
+	UWorld* World = nullptr;
 };

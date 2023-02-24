@@ -10,6 +10,7 @@
 #include "Syrup/Tiles/Resources/ResourceFaucet.h"
 #include "Syrup/Tiles/Resources/Resource.h"
 
+DEFINE_LOG_CATEGORY(LogSaveGame);
 
 USyrupSaveGame::USyrupSaveGame()
 {
@@ -59,12 +60,12 @@ void USyrupSaveGame::LoadGame(const UObject* WorldContext, const FString& SlotNa
 	{
 		return;
 	}
-	UWorld* World = WorldContext->GetWorld();
+	Save->World = WorldContext->GetWorld();
 
-	Save->DestoryDynamicTiles(World);
+	Save->DestoryDynamicTiles();
 
 	TMap<FIntPoint, ATile*> LocationsToTiles = TMap<FIntPoint, ATile*>();
-	Save->SpawnTiles(World, LocationsToTiles);
+	Save->SpawnTiles(LocationsToTiles);
 	Save->UpdateSinkAmounts(LocationsToTiles);
 	Save->UpdateDamageTaken(LocationsToTiles);
 	Save->AllocateResources(LocationsToTiles);
@@ -150,7 +151,7 @@ void USyrupSaveGame::StoreTileSinkData(ATile* Tile)
  *
  * @param World - The world to destroy tiles in.
  */
-void USyrupSaveGame::DestoryDynamicTiles(UWorld* World)
+void USyrupSaveGame::DestoryDynamicTiles()
 {
 	for (TActorIterator<ATile> EachTile(World); EachTile; ++EachTile)
 	{
@@ -172,14 +173,14 @@ void USyrupSaveGame::DestoryDynamicTiles(UWorld* World)
  * @param World - The world to spawn the tiles in.
  * @param LocationsToTiles - Will be set to contain the locations of each tile.
  */
-void USyrupSaveGame::SpawnTiles(UWorld* World, TMap<FIntPoint, ATile*>& LocationsToTiles)
+void USyrupSaveGame::SpawnTiles(TMap<FIntPoint, ATile*>& LocationsToTiles)
 {
-	for (FTileSaveData EachTileDataum : TileData)
+	for (FTileSaveData EachTileDatum : TileData)
 	{
-		FTransform ActorTranfrom = UGridLibrary::GridTransformToWorldTransform(EachTileDataum.TileTransfrom);
-		ATile* NewTile = World->SpawnActor<ATile>(EachTileDataum.TileClass, ActorTranfrom);
+		FTransform ActorTranfrom = UGridLibrary::GridTransformToWorldTransform(EachTileDatum.TileTransfrom);
+		ATile* NewTile = World->SpawnActor<ATile>(EachTileDatum.TileClass, ActorTranfrom);
 
-		LocationsToTiles.Add(EachTileDataum.TileTransfrom.Location, NewTile);
+		LocationsToTiles.Add(EachTileDatum.TileTransfrom.Location, NewTile);
 	}
 }
 
@@ -190,7 +191,10 @@ void USyrupSaveGame::SpawnTiles(UWorld* World, TMap<FIntPoint, ATile*>& Location
  */
 void USyrupSaveGame::UpdateDamageTaken(const TMap<FIntPoint, ATile*> LocationsToTiles)
 {
-
+	for (FDamageTakenSaveData EachDamageTakenDatum : DamageTakenData)
+	{
+		Cast<APlant>(GetTileAtLocation(EachDamageTakenDatum.Location, LocationsToTiles))->SetDamageTaken(EachDamageTakenDatum.Amount);
+	}
 }
 
 /**
@@ -200,7 +204,28 @@ void USyrupSaveGame::UpdateDamageTaken(const TMap<FIntPoint, ATile*> LocationsTo
  */
 void USyrupSaveGame::UpdateSinkAmounts(const TMap<FIntPoint, ATile*> LocationsToTiles)
 {
+	for (FSinkSaveData EachSinkDatum : SinkData)
+	{
+		AActor* Owner = GetTileAtLocation(EachSinkDatum.Location, LocationsToTiles);
+		if (!IsValid(Owner))
+		{
+			UE_LOG(LogSaveGame, Error, TEXT("Sink: %s Owner not found at %s"), *EachSink->GetFName().ToString(), *EachSinkDatum.Location.ToString());
+		}
 
+		TArray<UResourceSink*> Sinks;
+		Owner->GetComponents<UResourceSink>(Sinks);
+
+		for (UResourceSink* EachSink : Sinks)
+		{
+			if (EachSink->GetFName() == EachSinkDatum.Name)
+			{
+				EachSink->SetAllocationAmount(EachSinkDatum.StoredAmount);
+				goto nextLoop;
+			}
+		}
+		UE_LOG(LogSaveGame, Error, TEXT("Sink: %s not found on %s"), *EachSink->GetFName().ToString(), *Owner->GetName());
+	nextLoop:
+	}
 }
 
 /**
@@ -211,6 +236,25 @@ void USyrupSaveGame::UpdateSinkAmounts(const TMap<FIntPoint, ATile*> LocationsTo
 void USyrupSaveGame::AllocateResources(const TMap<FIntPoint, ATile*> LocationsToTiles)
 {
 
+}
+
+
+/**
+ * Gets the tile at a given location.
+ *
+ * @param LocationToSearch - The location to find the tile at.
+ * @param LocationsToTiles - The locations of tiles, if LocationToSearch is not contained, the world will be queried.
+ */
+ATile* USyrupSaveGame::GetTileAtLocation(const FIntPoint LocationToSearch, const TMap<FIntPoint, ATile*> LocationsToTiles)
+{
+	if (LocationsToTiles.Contains(LocationToSearch))
+	{
+		return LocationsToTiles.FindRef(LocationToSearch);
+	}
+
+	ATile* ReturnValue;
+	UGridLibrary::OverlapGridLocation(World, LocationToSearch, ReturnValue, TArray<AActor*>());
+	return ReturnValue;
 }
 
 /* /\ Loading Helpers /\ *\

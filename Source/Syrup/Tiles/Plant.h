@@ -100,6 +100,14 @@ public:
 	 */
 	UFUNCTION(BlueprintPure, Category = "Plant|Health")	
 	FORCEINLINE int GetDamageTaken() const { return DamageTaken; };
+	
+	/**
+	 * Sets the amount of damage this plant has taken.
+	 *
+	 * @param NewDamageTaken - The amount of damage this plant has taken.
+	 */
+	UFUNCTION(Category = "Plant|Health")	
+	FORCEINLINE void SetDamageTaken(int NewDamageTaken) { DamageTaken = NewDamageTaken; };
 
 protected:
 	
