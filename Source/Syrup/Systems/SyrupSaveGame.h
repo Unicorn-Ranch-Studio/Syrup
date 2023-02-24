@@ -4,6 +4,8 @@
 
 #include "ResourceSaveData.h"
 #include "TileSaveData.h"
+#include "SinkSaveData.h"
+#include "DamageTakenSaveData.h"
 
 #include "CoreMinimal.h"
 #include "GameFramework/SaveGame.h"
@@ -88,33 +90,44 @@ private:
 	void SpawnTiles(UWorld* World, TMap<FIntPoint, ATile*>& LocationsToTiles);
 
 	/**
-	 * Sets the sink amounts from the data stored
+	 * Sets the sink amounts from the data stored.
 	 *
 	 * @param LocationsToTiles - The locations of every tile containing a sink.
 	 */
 	void UpdateSinkAmounts(const TMap<FIntPoint, ATile*> LocationsToTiles = TMap<FIntPoint, ATile*>());
+
+	/**
+	 * Sets the damage taken from the data stored.
+	 *
+	 * @param LocationsToTiles - The locations of every damaged plant.
+	 */
+	void UpdateDamageTaken(const TMap<FIntPoint, ATile*> LocationsToTiles = TMap<FIntPoint, ATile*>());
 	
 	/**
-	 * Sets the sink amounts from the data stored
+	 * Allocates all resources from the data stored.
 	 *
-	 * @param LocationsToTiles - The locations of every tile containing a sink.
+	 * @param LocationsToTiles - The locations of every tile containing a sink or faucet.
 	 */
-	void CreateResources(const TMap<FIntPoint, ATile*> LocationsToTiles = TMap<FIntPoint, ATile*>());
+	void AllocateResources(const TMap<FIntPoint, ATile*> LocationsToTiles = TMap<FIntPoint, ATile*>());
 
 	/* /\ Loading Helpers /\ *\
 	\* --------------------- */
 
-	//Stores the type and position of each dynamic tile
+	//Stores the type and position of each dynamic tile.
 	UPROPERTY()
 	TArray<FTileSaveData> TileData = TArray<FTileSaveData>();
 	
-	//Stores resources and what they link
+	//Stores resources and what they link.
 	UPROPERTY()
 	TArray<FResourceSaveData> ResourceData = TArray<FResourceSaveData>();
 	
-	//Stores the amount stored in each sink
+	//Stores the amount stored in each sink.
 	UPROPERTY()
-	TArray<int> SinkData = TArray<int>();
+	TArray<FSinkSaveData> SinkData = TArray<FSinkSaveData>();
+	
+	//Stores the amount stored in each sink.
+	UPROPERTY()
+	TArray<FDamageTakenSaveData> DamageTakenData = TArray<FDamageTakenSaveData>();
 
 	//The classes to save the tile data for.
 	TArray<TSubclassOf<ATile>> DynamicTileClasses;

@@ -41,6 +41,8 @@ void USyrupSaveGame::SaveGame(const UObject* WorldContext, const FString& SlotNa
 		Save->StoreTileSinkData(*EachTile);
 		Save->StoreTileResourceData(*EachTile);
 	}
+
+	UGameplayStatics::SaveGameToSlot(Save, SlotName, 0);
 }
 
 /**
@@ -64,7 +66,8 @@ void USyrupSaveGame::LoadGame(const UObject* WorldContext, const FString& SlotNa
 	TMap<FIntPoint, ATile*> LocationsToTiles = TMap<FIntPoint, ATile*>();
 	Save->SpawnTiles(World, LocationsToTiles);
 	Save->UpdateSinkAmounts(LocationsToTiles);
-	Save->CreateResources(LocationsToTiles);
+	Save->UpdateDamageTaken(LocationsToTiles);
+	Save->AllocateResources(LocationsToTiles);
 }
 
 /* -------------------- *\
@@ -77,10 +80,20 @@ void USyrupSaveGame::LoadGame(const UObject* WorldContext, const FString& SlotNa
  */
 void USyrupSaveGame::StoreTileData(ATile* Tile)
 {
-	TSubclassOf<ATile> TileClass = Tile->GetClass();
-	if (DynamicTileClasses.Contains(TileClass))
+	for (TSubclassOf<ATile> EachDynamicTileClass : DynamicTileClasses)
 	{
-		TileData.Add(FTileSaveData(Tile->GetGridTransform(), TileClass));
+		if (Tile->IsA(EachDynamicTileClass.Get()))
+		{
+			TSubclassOf<ATile> TileClass = Tile->GetClass();
+			TileData.Add(FTileSaveData(Tile->GetGridTransform(), TileClass));
+
+			if (TileClass == APlant::StaticClass())
+			{
+				APlant* Plant = Cast<APlant>(Tile);
+				DamageTakenData.Add(FDamageTakenSaveData(Tile->GetGridTransform().Location, Plant->GetDamageTaken()));
+			}
+			return;
+		}
 	}
 }
 
@@ -120,7 +133,7 @@ void USyrupSaveGame::StoreTileSinkData(ATile* Tile)
 	Tile->GetComponents<UResourceSink>(Sinks);
 	for (UResourceSink* EachSink : Sinks)
 	{
-		SinkData.Add(EachSink->GetAllocationAmount());
+		SinkData.Add(FSinkSaveData(Tile->GetGridTransform().Location, EachSink->GetFName(), EachSink->GetAllocationAmount()));
 	}
 }
 
@@ -142,29 +155,60 @@ void USyrupSaveGame::DestoryDynamicTiles(UWorld* World)
 	for (TActorIterator<ATile> EachTile(World); EachTile; ++EachTile)
 	{
 		TSubclassOf<ATile> TileClass = EachTile->GetClass();
-		if (DynamicTileClasses.Contains(TileClass))
+		for (TSubclassOf<ATile> EachDynamicTileClass : DynamicTileClasses)
 		{
-			EachTile->Destroy();
+			if (EachTile->IsA(EachDynamicTileClass.Get()))
+			{
+				EachTile->Destroy();
+				break;
+			}
 		}
 	}
 }
 
+/**
+ * Spawns the tiles from the data stored.
+ *
+ * @param World - The world to spawn the tiles in.
+ * @param LocationsToTiles - Will be set to contain the locations of each tile.
+ */
 void USyrupSaveGame::SpawnTiles(UWorld* World, TMap<FIntPoint, ATile*>& LocationsToTiles)
 {
 	for (FTileSaveData EachTileDataum : TileData)
 	{
 		FTransform ActorTranfrom = UGridLibrary::GridTransformToWorldTransform(EachTileDataum.TileTransfrom);
 		ATile* NewTile = World->SpawnActor<ATile>(EachTileDataum.TileClass, ActorTranfrom);
+
+		LocationsToTiles.Add(EachTileDataum.TileTransfrom.Location, NewTile);
 	}
 }
 
+/**
+ * Sets the sink amounts from the data stored.
+ *
+ * @param LocationsToTiles - The locations of every tile containing a sink.
+ */
+void USyrupSaveGame::UpdateDamageTaken(const TMap<FIntPoint, ATile*> LocationsToTiles)
+{
 
+}
+
+/**
+ * Sets the damage taken from the data stored.
+ *
+ * @param LocationsToTiles - The locations of every damaged plant.
+ */
 void USyrupSaveGame::UpdateSinkAmounts(const TMap<FIntPoint, ATile*> LocationsToTiles)
 {
 
 }
 
-void USyrupSaveGame::CreateResources(const TMap<FIntPoint, ATile*> LocationsToTiles)
+/**
+ * Allocates all resources from the data stored.
+ *
+ * @param LocationsToTiles - The locations of every tile containing a sink or faucet.
+ */
+void USyrupSaveGame::AllocateResources(const TMap<FIntPoint, ATile*> LocationsToTiles)
 {
 
 }
