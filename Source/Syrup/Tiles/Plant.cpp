@@ -265,7 +265,7 @@ void APlant::ReceiveEffectTrigger_Implementation(const ETileEffectTriggerType Tr
 		{
 			Died();
 		}
-		else
+		else if (IncomingDamage > 0)
 		{
 			Damaged();
 		}
