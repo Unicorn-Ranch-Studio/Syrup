@@ -209,7 +209,7 @@ void USyrupSaveGame::UpdateSinkAmounts(const TMap<FIntPoint, ATile*> LocationsTo
 		AActor* Owner = GetTileAtLocation(EachSinkDatum.Location, LocationsToTiles);
 		if (!IsValid(Owner))
 		{
-			UE_LOG(LogSaveGame, Error, TEXT("Sink: %s Owner not found at %s"), *EachSink->GetFName().ToString(), *EachSinkDatum.Location.ToString());
+			UE_LOG(LogSaveGame, Error, TEXT("Sink: %s Owner not found at %s"), *EachSinkDatum.Name.ToString(), *EachSinkDatum.Location.ToString());
 		}
 
 		TArray<UResourceSink*> Sinks;
@@ -223,7 +223,7 @@ void USyrupSaveGame::UpdateSinkAmounts(const TMap<FIntPoint, ATile*> LocationsTo
 				goto nextLoop;
 			}
 		}
-		UE_LOG(LogSaveGame, Error, TEXT("Sink: %s not found on %s"), *EachSink->GetFName().ToString(), *Owner->GetName());
+		UE_LOG(LogSaveGame, Error, TEXT("Sink: %s not found on %s"), *EachSinkDatum.Name.ToString(), *Owner->GetName());
 	nextLoop:
 	}
 }
