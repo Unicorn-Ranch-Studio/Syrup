@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "FaucetSaveData.h"
+#include "ResourceSaveData.h"
 #include "TileSaveData.h"
 
 #include "CoreMinimal.h"
@@ -18,6 +18,8 @@ class SYRUP_API USyrupSaveGame : public USaveGame
 	GENERATED_BODY()
 	
 public:
+	USyrupSaveGame();
+
 	/**
 	 * Saves the entire world state.
 	 * 
@@ -26,7 +28,7 @@ public:
 	 * @param DynamicTileClasses - The classes of tile that will be spawned or destroyed during runtime.
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Saving", Meta = (WorldContext = "WorldContext"))
-	static void SaveGame(const UObject* WorldContext, const FString& SlotName, TArray<TSubclassOf<ATile>> DynamicTileClasses);
+	static void SaveGame(const UObject* WorldContext, const FString& SlotName);
 
 	/**
 	 * Loads the entire world.
@@ -36,13 +38,84 @@ public:
 	 * @param DynamicTileClasses - The classes of tile that will be spawned or destroyed during runtime.
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Saving", Meta = (WorldContext = "WorldContext"))
-	static void LoadGame(const UObject* WorldContext, const FString& SlotName, TArray<TSubclassOf<ATile>> DynamicTileClasses);
+	static void LoadGame(const UObject* WorldContext, const FString& SlotName);
 
 private:
 
+	/* -------------------- *\
+	\* \/ Saving Helpers \/ */
+
+	/**
+	 * Stores a tile's class & transform.
+	 *
+	 * @param Tile - The tile whose data to store.
+	 */
+	void StoreTileData(ATile* Tile);
+
+	/**
+	 * Stores a tile's resources.
+	 *
+	 * @param Tile - The tile whose produced resources should be saved.
+	 */
+	void StoreTileResourceData(ATile* Tile);
+
+	/**
+	 * Stores a tile's sinks.
+	 *
+	 * @param Tile - The tile whose sinks should be saved.
+	 */
+	void StoreTileSinkData(ATile* Tile);
+
+	/* /\ Saving Helpers /\ *\
+	\* -------------------- */
+
+	/* --------------------- *\
+	\* \/ Loading Helpers \/ */
+
+	/**
+	 * Destroys all tiles that could have been spawned during runtime.
+	 * 
+	 * @param World - The world to destroy tiles in.
+	 */
+	void DestoryDynamicTiles(UWorld* World);
+
+	/**
+	 * Spawns the tiles from the data stored.
+	 * 
+	 * @param World - The world to spawn the tiles in.
+	 * @param LocationsToTiles - Will be set to contain the locations of each tile.
+	 */
+	void SpawnTiles(UWorld* World, TMap<FIntPoint, ATile*>& LocationsToTiles);
+
+	/**
+	 * Sets the sink amounts from the data stored
+	 *
+	 * @param LocationsToTiles - The locations of every tile containing a sink.
+	 */
+	void UpdateSinkAmounts(const TMap<FIntPoint, ATile*> LocationsToTiles = TMap<FIntPoint, ATile*>());
+	
+	/**
+	 * Sets the sink amounts from the data stored
+	 *
+	 * @param LocationsToTiles - The locations of every tile containing a sink.
+	 */
+	void CreateResources(const TMap<FIntPoint, ATile*> LocationsToTiles = TMap<FIntPoint, ATile*>());
+
+	/* /\ Loading Helpers /\ *\
+	\* --------------------- */
+
+	//Stores the type and position of each dynamic tile
 	UPROPERTY()
 	TArray<FTileSaveData> TileData = TArray<FTileSaveData>();
 	
+	//Stores resources and what they link
 	UPROPERTY()
-	TArray<FFaucetSaveData> FaucetData = TArray<FFaucetSaveData>();
+	TArray<FResourceSaveData> ResourceData = TArray<FResourceSaveData>();
+	
+	//Stores the amount stored in each sink
+	UPROPERTY()
+	TArray<int> SinkData = TArray<int>();
+
+	//The classes to save the tile data for.
+	TArray<TSubclassOf<ATile>> DynamicTileClasses;
 };

@@ -10,6 +10,14 @@
 #include "Syrup/Tiles/Resources/ResourceFaucet.h"
 #include "Syrup/Tiles/Resources/Resource.h"
 
+
+USyrupSaveGame::USyrupSaveGame()
+{
+	DynamicTileClasses = TArray<TSubclassOf<ATile>>();
+	DynamicTileClasses.Add(APlant::StaticClass());
+	DynamicTileClasses.Add(ATrash::StaticClass());
+}
+
 /**
  * Saves the entire world state.
  * 
@@ -17,7 +25,7 @@
  * @param SlotName - The name of the save slot to put the world in.
  * @param DynamicTileClasses - The classes of tile that will be spawned or destroyed during runtime.
  */
-void USyrupSaveGame::SaveGame(const UObject* WorldContext, const FString& SlotName, TArray<TSubclassOf<ATile>> DynamicTileClasses)
+void USyrupSaveGame::SaveGame(const UObject* WorldContext, const FString& SlotName)
 {
 	if (!IsValid(WorldContext) || !IsValid(WorldContext->GetWorld()))
 	{
@@ -29,25 +37,9 @@ void USyrupSaveGame::SaveGame(const UObject* WorldContext, const FString& SlotNa
 
 	for (TActorIterator<ATile> EachTile(World); EachTile; ++EachTile)
 	{
-		TSubclassOf<ATile> TileClass = EachTile->GetClass();
-		if (DynamicTileClasses.Contains(DynamicTileClasses))
-		{
-			Save->TileData.Add(FTileSaveData(EachTile->GetGridTransform(), TileClass));
-		}
-
-		if (IResourceFaucet* EachFaucet = Cast<IResourceFaucet>(*EachTile))
-		{
-			FFaucetSaveData DataToSave = FFaucetSaveData(EachTile->GetGridTransform().Location);
-			for (UResource* EachProducedResource : EachFaucet->GetProducedResources())
-			{
-				UResourceSink* LinkedSink = EachProducedResource->GetLinkedSink();
-
-				DataToSave.TargetLocation = LinkedSink->GetOwner<ATile>()->GetGridTransform().Location;
-				DataToSave.SinkName = LinkedSink->GetFName();
-
-				Save->FaucetData.Add(DataToSave);
-			}
-		}
+		Save->StoreTileData(*EachTile);
+		Save->StoreTileSinkData(*EachTile);
+		Save->StoreTileResourceData(*EachTile);
 	}
 }
 
@@ -58,39 +50,124 @@ void USyrupSaveGame::SaveGame(const UObject* WorldContext, const FString& SlotNa
  * @param SlotName - The name of the save slot to load the world from.
  * @param DynamicTileClasses - The classes of tile that will be spawned or destroyed during runtime.
  */
-void USyrupSaveGame::LoadGame(const UObject* WorldContext, const FString& SlotName, TArray<TSubclassOf<ATile>> DynamicTileClasses)
+void USyrupSaveGame::LoadGame(const UObject* WorldContext, const FString& SlotName)
 {
-	if (!IsValid(WorldContext) || !IsValid(WorldContext->GetWorld()))
+	USyrupSaveGame* Save = Cast<USyrupSaveGame>(UGameplayStatics::LoadGameFromSlot(SlotName, 0));
+	if (!IsValid(Save) || !IsValid(WorldContext) || !IsValid(WorldContext->GetWorld()))
 	{
 		return;
 	}
-
-	USyrupSaveGame* Save = Cast<USyrupSaveGame>(UGameplayStatics::LoadGameFromSlot(SlotName, 0));
 	UWorld* World = WorldContext->GetWorld();
 
-	if (!IsValid(Save))
-	{
-		return;
-	}
+	Save->DestoryDynamicTiles(World);
 
+	TMap<FIntPoint, ATile*> LocationsToTiles = TMap<FIntPoint, ATile*>();
+	Save->SpawnTiles(World, LocationsToTiles);
+	Save->UpdateSinkAmounts(LocationsToTiles);
+	Save->CreateResources(LocationsToTiles);
+}
+
+/* -------------------- *\
+\* \/ Saving Helpers \/ */
+
+/**
+ * Stores a tile's class & transform.
+ *
+ * @param Tile - The tile whose data to store.
+ */
+void USyrupSaveGame::StoreTileData(ATile* Tile)
+{
+	TSubclassOf<ATile> TileClass = Tile->GetClass();
+	if (DynamicTileClasses.Contains(TileClass))
+	{
+		TileData.Add(FTileSaveData(Tile->GetGridTransform(), TileClass));
+	}
+}
+
+/**
+ * Stores a tile's resources.
+ * 
+ * @param Tile - The tile whose produced resources should be saved.
+ */
+void USyrupSaveGame::StoreTileResourceData(ATile* Tile)
+{
+	if (IResourceFaucet* EachFaucet = Cast<IResourceFaucet>(Tile))
+	{
+		FResourceSaveData DataToSave = FResourceSaveData(Tile->GetGridTransform().Location);
+		for (UResource* EachProducedResource : EachFaucet->GetProducedResources())
+		{
+			if (EachProducedResource->IsAllocated())
+			{
+				UResourceSink* LinkedSink = EachProducedResource->GetLinkedSink();
+
+				DataToSave.FaucetLocation = LinkedSink->GetOwner<ATile>()->GetGridTransform().Location;
+				DataToSave.SinkName = LinkedSink->GetFName();
+
+				ResourceData.Add(DataToSave);
+			}
+		}
+	}
+}
+
+/**
+ * Stores a tile's sinks.
+ *
+ * @param Tile - The tile whose sinks should be saved.
+ */
+void USyrupSaveGame::StoreTileSinkData(ATile* Tile)
+{
+	TArray<UResourceSink*> Sinks;
+	Tile->GetComponents<UResourceSink>(Sinks);
+	for (UResourceSink* EachSink : Sinks)
+	{
+		SinkData.Add(EachSink->GetAllocationAmount());
+	}
+}
+
+/* /\ Saving Helpers /\ *\
+\* -------------------- */
+
+
+
+/* --------------------- *\
+\* \/ Loading Helpers \/ */
+
+/**
+ * Destroys all tiles that could have been spawned during runtime.
+ *
+ * @param World - The world to destroy tiles in.
+ */
+void USyrupSaveGame::DestoryDynamicTiles(UWorld* World)
+{
 	for (TActorIterator<ATile> EachTile(World); EachTile; ++EachTile)
 	{
 		TSubclassOf<ATile> TileClass = EachTile->GetClass();
-		if (DynamicTileClasses.Contains(DynamicTileClasses))
+		if (DynamicTileClasses.Contains(TileClass))
 		{
 			EachTile->Destroy();
 		}
 	}
+}
 
-	TMap<FIntPoint, ATile*> LocationsToTiles = TMap<FIntPoint, ATile*>();
-	for (FTileSaveData EachTileDataum : Save->TileData)
+void USyrupSaveGame::SpawnTiles(UWorld* World, TMap<FIntPoint, ATile*>& LocationsToTiles)
+{
+	for (FTileSaveData EachTileDataum : TileData)
 	{
-		FTransform ActorTransfrom = UGridLibrary::GridTransformToWorldTransform(EachTileDataum.TileTransfrom);
-		LocationsToTiles.Add(EachTileDataum.TileTransfrom.Location, World->SpawnActor<ATile>(EachTileDataum.TileClass, ActorTransfrom));
-	}
-
-	for (FFaucetSaveData EachFaucetDataum : Save->FaucetData)
-	{
-		EachFaucetDataum.Location
+		FTransform ActorTranfrom = UGridLibrary::GridTransformToWorldTransform(EachTileDataum.TileTransfrom);
+		ATile* NewTile = World->SpawnActor<ATile>(EachTileDataum.TileClass, ActorTranfrom);
 	}
 }
+
+
+void USyrupSaveGame::UpdateSinkAmounts(const TMap<FIntPoint, ATile*> LocationsToTiles)
+{
+
+}
+
+void USyrupSaveGame::CreateResources(const TMap<FIntPoint, ATile*> LocationsToTiles)
+{
+
+}
+
+/* /\ Loading Helpers /\ *\
+\* --------------------- */

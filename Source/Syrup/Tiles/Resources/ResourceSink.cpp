@@ -68,6 +68,18 @@ void UResourceSink::BeginPlay()
 }
 
 /**
+ * Sets the amount stored in this sink (not to be confused with the number of resources allocated to this).
+ *
+ * @param NewAmount - The amount to be stored in this sink.
+ */
+UFUNCTION(BlueprintPure, Category = "Resources")
+void UResourceSink::SetAllocationAmount(int NewAmount) const
+{
+	OnAmountChanged.Execute(NewAmount);
+	EventOnAmountChanged.Broadcast(NewAmount);
+}
+
+/**
  * Gets whether it is possible to allocate a resource to this.
  *
  * @param FreedResource - The resource to test.

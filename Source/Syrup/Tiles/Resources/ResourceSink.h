@@ -80,6 +80,14 @@ public:
     FORCEINLINE int GetAllocationAmount() const { return AllocatedAmountGetter.Execute(); };
 
     /**
+     * Sets the amount stored in this sink (not to be confused with the number of resources allocated to this).
+     *
+     * @param NewAmount - The amount to be stored in this sink.
+     */
+    UFUNCTION(Category = "Resources")
+    void SetAllocationAmount(int NewAmount) const;
+
+    /**
      * Gets all the resources allocated to this.
      *
      * @return The resources allocated to this.
