@@ -55,6 +55,12 @@ protected:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
 	UBoxComponent* SpawnArea;
 
+	/**
+	 * Spawns a trash.
+	 */
+	UFUNCTION(BlueprintImplementableEvent)
+	ATrash* SpawnTrash(FTransform TrashTransfrom);
+
 private:
 	/**
 	 * Links this to the game mode for receiving trigger events.
@@ -101,7 +107,7 @@ private:
 	 * @return Whether or not a trash was sucessfuly spawned.
 	 */
 	UFUNCTION()
-	bool SpawnTrash(bool bAttachTrash = false);
+	bool SpawnAllTrash(bool bAttachTrash = false);
 
 	//The number of trash existing trash that has been spawned by this.
 	UPROPERTY()

@@ -48,6 +48,11 @@ private:
 	virtual void BeginPlay() override;
 
 	/**
+	 * Handles undoing of tile effects.
+	 */
+	virtual void Destroyed() override;
+
+	/**
 	 * Initializes Damage, Range, and sets the appropriate mesh.
 	 *
 	 * @param Transform - The new transform of the trash.

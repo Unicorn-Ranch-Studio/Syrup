@@ -50,6 +50,15 @@ void APlant::BeginPlay()
 }
 
 /**
+ * Handles undoing effects and deallocating resources,
+ */
+void APlant::Destroyed()
+{
+	Died_Implementation();
+	Super::Destroyed();
+}
+
+/**
  * Initializes Health, Range, and Shape; and sets the appropriate mesh.
  *
  * @param Transform - The new transform of the plant.
@@ -144,7 +153,6 @@ void APlant::Died_Implementation()
 		}
 
 		SubtileMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		ASyrupGameMode::GetTileEffectTriggerDelegate(GetWorld()).Broadcast(ETileEffectTriggerType::PlantKilled, this, GetSubTileLocations());
 		ReceiveEffectTrigger(ETileEffectTriggerType::OnDeactivated, nullptr, TSet<FIntPoint>());
 	}
 }
@@ -263,6 +271,7 @@ void APlant::ReceiveEffectTrigger_Implementation(const ETileEffectTriggerType Tr
 		DamageTaken += IncomingDamage;
 		if (Health <= DamageTaken)
 		{
+			ASyrupGameMode::GetTileEffectTriggerDelegate(GetWorld()).Broadcast(ETileEffectTriggerType::PlantKilled, this, GetSubTileLocations());
 			Died();
 		}
 		else if (IncomingDamage > 0)

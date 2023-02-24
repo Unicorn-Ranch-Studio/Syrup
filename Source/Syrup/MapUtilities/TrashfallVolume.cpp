@@ -95,7 +95,7 @@ void ATrashfallVolume::OnConstruction(const FTransform& Transform)
 	{
 		while (NumTrash < NumToMaintain * InitalTrashPercent)
 		{
-			if (!SpawnTrash(true))
+			if (!SpawnAllTrash(true))
 			{
 				break;
 			}
@@ -120,7 +120,7 @@ void ATrashfallVolume::ReceiveEffectTrigger(const ETileEffectTriggerType Trigger
 		while (TrashToSpawn >= 1)
 		{
 			TrashToSpawn--;
-			SpawnTrash();
+			SpawnAllTrash();
 		}
 	}
 }
@@ -130,7 +130,7 @@ void ATrashfallVolume::ReceiveEffectTrigger(const ETileEffectTriggerType Trigger
  * 
  * @param bAttachTrash - Whether or not to attach the trash to this.
  */
-bool ATrashfallVolume::SpawnTrash(bool bAttachTrash)
+bool ATrashfallVolume::SpawnAllTrash(bool bAttachTrash)
 {
 	TSet<FIntPoint> RelativeTileLocations = TrashType.GetDefaultObject()->GetRelativeSubTileLocations();
 	int Count = 0;
@@ -162,7 +162,7 @@ bool ATrashfallVolume::SpawnTrash(bool bAttachTrash)
 			}
 		}
 
-		ATrash* SpawnedTrash = GetWorld()->SpawnActor<ATrash>(TrashType, SpawnWorldTransform);
+		ATrash* SpawnedTrash = SpawnTrash(SpawnWorldTransform);
 		SpawnedTrash->OnDestroyed.AddDynamic(this, &ATrashfallVolume::ReciveTrashDestoryed);
 		NumTrash++;
 

@@ -57,6 +57,15 @@ void ATrash::BeginPlay()
 }
 
 /**
+ * Handles undoing of tile effects.
+ */
+void ATrash::Destroyed()
+{
+	ReceiveEffectTrigger(ETileEffectTriggerType::OnDeactivated, nullptr, TSet<FIntPoint>());
+	Super::Destroyed();
+}
+
+/**
  * Initializes Damage, Range, and sets the appropriate mesh.
  *
  * @param Transform - The new transform of the trash.

@@ -39,6 +39,11 @@ private:
 	virtual void BeginPlay() override;
 
 	/**
+	 * Handles undoing effects and deallocating resources,
+	 */
+	virtual void Destroyed() override;
+
+	/**
 	 * Initializes Health, Range, and Shape; and sets the appropriate mesh.
 	 *
 	 * @param Transform - The new transform of the plant.
