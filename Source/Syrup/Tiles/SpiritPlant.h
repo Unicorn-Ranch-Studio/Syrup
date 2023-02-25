@@ -72,11 +72,15 @@ private:
 	 */
 	UFUNCTION()
 	void ReceiveEffectTrigger(const ETileEffectTriggerType TriggerType, const ATile* Triggerer, const TSet<FIntPoint>& LocationsToTrigger);
-
+    
     /**
-     * Produces a new resource.
+     * Causes this to produce an  additional resource of the given type.
+     * 
+     * @param Type - The type of resource to produce.
+     * 
+     * @return The newly created resource.
      */
-    void ProduceResource();
+    virtual UResource* ProduceResource(const EResourceType& Type) override;
 
     //Whether or not another resource needs to be produced.
     UPROPERTY()

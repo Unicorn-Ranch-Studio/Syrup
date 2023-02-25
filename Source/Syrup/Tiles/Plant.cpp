@@ -328,7 +328,7 @@ void APlant::SetProduction_Implementation(int NewProduction)
 	NewProduction = FMath::Max(0, NewProduction);
 	while (ProducedResources.Num() < NewProduction)
 	{
-		ProducedResources.Add(UResource::Create(ProductionType, this));
+		ProduceResource(ProductionType);
 		Production++;
 	}
 
@@ -355,6 +355,21 @@ void APlant::SetProduction_Implementation(int NewProduction)
 		ProducedResources.RemoveSingle(ResourceToRemove);
 		Production--;
 	}
+}
+
+
+/**
+ * Causes this to produce an  additional resource of the given type.
+ *
+ * @param Type - The type of resource to produce.
+ *
+ * @return The newly created resource.
+ */
+UResource* APlant::ProduceResource(const EResourceType& Type)
+{
+	UResource* NewResource = UResource::Create(Type, this);
+	ProducedResources.Add(NewResource);
+	return NewResource;
 }
 
 /* /\ Resource /\ *\

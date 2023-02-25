@@ -286,7 +286,15 @@ public:
 	 */
 	UFUNCTION(BlueprintPure, Category = "Resources")
 	virtual FORCEINLINE TSet<FIntPoint> GetAllocatableLocations() const override { return GetEffectLocations(); };
-
+	
+    /**
+     * Causes this to produce an  additional resource of the given type.
+     * 
+     * @param Type - The type of resource to produce.
+     * 
+     * @return The newly created resource.
+     */
+    virtual UResource* ProduceResource(const EResourceType& Type) override;
 protected:
 
 	//The relation of how resources are allocated to production and how that is displayed.

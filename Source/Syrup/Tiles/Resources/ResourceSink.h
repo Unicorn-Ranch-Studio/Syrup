@@ -129,15 +129,17 @@ public:
     UFUNCTION(BlueprintCallable, Category = "Resources")
     bool CanAllocateResource(UResource* FreedResource) const;
 
+
     /**
-     * Causes effect of a resource that was sunk in this.
+     * Undoes the effect of a resource that was sunk in this.
      *
-     * @param FreedResource - The resource to be allocated.
+     * @param ResourceToAllocate - The resource that was freed.
+     * @param bForceAllocation - Whether or not to ignore allocation requirements.
      *
      * @return Whether or not the allocation was successful.
      */
     UFUNCTION(BlueprintCallable, Category = "Resources")
-    bool AllocateResource(UResource* ResourceToAllocate);
+    bool AllocateResource(UResource* ResourceToAllocate, bool bForceAllocation = false);
 
     /**
      * Undoes the effect of a resource that was sunk in this.

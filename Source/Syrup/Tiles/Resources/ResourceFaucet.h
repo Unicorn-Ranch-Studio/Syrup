@@ -42,6 +42,16 @@ public:
      */
     UFUNCTION(BlueprintPure, Category = "Resources")
     virtual TArray<UResource*> GetProducedResources() const = 0;
+
+    /**
+     * Causes this to produce an  additional resource of the given type.
+     * 
+     * @param Type - The type of resource to produce.
+     * 
+     * @return The newly created resource.
+     */
+    UFUNCTION(Category = "Resources")
+    virtual UResource* ProduceResource(const EResourceType& Type) = 0;
 };
 /* /\ ============ /\ *\
 |  /\ ResourceSink /\  |

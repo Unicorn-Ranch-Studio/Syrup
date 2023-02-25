@@ -236,7 +236,54 @@ void USyrupSaveGame::UpdateSinkAmounts(const TMap<FIntPoint, ATile*> LocationsTo
  */
 void USyrupSaveGame::AllocateResources(const TMap<FIntPoint, ATile*> LocationsToTiles)
 {
+	for (FResourceSaveData ResourceDatum : ResourceData)
+	{
+		IResourceFaucet* Faucet = Cast<IResourceFaucet>(GetTileAtLocation(ResourceDatum.FaucetLocation));
+		if (!Faucet)
+		{
+			UE_LOG(LogSaveGame, Error, TEXT("Allocating resource from %s to the %s at %s failed to find faucet."), *ResourceDatum.FaucetLocation.ToString(), *ResourceDatum.SinkName.ToString(), *ResourceDatum.SinkLocation.ToString());
+			continue;
+		}
 
+		ATile* SinkOwner = GetTileAtLocation(ResourceDatum.SinkLocation);
+		if (!IsValid(SinkOwner))
+		{
+			UE_LOG(LogSaveGame, Error, TEXT("Allocating resource from %s to the %s at %s failed to find sink owner."), *ResourceDatum.FaucetLocation.ToString(), *ResourceDatum.SinkName.ToString(), *ResourceDatum.SinkLocation.ToString());
+			continue;
+		}
+
+		UResourceSink* Sink = nullptr;
+		TArray<UResourceSink*> Sinks;
+		SinkOwner->GetComponents<UResourceSink>(Sinks);
+		for (UResourceSink* EachSink : Sinks)
+		{
+			if (EachSink->GetFName() == ResourceDatum.SinkName)
+			{
+				Sink = EachSink;
+				break;
+			}
+		}
+		if (!IsValid(Sink))
+		{
+			UE_LOG(LogSaveGame, Error, TEXT("Allocating resource from %s to the %s at %s failed to find sink."), *ResourceDatum.FaucetLocation.ToString(), *ResourceDatum.SinkName.ToString(), *ResourceDatum.SinkLocation.ToString());
+			continue;
+		}
+
+		UResource* ResourceToAllocate = nullptr;
+		for (UResource* EachProducedResource : Faucet->GetProducedResources())
+		{
+			if (!EachProducedResource->IsAllocated() && EachProducedResource->GetType() == ResourceDatum.Type)
+			{
+				break;
+			}
+		}
+		if (!IsValid(ResourceToAllocate))
+		{
+			ResourceToAllocate = Faucet->ProduceResource(ResourceDatum.Type);
+		}
+
+		Sink->AllocateResource(ResourceToAllocate, true);
+	}
 }
 
 

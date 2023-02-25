@@ -13,7 +13,7 @@ void ASpiritPlant::BeginPlay()
 {
 	Super::BeginPlay();
 
-	ProduceResource();
+	ProduceResource(ProductionType);
 	OnProductionChanged.Broadcast();
 
 	ASyrupGameMode::GetTileEffectTriggerDelegate(this).AddDynamic(this, &ASpiritPlant::ReceiveEffectTrigger);
@@ -69,16 +69,21 @@ void ASpiritPlant::ResourceAllocated(UResource* UpdatedResource)
 }
 
 /**
- * Produces a new resource.
+ * Causes this to produce an  additional resource of the given type.
+ *
+ * @param Type - The type of resource to produce.
+ *
+ * @return The newly created resource.
  */
-void ASpiritPlant::ProduceResource()
+UResource* ASpiritPlant::ProduceResource(const EResourceType& Type)
 {
-	UResource* NewResource = UResource::Create(ProductionType, this);
+	UResource* NewResource = UResource::Create(Type, this);
 	ProducedResources.Add(NewResource);
 	NewResource->OnFreed.AddDynamic(this, &ASpiritPlant::ResourceFreed);
 	NewResource->OnAllocated.AddDynamic(this, &ASpiritPlant::ResourceAllocated);
 	bNeedsMoreResource = false;
 	OnProductionChanged.Broadcast();
+	return NewResource;
 }
 
 
@@ -93,6 +98,6 @@ void ASpiritPlant::ReceiveEffectTrigger(const ETileEffectTriggerType TriggerType
 {
 	if (TriggerType == ETileEffectTriggerType::PlantsGrow && bNeedsMoreResource)
 	{
-		ProduceResource();
+		ProduceResource(ProductionType);
 	}
 }

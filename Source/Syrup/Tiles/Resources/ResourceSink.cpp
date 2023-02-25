@@ -98,12 +98,13 @@ bool UResourceSink::CanAllocateResource(UResource* FreedResource) const
  * Undoes the effect of a resource that was sunk in this.
  *
  * @param ResourceToAllocate - The resource that was freed.
+ * @param bForceAllocation - Whether or not to ignore allocation requirements.
  * 
  * @return Whether or not the allocation was successful.
  */
-bool UResourceSink::AllocateResource(UResource* ResourceToAllocate)
+bool UResourceSink::AllocateResource(UResource* ResourceToAllocate, bool bForceAllocation)
 {
-	if (!CanAllocateResource(ResourceToAllocate))
+	if (!CanAllocateResource(ResourceToAllocate) && !bForceAllocation)
 	{
 		return false;
 	}
@@ -111,14 +112,14 @@ bool UResourceSink::AllocateResource(UResource* ResourceToAllocate)
 	ResourceToAllocate->Allocate(this, Data.AllocationType);
 	AllocatedResources.Add(ResourceToAllocate);
 
-	if (Data.bDeferredIncrement)
+	if (Data.bDeferredIncrement && !bForceAllocation)
 	{
 		IncrementsThisTurn++;
 		EventOnAmountChanged.Broadcast(GetAllocationAmount());
 	}
 	else
 	{
-		int NewAmount = GetAllocationAmount() + IncrementsThisTurn * Data.IncrementPerResource;
+		int NewAmount = GetAllocationAmount() + Data.IncrementPerResource;
 		OnAmountChanged.Execute(NewAmount);
 		EventOnAmountChanged.Broadcast(NewAmount);
 	}
