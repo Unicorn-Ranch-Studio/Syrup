@@ -225,6 +225,7 @@ void USyrupSaveGame::UpdateSinkAmounts(const TMap<FIntPoint, ATile*> LocationsTo
 		}
 		UE_LOG(LogSaveGame, Error, TEXT("Sink: %s not found on %s"), *EachSinkDatum.Name.ToString(), *Owner->GetName());
 	nextLoop:
+		;
 	}
 }
 
