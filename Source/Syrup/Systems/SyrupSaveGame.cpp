@@ -79,7 +79,7 @@ void USyrupSaveGame::LoadGame(const UObject* WorldContext, const FString& SlotNa
  *
  * @param Tile - The tile whose data to store.
  */
-void USyrupSaveGame::StoreTileData(ATile* Tile)
+void USyrupSaveGame::StoreTileData(const ATile* Tile)
 {
 	for (TSubclassOf<ATile> EachDynamicTileClass : DynamicTileClasses)
 	{
@@ -90,7 +90,7 @@ void USyrupSaveGame::StoreTileData(ATile* Tile)
 
 			if (TileClass == APlant::StaticClass())
 			{
-				APlant* Plant = Cast<APlant>(Tile);
+				const APlant* Plant = Cast<APlant>(Tile);
 				DamageTakenData.Add(FDamageTakenSaveData(Tile->GetGridTransform().Location, Plant->GetDamageTaken()));
 			}
 			return;
@@ -103,19 +103,23 @@ void USyrupSaveGame::StoreTileData(ATile* Tile)
  * 
  * @param Tile - The tile whose produced resources should be saved.
  */
-void USyrupSaveGame::StoreTileResourceData(ATile* Tile)
+void USyrupSaveGame::StoreTileResourceData(const ATile* Tile)
 {
-	if (IResourceFaucet* EachFaucet = Cast<IResourceFaucet>(Tile))
+	if (const IResourceFaucet* EachFaucet = Cast<IResourceFaucet>(Tile))
 	{
 		FResourceSaveData DataToSave = FResourceSaveData(Tile->GetGridTransform().Location);
 		for (UResource* EachProducedResource : EachFaucet->GetProducedResources())
 		{
 			if (EachProducedResource->IsAllocated())
 			{
-				UResourceSink* LinkedSink = EachProducedResource->GetLinkedSink();
+				const UResourceSink* LinkedSink = EachProducedResource->GetLinkedSink();
+				TScriptInterface<IResourceFaucet> LinkedFaucet;
+				EachProducedResource->GetLinkedFaucet(LinkedFaucet);
 
-				DataToSave.FaucetLocation = LinkedSink->GetOwner<ATile>()->GetGridTransform().Location;
+				DataToSave.FaucetLocation = Cast<ATile>(LinkedFaucet.GetObject())->GetGridTransform().Location;
+				DataToSave.SinkLocation = LinkedSink->GetOwner<ATile>()->GetGridTransform().Location;
 				DataToSave.SinkName = LinkedSink->GetFName();
+				DataToSave.Type = EachProducedResource->GetType();
 
 				ResourceData.Add(DataToSave);
 			}
@@ -128,7 +132,7 @@ void USyrupSaveGame::StoreTileResourceData(ATile* Tile)
  *
  * @param Tile - The tile whose sinks should be saved.
  */
-void USyrupSaveGame::StoreTileSinkData(ATile* Tile)
+void USyrupSaveGame::StoreTileSinkData(const ATile* Tile)
 {
 	TArray<UResourceSink*> Sinks;
 	Tile->GetComponents<UResourceSink>(Sinks);
@@ -151,7 +155,7 @@ void USyrupSaveGame::StoreTileSinkData(ATile* Tile)
  *
  * @param World - The world to destroy tiles in.
  */
-void USyrupSaveGame::DestoryDynamicTiles()
+void USyrupSaveGame::DestoryDynamicTiles() const
 {
 	for (TActorIterator<ATile> EachTile(World); EachTile; ++EachTile)
 	{
@@ -173,7 +177,7 @@ void USyrupSaveGame::DestoryDynamicTiles()
  * @param World - The world to spawn the tiles in.
  * @param LocationsToTiles - Will be set to contain the locations of each tile.
  */
-void USyrupSaveGame::SpawnTiles(TMap<FIntPoint, ATile*>& LocationsToTiles)
+void USyrupSaveGame::SpawnTiles(TMap<FIntPoint, ATile*>& LocationsToTiles) const
 {
 	for (FTileSaveData EachTileDatum : TileData)
 	{
@@ -189,7 +193,7 @@ void USyrupSaveGame::SpawnTiles(TMap<FIntPoint, ATile*>& LocationsToTiles)
  *
  * @param LocationsToTiles - The locations of every tile containing a sink.
  */
-void USyrupSaveGame::UpdateDamageTaken(const TMap<FIntPoint, ATile*> LocationsToTiles)
+void USyrupSaveGame::UpdateDamageTaken(const TMap<FIntPoint, ATile*>& LocationsToTiles) const
 {
 	for (FDamageTakenSaveData EachDamageTakenDatum : DamageTakenData)
 	{
@@ -202,7 +206,7 @@ void USyrupSaveGame::UpdateDamageTaken(const TMap<FIntPoint, ATile*> LocationsTo
  *
  * @param LocationsToTiles - The locations of every damaged plant.
  */
-void USyrupSaveGame::UpdateSinkAmounts(const TMap<FIntPoint, ATile*> LocationsToTiles)
+void USyrupSaveGame::UpdateSinkAmounts(const TMap<FIntPoint, ATile*>& LocationsToTiles) const
 {
 	for (FSinkSaveData EachSinkDatum : SinkData)
 	{
@@ -234,7 +238,7 @@ void USyrupSaveGame::UpdateSinkAmounts(const TMap<FIntPoint, ATile*> LocationsTo
  *
  * @param LocationsToTiles - The locations of every tile containing a sink or faucet.
  */
-void USyrupSaveGame::AllocateResources(const TMap<FIntPoint, ATile*> LocationsToTiles)
+void USyrupSaveGame::AllocateResources(const TMap<FIntPoint, ATile*>& LocationsToTiles) const
 {
 	for (FResourceSaveData ResourceDatum : ResourceData)
 	{
@@ -274,6 +278,7 @@ void USyrupSaveGame::AllocateResources(const TMap<FIntPoint, ATile*> LocationsTo
 		{
 			if (!EachProducedResource->IsAllocated() && EachProducedResource->GetType() == ResourceDatum.Type)
 			{
+				ResourceToAllocate = EachProducedResource;
 				break;
 			}
 		}
@@ -293,7 +298,7 @@ void USyrupSaveGame::AllocateResources(const TMap<FIntPoint, ATile*> LocationsTo
  * @param LocationToSearch - The location to find the tile at.
  * @param LocationsToTiles - The locations of tiles, if LocationToSearch is not contained, the world will be queried.
  */
-ATile* USyrupSaveGame::GetTileAtLocation(const FIntPoint LocationToSearch, const TMap<FIntPoint, ATile*> LocationsToTiles)
+ATile* USyrupSaveGame::GetTileAtLocation(const FIntPoint& LocationToSearch, const TMap<FIntPoint, ATile*>& LocationsToTiles) const
 {
 	if (LocationsToTiles.Contains(LocationToSearch))
 	{

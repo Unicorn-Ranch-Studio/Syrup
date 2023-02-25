@@ -112,7 +112,12 @@ bool UResourceSink::AllocateResource(UResource* ResourceToAllocate, bool bForceA
 	ResourceToAllocate->Allocate(this, Data.AllocationType);
 	AllocatedResources.Add(ResourceToAllocate);
 
-	if (Data.bDeferredIncrement && !bForceAllocation)
+	if (bForceAllocation)
+	{
+		return true;
+	}
+
+	if (Data.bDeferredIncrement)
 	{
 		IncrementsThisTurn++;
 		EventOnAmountChanged.Broadcast(GetAllocationAmount());

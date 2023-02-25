@@ -54,21 +54,21 @@ private:
 	 *
 	 * @param Tile - The tile whose data to store.
 	 */
-	void StoreTileData(ATile* Tile);
+	void StoreTileData(const ATile* Tile);
 
 	/**
 	 * Stores a tile's resources.
 	 *
 	 * @param Tile - The tile whose produced resources should be saved.
 	 */
-	void StoreTileResourceData(ATile* Tile);
+	void StoreTileResourceData(const ATile* Tile);
 
 	/**
 	 * Stores a tile's sinks.
 	 *
 	 * @param Tile - The tile whose sinks should be saved.
 	 */
-	void StoreTileSinkData(ATile* Tile);
+	void StoreTileSinkData(const ATile* Tile);
 
 	/* /\ Saving Helpers /\ *\
 	\* -------------------- */
@@ -81,7 +81,7 @@ private:
 	 * 
 	 * @param World - The world to destroy tiles in.
 	 */
-	void DestoryDynamicTiles();
+	void DestoryDynamicTiles() const;
 
 	/**
 	 * Spawns the tiles from the data stored.
@@ -89,28 +89,35 @@ private:
 	 * @param World - The world to spawn the tiles in.
 	 * @param LocationsToTiles - Will be set to contain the locations of each tile.
 	 */
-	void SpawnTiles(TMap<FIntPoint, ATile*>& LocationsToTiles);
+	void SpawnTiles(TMap<FIntPoint, ATile*>& LocationsToTiles) const;
 
 	/**
 	 * Sets the sink amounts from the data stored.
 	 *
 	 * @param LocationsToTiles - The locations of every tile containing a sink.
 	 */
-	void UpdateSinkAmounts(const TMap<FIntPoint, ATile*> LocationsToTiles = TMap<FIntPoint, ATile*>());
+	void UpdateSinkAmounts(const TMap<FIntPoint, ATile*>& LocationsToTiles = TMap<FIntPoint, ATile*>()) const;
 
 	/**
 	 * Sets the damage taken from the data stored.
 	 *
 	 * @param LocationsToTiles - The locations of every damaged plant.
 	 */
-	void UpdateDamageTaken(const TMap<FIntPoint, ATile*> LocationsToTiles = TMap<FIntPoint, ATile*>());
-	
+	void UpdateDamageTaken(const TMap<FIntPoint, ATile*>& LocationsToTiles = TMap<FIntPoint, ATile*>()) const;
+
+	/**
+	 * Sets the trashfall links from the data stored.
+	 *
+	 * @param LocationsToTiles - The locations of every trash spawned by a trashfall.
+	 */
+	//void UpdateTrashfallLinks(const TMap<FIntPoint, ATile*> LocationsToTiles = TMap<FIntPoint, ATile*>()) const;
+
 	/**
 	 * Allocates all resources from the data stored.
 	 *
 	 * @param LocationsToTiles - The locations of every tile containing a sink or faucet.
 	 */
-	void AllocateResources(const TMap<FIntPoint, ATile*> LocationsToTiles = TMap<FIntPoint, ATile*>());
+	void AllocateResources(const TMap<FIntPoint, ATile*>& LocationsToTiles = TMap<FIntPoint, ATile*>()) const;
 
 	/**
 	 * Gets the tile at a given location.
@@ -119,7 +126,7 @@ private:
 	 * @param LocationToSearch - The location to find the tile at.
 	 * @param LocationsToTiles - The locations of tiles, if LocationToSearch is not contained, the world will be queried.
 	 */
-	ATile* GetTileAtLocation(const FIntPoint LocationToSearch, const TMap<FIntPoint, ATile*> LocationsToTiles = TMap<FIntPoint, ATile*>());
+	ATile* GetTileAtLocation(const FIntPoint& LocationToSearch, const TMap<FIntPoint, ATile*>& LocationsToTiles = TMap<FIntPoint, ATile*>()) const;
 	/* /\ Loading Helpers /\ *\
 	\* --------------------- */
 
