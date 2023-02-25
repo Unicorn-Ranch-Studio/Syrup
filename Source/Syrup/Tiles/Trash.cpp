@@ -100,7 +100,6 @@ bool ATrash::PickUp(int& EnergyReserve)
 	{
 		EnergyReserve -= PickUpCost;
 		ASyrupGameMode::GetTileEffectTriggerDelegate(GetWorld()).Broadcast(ETileEffectTriggerType::TrashPickedUp, this, GetSubTileLocations());
-		ReceiveEffectTrigger(ETileEffectTriggerType::OnDeactivated, nullptr, TSet<FIntPoint>());
 		Destroy();
 		return true;
 	}
