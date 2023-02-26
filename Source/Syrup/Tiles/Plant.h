@@ -198,8 +198,9 @@ public:
 	 *
 	 * @param NewRange - The value to set the range to. Will be clamped >= 0.
 	 */
-	UFUNCTION(BlueprintCallable, Category = "Plant|Effect")
+	UFUNCTION(BlueprintNativeEvent, Category = "Plant|Effect")
 	void SetRange(const int NewRange);
+	void SetRange_Implementation(const int NewRange);
 
 	/**
 	 * Gets the current range of this plant type's effects.

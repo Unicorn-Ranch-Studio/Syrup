@@ -228,7 +228,7 @@ bool APlant::SowPlant(UObject* WorldContextObject, TSubclassOf<APlant> PlantClas
  *
  * @param NewRange - The value to set the range to. Will be clamped >= 0.
  */
-void APlant::SetRange(const int NewRange)
+void APlant::SetRange_Implementation(const int NewRange)
 {
 	TSet<FIntPoint> OldEffectLocations = GetEffectLocations();
 	TSet<FIntPoint> NewEffectLocations = UGridLibrary::ScaleShapeUp(GetSubTileLocations(), FMath::Max(0, NewRange));
