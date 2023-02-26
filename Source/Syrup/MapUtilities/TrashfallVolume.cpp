@@ -32,6 +32,19 @@ void ATrashfallVolume::ResetTrashLocations()
 }
 
 /**
+ * Causes this volume to claim the given trash.
+ *
+ * @param Trash - The trash to claim.
+ */
+UFUNCTION()
+void ATrashfallVolume::ClaimTrash(ATrash* Trash)
+{
+	Trash->OnDestroyed.AddDynamic(this, &ATrashfallVolume::ReciveTrashDestoryed);
+	Trash->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
+	NumTrash++;
+}
+
+/**
  * Links this to the game mode for receiving trigger events.
  */
 void ATrashfallVolume::BeginPlay()
@@ -69,6 +82,7 @@ void ATrashfallVolume::Destroyed()
  */
 void ATrashfallVolume::OnConstruction(const FTransform& Transform)
 {
+	RNG = FRandomStream(SpawnSeed);
 	NumTiles = FMath::Max(1, SpawnArea->GetScaledBoxExtent().SizeSquared2D() / 1558.845726811990);
 	BadLocations = TSet<FIntPoint>();
 
@@ -95,7 +109,7 @@ void ATrashfallVolume::OnConstruction(const FTransform& Transform)
 	{
 		while (NumTrash < NumToMaintain * InitalTrashPercent)
 		{
-			if (!SpawnAllTrash(true))
+			if (!SpawnTrashInBox())
 			{
 				break;
 			}
@@ -117,10 +131,10 @@ void ATrashfallVolume::ReceiveEffectTrigger(const ETileEffectTriggerType Trigger
 	if (TriggerType == ETileEffectTriggerType::TrashSpawn && NumTrash < NumToMaintain)
 	{
 		TrashToSpawn += TurnsBetweenSpawns ? 1 / TurnsBetweenSpawns : NumToMaintain - NumTrash;
-		while (TrashToSpawn >= 1)
+		while (FMath::Min(TrashToSpawn, NumToMaintain - NumTrash) >= 1)
 		{
 			TrashToSpawn--;
-			SpawnAllTrash();
+			SpawnTrashInBox();
 		}
 	}
 }
@@ -130,14 +144,14 @@ void ATrashfallVolume::ReceiveEffectTrigger(const ETileEffectTriggerType Trigger
  * 
  * @param bAttachTrash - Whether or not to attach the trash to this.
  */
-bool ATrashfallVolume::SpawnAllTrash(bool bAttachTrash)
+bool ATrashfallVolume::SpawnTrashInBox()
 {
 	TSet<FIntPoint> RelativeTileLocations = TrashType.GetDefaultObject()->GetRelativeSubTileLocations();
 	int Count = 0;
 	while (Count++ < 50)
 	{
 		//Gets a random transform in spawn area and converts it to a grid transform.
-		FTransform SpawnWorldTransform = FTransform(FQuat(FVector::UpVector, FMath::FRandRange(0.f, TWO_PI)), GetActorTransform().TransformPosition(FMath::RandPointInBox(FBox(-SpawnArea->GetUnscaledBoxExtent(), SpawnArea->GetUnscaledBoxExtent()))));
+		FTransform SpawnWorldTransform = FTransform(FQuat(FVector::UpVector, RNG.FRandRange(0.f, TWO_PI)), GetActorTransform().TransformPosition(RNG.RandPointInBox(FBox(-SpawnArea->GetUnscaledBoxExtent(), SpawnArea->GetUnscaledBoxExtent()))));
 
 		FGridTransform SpawnTransform = UGridLibrary::WorldTransformToGridTransform(SpawnWorldTransform);
 
@@ -163,15 +177,7 @@ bool ATrashfallVolume::SpawnAllTrash(bool bAttachTrash)
 		}
 
 		ATrash* SpawnedTrash = SpawnTrash(SpawnWorldTransform);
-		SpawnedTrash->OnDestroyed.AddDynamic(this, &ATrashfallVolume::ReciveTrashDestoryed);
-		NumTrash++;
-
-		//BadLocations = BadLocations.Union(SpawnLocations);
-
-		if (bAttachTrash)
-		{
-			SpawnedTrash->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
-		}
+		ClaimTrash(SpawnedTrash);		
 		return true;
 		endOfLoop:;
 	}

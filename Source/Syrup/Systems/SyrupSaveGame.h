@@ -6,6 +6,7 @@
 #include "TileSaveData.h"
 #include "SinkSaveData.h"
 #include "DamageTakenSaveData.h"
+#include "TrashfallSaveData.h"
 
 #include "CoreMinimal.h"
 #include "GameFramework/SaveGame.h"
@@ -78,55 +79,39 @@ private:
 
 	/**
 	 * Destroys all tiles that could have been spawned during runtime.
-	 * 
-	 * @param World - The world to destroy tiles in.
 	 */
 	void DestoryDynamicTiles() const;
 
 	/**
 	 * Spawns the tiles from the data stored.
-	 * 
-	 * @param World - The world to spawn the tiles in.
-	 * @param LocationsToTiles - Will be set to contain the locations of each tile.
 	 */
-	void SpawnTiles(TMap<FIntPoint, ATile*>& LocationsToTiles) const;
+	void SpawnTiles();
 
 	/**
 	 * Sets the sink amounts from the data stored.
-	 *
-	 * @param LocationsToTiles - The locations of every tile containing a sink.
 	 */
-	void UpdateSinkAmounts(const TMap<FIntPoint, ATile*>& LocationsToTiles = TMap<FIntPoint, ATile*>()) const;
+	void UpdateSinkAmounts() const;
 
 	/**
 	 * Sets the damage taken from the data stored.
-	 *
-	 * @param LocationsToTiles - The locations of every damaged plant.
 	 */
-	void UpdateDamageTaken(const TMap<FIntPoint, ATile*>& LocationsToTiles = TMap<FIntPoint, ATile*>()) const;
-
-	/**
-	 * Sets the trashfall links from the data stored.
-	 *
-	 * @param LocationsToTiles - The locations of every trash spawned by a trashfall.
-	 */
-	//void UpdateTrashfallLinks(const TMap<FIntPoint, ATile*> LocationsToTiles = TMap<FIntPoint, ATile*>()) const;
+	void UpdateDamageTaken() const;
 
 	/**
 	 * Allocates all resources from the data stored.
-	 *
-	 * @param LocationsToTiles - The locations of every tile containing a sink or faucet.
 	 */
-	void AllocateResources(const TMap<FIntPoint, ATile*>& LocationsToTiles = TMap<FIntPoint, ATile*>()) const;
+	void AllocateResources() const;
+
+	/**
+	 * Sets the trashfall links from the data stored.
+	 */
+	void UpdateTrashfallLinks() const;
 
 	/**
 	 * Gets the tile at a given location.
-	 * 
-	 * @param WorldContext - An object in the world to query as a fallback.
-	 * @param LocationToSearch - The location to find the tile at.
-	 * @param LocationsToTiles - The locations of tiles, if LocationToSearch is not contained, the world will be queried.
 	 */
-	ATile* GetTileAtLocation(const FIntPoint& LocationToSearch, const TMap<FIntPoint, ATile*>& LocationsToTiles = TMap<FIntPoint, ATile*>()) const;
+	ATile* GetTileAtLocation(const FIntPoint& LocationToSearch) const;
+
 	/* /\ Loading Helpers /\ *\
 	\* --------------------- */
 
@@ -145,6 +130,17 @@ private:
 	//Stores the amount stored in each sink.
 	UPROPERTY()
 	TArray<FDamageTakenSaveData> DamageTakenData = TArray<FDamageTakenSaveData>();
+	
+	//Stores the amount stored in each sink.
+	UPROPERTY()
+	TArray<FTrashfallSaveData> TrashfallData = TArray<FTrashfallSaveData>();
+
+	//Stores the players location.
+	UPROPERTY()
+	FVector PlayerLocation;
+
+	//All of the potentially relevant for data loading tile locations.
+	TMap<FIntPoint, ATile*> LocationsToTiles = TMap<FIntPoint, ATile*>();
 
 	//The classes to save the tile data for.
 	TArray<TSubclassOf<ATile>> DynamicTileClasses;

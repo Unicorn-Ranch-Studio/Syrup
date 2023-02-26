@@ -9,6 +9,7 @@
 #include "Syrup/Tiles/Trash.h"
 #include "Syrup/Tiles/Resources/ResourceFaucet.h"
 #include "Syrup/Tiles/Resources/Resource.h"
+#include "Syrup/MapUtilities/TrashfallVolume.h"
 
 DEFINE_LOG_CATEGORY(LogSaveGame);
 
@@ -42,6 +43,7 @@ void USyrupSaveGame::SaveGame(const UObject* WorldContext, const FString& SlotNa
 		Save->StoreTileSinkData(*EachTile);
 		Save->StoreTileResourceData(*EachTile);
 	}
+	Save->PlayerLocation = UGameplayStatics::GetPlayerPawn(WorldContext, 0)->GetActorLocation();
 
 	UGameplayStatics::SaveGameToSlot(Save, SlotName, 0);
 }
@@ -64,11 +66,12 @@ void USyrupSaveGame::LoadGame(const UObject* WorldContext, const FString& SlotNa
 
 	Save->DestoryDynamicTiles();
 
-	TMap<FIntPoint, ATile*> LocationsToTiles = TMap<FIntPoint, ATile*>();
-	Save->SpawnTiles(LocationsToTiles);
-	Save->UpdateSinkAmounts(LocationsToTiles);
-	Save->UpdateDamageTaken(LocationsToTiles);
-	Save->AllocateResources(LocationsToTiles);
+	Save->SpawnTiles();
+	Save->UpdateSinkAmounts();
+	Save->UpdateDamageTaken();
+	Save->AllocateResources();
+	Save->UpdateTrashfallLinks();
+	UGameplayStatics::GetPlayerPawn(WorldContext, 0)->SetActorLocation(Save->PlayerLocation);
 }
 
 /* -------------------- *\
@@ -88,10 +91,18 @@ void USyrupSaveGame::StoreTileData(const ATile* Tile)
 			TSubclassOf<ATile> TileClass = Tile->GetClass();
 			TileData.Add(FTileSaveData(Tile->GetGridTransform(), TileClass));
 
-			if (TileClass == APlant::StaticClass())
+			if (Tile->IsA(APlant::StaticClass()))
 			{
 				const APlant* Plant = Cast<APlant>(Tile);
 				DamageTakenData.Add(FDamageTakenSaveData(Tile->GetGridTransform().Location, Plant->GetDamageTaken()));
+			}
+			else if (Tile->IsA(ATrash::StaticClass()))
+			{
+				ATrashfallVolume* ParentVolume = Cast<ATrashfallVolume>(Tile->GetRootComponent()->GetAttachParentActor());
+				if (IsValid(ParentVolume))
+				{
+					TrashfallData.Add(FTrashfallSaveData(Tile->GetGridTransform().Location, ParentVolume));
+				}
 			}
 			return;
 		}
@@ -152,8 +163,6 @@ void USyrupSaveGame::StoreTileSinkData(const ATile* Tile)
 
 /**
  * Destroys all tiles that could have been spawned during runtime.
- *
- * @param World - The world to destroy tiles in.
  */
 void USyrupSaveGame::DestoryDynamicTiles() const
 {
@@ -173,11 +182,8 @@ void USyrupSaveGame::DestoryDynamicTiles() const
 
 /**
  * Spawns the tiles from the data stored.
- *
- * @param World - The world to spawn the tiles in.
- * @param LocationsToTiles - Will be set to contain the locations of each tile.
  */
-void USyrupSaveGame::SpawnTiles(TMap<FIntPoint, ATile*>& LocationsToTiles) const
+void USyrupSaveGame::SpawnTiles()
 {
 	for (FTileSaveData EachTileDatum : TileData)
 	{
@@ -190,27 +196,23 @@ void USyrupSaveGame::SpawnTiles(TMap<FIntPoint, ATile*>& LocationsToTiles) const
 
 /**
  * Sets the sink amounts from the data stored.
- *
- * @param LocationsToTiles - The locations of every tile containing a sink.
  */
-void USyrupSaveGame::UpdateDamageTaken(const TMap<FIntPoint, ATile*>& LocationsToTiles) const
+void USyrupSaveGame::UpdateDamageTaken() const
 {
 	for (FDamageTakenSaveData EachDamageTakenDatum : DamageTakenData)
 	{
-		Cast<APlant>(GetTileAtLocation(EachDamageTakenDatum.Location, LocationsToTiles))->SetDamageTaken(EachDamageTakenDatum.Amount);
+		Cast<APlant>(GetTileAtLocation(EachDamageTakenDatum.Location))->SetDamageTaken(EachDamageTakenDatum.Amount);
 	}
 }
 
 /**
  * Sets the damage taken from the data stored.
- *
- * @param LocationsToTiles - The locations of every damaged plant.
  */
-void USyrupSaveGame::UpdateSinkAmounts(const TMap<FIntPoint, ATile*>& LocationsToTiles) const
+void USyrupSaveGame::UpdateSinkAmounts() const
 {
 	for (FSinkSaveData EachSinkDatum : SinkData)
 	{
-		AActor* Owner = GetTileAtLocation(EachSinkDatum.Location, LocationsToTiles);
+		AActor* Owner = GetTileAtLocation(EachSinkDatum.Location);
 		if (!IsValid(Owner))
 		{
 			UE_LOG(LogSaveGame, Error, TEXT("Sink: %s Owner not found at %s"), *EachSinkDatum.Name.ToString(), *EachSinkDatum.Location.ToString());
@@ -235,10 +237,8 @@ void USyrupSaveGame::UpdateSinkAmounts(const TMap<FIntPoint, ATile*>& LocationsT
 
 /**
  * Allocates all resources from the data stored.
- *
- * @param LocationsToTiles - The locations of every tile containing a sink or faucet.
  */
-void USyrupSaveGame::AllocateResources(const TMap<FIntPoint, ATile*>& LocationsToTiles) const
+void USyrupSaveGame::AllocateResources() const
 {
 	for (FResourceSaveData ResourceDatum : ResourceData)
 	{
@@ -293,12 +293,20 @@ void USyrupSaveGame::AllocateResources(const TMap<FIntPoint, ATile*>& LocationsT
 
 
 /**
- * Gets the tile at a given location.
- *
- * @param LocationToSearch - The location to find the tile at.
- * @param LocationsToTiles - The locations of tiles, if LocationToSearch is not contained, the world will be queried.
+ * Sets the trashfall links from the data stored.
  */
-ATile* USyrupSaveGame::GetTileAtLocation(const FIntPoint& LocationToSearch, const TMap<FIntPoint, ATile*>& LocationsToTiles) const
+void USyrupSaveGame::UpdateTrashfallLinks() const
+{
+	for (FTrashfallSaveData EachTrashfallDatum : TrashfallData)
+	{
+		EachTrashfallDatum.Volume->ClaimTrash(Cast<ATrash>(GetTileAtLocation(EachTrashfallDatum.TrashLocation)));
+	}
+}
+
+/**
+ * Gets the tile at a given location.
+ */
+ATile* USyrupSaveGame::GetTileAtLocation(const FIntPoint& LocationToSearch) const
 {
 	if (LocationsToTiles.Contains(LocationToSearch))
 	{

@@ -35,6 +35,20 @@ public:
 	UFUNCTION(CallInEditor, Category = "Trashfall")
 	void ResetTrashLocations();
 
+	/**
+	 * Causes this volume to claim the given trash.
+	 * 
+	 * @param Trash - The trash to claim.
+	 */
+	UFUNCTION()
+	void ClaimTrash(ATrash* Trash);
+
+	/**
+	 * Respawns all trash spawned by this
+	 */
+	UFUNCTION(CallInEditor, Category = "Trashfall")
+	FORCEINLINE void RandomizeSeed() { SpawnSeed = FMath::Rand(); };
+
 	//The type of trash that will fall in this volume.
 	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = "Trashfall", Meta=(AllowAbstract = "false"))
 	TSubclassOf<ATrash> TrashType;
@@ -50,6 +64,11 @@ public:
 	//Whether or not this volume should already be at capacity when the game starts.
 	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = "Trashfall", Meta = (ClampMin = "0", ClampMax = "1"))
 	float InitalTrashPercent = 1;
+
+	//The seed to use for trash spawning.
+	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = "Trashfall")
+	int SpawnSeed = 1;
+
 protected:
 	//The area in which this will attempt to spawn trash.
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
@@ -97,17 +116,13 @@ private:
 	UFUNCTION()
 	FORCEINLINE void ReciveTrashDestoryed(AActor* DestroyedActor) { NumTrash--;};
 
-	
-
 	/**
 	 * Spawns a single trash inside the spawn area.
-	 * 
-	 * @param bAttachTrash - Whether or not to attach the trash to this.
 	 * 
 	 * @return Whether or not a trash was sucessfuly spawned.
 	 */
 	UFUNCTION()
-	bool SpawnAllTrash(bool bAttachTrash = false);
+	bool SpawnTrashInBox();
 
 	//The number of trash existing trash that has been spawned by this.
 	UPROPERTY()
@@ -124,4 +139,8 @@ private:
 	//Locations known to block trash spawning.
 	UPROPERTY()
 	TSet<FIntPoint> BadLocations = TSet<FIntPoint>();
+
+	//The random number generator used for trash spawning.
+	UPROPERTY()
+	FRandomStream RNG = FRandomStream();
 };
