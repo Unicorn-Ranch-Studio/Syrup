@@ -215,7 +215,7 @@ void USyrupSaveGame::UpdateSinkAmounts() const
 		AActor* Owner = GetTileAtLocation(EachSinkDatum.Location);
 		if (!IsValid(Owner))
 		{
-			UE_LOG(LogSaveGame, Error, TEXT("Sink: %s Owner not found at %s"), *EachSinkDatum.Name.ToString(), *EachSinkDatum.Location.ToString());
+			UE_LOG(LogSaveGame, Error, TEXT("Loading Failed: Sink %s Owner not found at %s"), *EachSinkDatum.Name.ToString(), *EachSinkDatum.Location.ToString());
 		}
 
 		TArray<UResourceSink*> Sinks;
@@ -229,7 +229,7 @@ void USyrupSaveGame::UpdateSinkAmounts() const
 				goto nextLoop;
 			}
 		}
-		UE_LOG(LogSaveGame, Error, TEXT("Sink: %s not found on %s"), *EachSinkDatum.Name.ToString(), *Owner->GetName());
+		UE_LOG(LogSaveGame, Error, TEXT("Loading Failed: Sink %s not found on %s"), *EachSinkDatum.Name.ToString(), *Owner->GetName());
 	nextLoop:
 		;
 	}
@@ -245,14 +245,14 @@ void USyrupSaveGame::AllocateResources() const
 		IResourceFaucet* Faucet = Cast<IResourceFaucet>(GetTileAtLocation(ResourceDatum.FaucetLocation));
 		if (!Faucet)
 		{
-			UE_LOG(LogSaveGame, Error, TEXT("Allocating resource from %s to the %s at %s failed to find faucet."), *ResourceDatum.FaucetLocation.ToString(), *ResourceDatum.SinkName.ToString(), *ResourceDatum.SinkLocation.ToString());
+			UE_LOG(LogSaveGame, Error, TEXT("Loading Failed: Allocating resource from %s to the %s at %s failed to find faucet."), *ResourceDatum.FaucetLocation.ToString(), *ResourceDatum.SinkName.ToString(), *ResourceDatum.SinkLocation.ToString());
 			continue;
 		}
 
 		ATile* SinkOwner = GetTileAtLocation(ResourceDatum.SinkLocation);
 		if (!IsValid(SinkOwner))
 		{
-			UE_LOG(LogSaveGame, Error, TEXT("Allocating resource from %s to the %s at %s failed to find sink owner."), *ResourceDatum.FaucetLocation.ToString(), *ResourceDatum.SinkName.ToString(), *ResourceDatum.SinkLocation.ToString());
+			UE_LOG(LogSaveGame, Error, TEXT("Loading Failed: Allocating resource from %s to the %s at %s failed to find sink owner."), *ResourceDatum.FaucetLocation.ToString(), *ResourceDatum.SinkName.ToString(), *ResourceDatum.SinkLocation.ToString());
 			continue;
 		}
 
@@ -269,7 +269,7 @@ void USyrupSaveGame::AllocateResources() const
 		}
 		if (!IsValid(Sink))
 		{
-			UE_LOG(LogSaveGame, Error, TEXT("Allocating resource from %s to the %s at %s failed to find sink."), *ResourceDatum.FaucetLocation.ToString(), *ResourceDatum.SinkName.ToString(), *ResourceDatum.SinkLocation.ToString());
+			UE_LOG(LogSaveGame, Error, TEXT("Loading Failed: Allocating resource from %s to the %s at %s failed to find sink."), *ResourceDatum.FaucetLocation.ToString(), *ResourceDatum.SinkName.ToString(), *ResourceDatum.SinkLocation.ToString());
 			continue;
 		}
 
@@ -299,7 +299,11 @@ void USyrupSaveGame::UpdateTrashfallLinks() const
 {
 	for (FTrashfallSaveData EachTrashfallDatum : TrashfallData)
 	{
-		EachTrashfallDatum.Volume->ClaimTrash(Cast<ATrash>(GetTileAtLocation(EachTrashfallDatum.TrashLocation)));
+		if (IsValid(EachTrashfallDatum.Volume))
+		{
+			EachTrashfallDatum.Volume->ClaimTrash(Cast<ATrash>(GetTileAtLocation(EachTrashfallDatum.TrashLocation)));
+		}
+		UE_LOG(LogSaveGame, Error, TEXT("Loading Failed: Cant find trashfall volume"))
 	}
 }
 
