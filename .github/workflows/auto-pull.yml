@@ -5,12 +5,17 @@ on:
     - cron: '0 0 * * *' # Runs every day at midnight UTC
 
 jobs:
-  pull:
+  update-branches:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout
+    - name: Checkout code
       uses: actions/checkout@v2
-    - name: Pull from master
+      with:
+        ref: master
+    - name: Update branches
       run: |
-        git checkout master
-        git pull origin master
+        for branch in $(git branch --format='%(refname:short)'); do
+          if [ "$branch" != "master" ]; then
+            git checkout "$branch" && git pull origin master
+          fi
+        done
