@@ -7,6 +7,32 @@
 #include "Resources/Resource.h"
 
 /**
+ * Ensures there is one and only one free resource available here.
+ */
+UFUNCTION()
+void ASpiritPlant::EnsureValidResourceQuantity()
+{
+	bool bFreeResourceFound = false;
+	for (UResource* EachProducedResource : GetProducedResources())
+	{
+		if (!EachProducedResource->IsAllocated())
+		{
+			if (bFreeResourceFound)
+			{
+				ProducedResources.Remove(EachProducedResource);
+				OnProductionChanged.Broadcast();
+			}
+			bFreeResourceFound = true;
+		}
+	}
+
+	if (!bFreeResourceFound)
+	{
+		ProduceResource(ProductionType);
+	}
+}
+
+/**
  * Creates a resource.
  */
 void ASpiritPlant::BeginPlay()

@@ -18,6 +18,13 @@ class SYRUP_API ASpiritPlant : public ATile, public IResourceFaucet
 {
 	GENERATED_BODY()
 
+public:
+    /**
+     * Ensures there is one and only one free resource available here.
+     */
+    UFUNCTION()
+    void EnsureValidResourceQuantity();
+
 protected:
     //The type of resource produced by this.
     UPROPERTY(EditAnywhere, BlueprintReadOnly)

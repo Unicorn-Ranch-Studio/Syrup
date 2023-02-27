@@ -6,6 +6,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "EngineUtils.h"
 #include "Syrup/Tiles/Plant.h"
+#include "Syrup/Tiles/SpiritPlant.h"
 #include "Syrup/Tiles/Trash.h"
 #include "Syrup/Tiles/Resources/ResourceFaucet.h"
 #include "Syrup/Tiles/Resources/Resource.h"
@@ -294,6 +295,12 @@ void USyrupSaveGame::AllocateResources() const
 		}
 
 		Sink->AllocateResource(ResourceToAllocate, true);
+
+		ASpiritPlant* SpiritPlant = Cast<ASpiritPlant>(Faucet);
+		if (IsValid(SpiritPlant))
+		{
+			SpiritPlant->EnsureValidResourceQuantity();
+		}
 	}
 }
 
