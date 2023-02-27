@@ -201,7 +201,13 @@ void USyrupSaveGame::UpdateDamageTaken() const
 {
 	for (FDamageTakenSaveData EachDamageTakenDatum : DamageTakenData)
 	{
-		Cast<APlant>(GetTileAtLocation(EachDamageTakenDatum.Location))->SetDamageTaken(EachDamageTakenDatum.Amount);
+		APlant* Plant = Cast<APlant>(GetTileAtLocation(EachDamageTakenDatum.Location));
+		if (!IsValid(Plant))
+		{
+			UE_LOG(LogSaveGame, Error, TEXT("Loading Failed: Can't find damaged plant at %s."), *EachDamageTakenDatum.Location.ToString());
+			continue;
+		}
+		Plant->SetDamageTaken(EachDamageTakenDatum.Amount);
 	}
 }
 
