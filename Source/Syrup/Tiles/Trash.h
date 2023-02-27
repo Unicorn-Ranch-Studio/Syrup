@@ -119,8 +119,9 @@ public:
 	 *
 	 * @param NewRange - The value to set the range to. Will be clamped >= 0.
 	 */
-	UFUNCTION(BlueprintCallable, Category = "Trash|Effect")
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Trash|Effect")
 	void SetRange(const int NewRange);
+	void SetRange_Implementation(const int NewRange);
 
 	/**
 	 * Gets the range of this trash's effects.
