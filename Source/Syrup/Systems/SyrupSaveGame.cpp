@@ -11,6 +11,7 @@
 #include "Syrup/Tiles/Resources/ResourceFaucet.h"
 #include "Syrup/Tiles/Resources/Resource.h"
 #include "Syrup/MapUtilities/TrashfallVolume.h"
+#include "SyrupGameMode.h"
 
 DEFINE_LOG_CATEGORY(LogSaveGame);
 
@@ -45,6 +46,7 @@ void USyrupSaveGame::SaveGame(const UObject* WorldContext, const FString& SlotNa
 		Save->StoreTileResourceData(*EachTile);
 	}
 	Save->PlayerLocation = UGameplayStatics::GetPlayerPawn(WorldContext, 0)->GetActorLocation();
+	Save->DayNumber = Cast<ASyrupGameMode>(UGameplayStatics::GetGameMode(WorldContext))->DayNumber;
 
 	UGameplayStatics::SaveGameToSlot(Save, SlotName, 0);
 }
@@ -73,6 +75,7 @@ void USyrupSaveGame::LoadGame(const UObject* WorldContext, const FString& SlotNa
 	Save->AllocateResources();
 	Save->UpdateTrashfallLinks();
 	UGameplayStatics::GetPlayerPawn(WorldContext, 0)->SetActorLocation(Save->PlayerLocation);
+	Cast<ASyrupGameMode>(UGameplayStatics::GetGameMode(WorldContext))->DayNumber = Save->DayNumber;
 }
 
 /* -------------------- *\
@@ -316,7 +319,10 @@ void USyrupSaveGame::UpdateTrashfallLinks() const
 		{
 			EachTrashfallDatum.Volume->ClaimTrash(Cast<ATrash>(GetTileAtLocation(EachTrashfallDatum.TrashLocation)));
 		}
-		UE_LOG(LogSaveGame, Error, TEXT("Loading Failed: Cant find trashfall volume"))
+		else
+		{
+			UE_LOG(LogSaveGame, Error, TEXT("Loading Failed: Cant find trashfall volume"))
+		}
 	}
 }
 

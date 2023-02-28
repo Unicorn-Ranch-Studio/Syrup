@@ -139,6 +139,10 @@ private:
 	UPROPERTY()
 	FVector PlayerLocation;
 
+	//Number of days that have passed +1.
+	UPROPERTY()
+	int DayNumber = 1;
+
 	//All of the potentially relevant for data loading tile locations.
 	TMap<FIntPoint, ATile*> LocationsToTiles = TMap<FIntPoint, ATile*>();
 

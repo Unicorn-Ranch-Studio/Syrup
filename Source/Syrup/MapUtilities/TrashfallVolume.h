@@ -131,10 +131,6 @@ private:
 	//The approximate number of tiles inside this volume.
 	UPROPERTY()
 	int NumTiles = 0;
-	
-	//The number of trash to spawn next turn.
-	UPROPERTY()
-	float TrashToSpawn = 0;
 
 	//Locations known to block trash spawning.
 	UPROPERTY()

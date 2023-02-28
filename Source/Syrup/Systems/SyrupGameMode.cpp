@@ -92,6 +92,7 @@ void ASyrupGameMode::TriggerPhaseEvent(const ETileEffectTriggerType TriggerType)
 
 	if (TriggerType == LAST_PHASE_TRIGGER)
 	{
+		DayNumber++;
 		bIsPlayerTurn = true;
 	}
 }

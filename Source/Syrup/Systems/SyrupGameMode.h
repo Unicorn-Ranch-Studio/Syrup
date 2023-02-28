@@ -50,6 +50,10 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Player Turn", Meta = (WorldContext = "WorldContextObject"))
 	static bool IsPlayerTurn(const UObject* WorldContextObject);
 
+	//Number of days that have passed +1.
+	UPROPERTY(BlueprintReadOnly)
+	int DayNumber = 1;
+
 protected:
 
 	/**

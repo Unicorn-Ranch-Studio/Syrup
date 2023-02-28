@@ -2,6 +2,7 @@
 
 #include "TrashfallVolume.h"
 
+#include "Kismet/GameplayStatics.h"
 #include "Syrup/Systems/SyrupGameMode.h"
 #include "Syrup/Tiles/GridLibrary.h"
 #include "Syrup/Tiles/Trash.h"
@@ -130,8 +131,18 @@ void ATrashfallVolume::ReceiveEffectTrigger(const ETileEffectTriggerType Trigger
 
 	if (TriggerType == ETileEffectTriggerType::TrashSpawn && NumTrash < NumToMaintain)
 	{
-		TrashToSpawn += TurnsBetweenSpawns ? 1 / TurnsBetweenSpawns : NumToMaintain - NumTrash;
-		while (FMath::Min(TrashToSpawn, NumToMaintain - NumTrash) >= 1)
+		int TrashToSpawn = 0;
+		if (TurnsBetweenSpawns)
+		{
+			int TrashPerTurn = 1 / TurnsBetweenSpawns;
+			int YesterdayDayNumber = Cast<ASyrupGameMode>(UGameplayStatics::GetGameMode(this))->DayNumber - 1;
+			TrashToSpawn = FMath::Min(TrashPerTurn + FMath::Frac(TrashPerTurn * YesterdayDayNumber), NumToMaintain - NumTrash);
+		}
+		else
+		{
+			TrashToSpawn = NumToMaintain - NumTrash;
+		}
+		while (TrashToSpawn >= 1)
 		{
 			TrashToSpawn--;
 			SpawnTrashInBox();
